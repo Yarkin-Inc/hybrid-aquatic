@@ -19,7 +19,7 @@ import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.StateDefinition
 import net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED
-import net.minecraft.world.level.block.state.properties.DirectionProperty
+import net.minecraft.world.level.block.state.properties.EnumProperty
 import net.minecraft.world.level.material.FluidState
 import net.minecraft.world.level.material.Fluids
 import net.minecraft.world.level.pathfinder.PathComputationType
@@ -39,7 +39,7 @@ open class BellBuoyBlock(settings: Properties) : Block(settings), EntityBlock, S
     }
 
     override fun getRenderShape(state: BlockState): RenderShape {
-        return RenderShape.ENTITYBLOCK_ANIMATED
+        return RenderShape.INVISIBLE
     }
 
     override fun newBlockEntity(pos: BlockPos, state: BlockState): BlockEntity {
@@ -75,20 +75,15 @@ open class BellBuoyBlock(settings: Properties) : Block(settings), EntityBlock, S
 
     override fun updateShape(
         state: BlockState,
-        direction: Direction,
-        neighborState: BlockState,
-        world: LevelAccessor,
+        world: net.minecraft.world.level.LevelReader,
+        tickAccess: net.minecraft.world.level.ScheduledTickAccess,
         pos: BlockPos,
+        direction: Direction,
         neighborPos: BlockPos,
+        neighborState: BlockState,
+        random: net.minecraft.util.RandomSource,
     ): BlockState {
-        return if (canSurvive(state, world, pos)) super.updateShape(
-            state,
-            direction,
-            neighborState,
-            world,
-            pos,
-            neighborPos
-        )
+        return if (canSurvive(state, world, pos)) super.updateShape(state, world, tickAccess, pos, direction, neighborPos, neighborState, random)
         else Blocks.AIR.defaultBlockState()
     }
 
@@ -124,7 +119,7 @@ open class BellBuoyBlock(settings: Properties) : Block(settings), EntityBlock, S
     }
 
     companion object {
-        val FACING: DirectionProperty = HorizontalDirectionalBlock.FACING
+        val FACING: EnumProperty<Direction> = HorizontalDirectionalBlock.FACING
 
         private val CUBE_SHAPE: VoxelShape = box(0.5, 3.0, 0.5, 15.5, 16.0, 15.5)
         private val POLE_SHAPE: VoxelShape = box(6.0, 16.0, 6.0, 10.0, 42.0, 10.0)

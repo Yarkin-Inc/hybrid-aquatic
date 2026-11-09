@@ -1,5 +1,6 @@
 package dev.hybridlabs.aquatic.entity.jellyfish
 
+import dev.hybridlabs.hapi.entity.VariantHolder
 import dev.hybridlabs.aquatic.entity.HAEntityTypes
 import dev.hybridlabs.hapi.entity.base.aquatic.BaseJellyfishEntity
 import net.minecraft.nbt.CompoundTag
@@ -64,7 +65,7 @@ class SeaNettleEntity(entityType: EntityType<out SeaNettleEntity>, world: Level)
                 )
 
                 fun byName(name: String?): Type {
-                    return CODEC.byName(name, PACIFIC) as Type
+                    return CODEC.byName(name ?: "", PACIFIC) as Type
                 }
 
                 fun fromId(id: Int): Type {
@@ -77,7 +78,7 @@ class SeaNettleEntity(entityType: EntityType<out SeaNettleEntity>, world: Level)
     override fun finalizeSpawn(
         world: ServerLevelAccessor,
         difficulty: DifficultyInstance,
-        spawnReason: MobSpawnType,
+        spawnReason: EntitySpawnReason,
         entityData: SpawnGroupData?
     ): SpawnGroupData? {
         val spawnData = super.finalizeSpawn(world, difficulty, spawnReason, entityData)
@@ -85,14 +86,14 @@ class SeaNettleEntity(entityType: EntityType<out SeaNettleEntity>, world: Level)
         val variant = Type.entries.random(Random).id
         this.variant = Type.fromId(variant)
 
-        if (spawnReason == MobSpawnType.CHUNK_GENERATION || spawnReason == MobSpawnType.NATURAL) {
+        if (spawnReason == EntitySpawnReason.CHUNK_GENERATION || spawnReason == EntitySpawnReason.NATURAL) {
             val jellyfishCount = (this.maxSpawnClusterSize * this.random.nextFloat()).toInt()
             if (jellyfishCount > 0 && !level().isClientSide()) {
                 for (i in 0 until  jellyfishCount) {
                     val distance = 1.5f
                     val entity = SeaNettleEntity(HAEntityTypes.SEA_NETTLE.get(), this.level())
                     entity.variant = this.variant
-                    entity.moveTo(
+                    entity.snapTo(
                         this.x + this.random.nextFloat() * distance,
                         this.y + this.random.nextFloat() * distance,
                         this.z + this.random.nextFloat() * distance
@@ -110,13 +111,13 @@ class SeaNettleEntity(entityType: EntityType<out SeaNettleEntity>, world: Level)
         super.defineSynchedData(builder)
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
+    override fun addAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueOutput) {
         compound.putString("Type", this.variant.serializedName)
         super.addAdditionalSaveData(compound)
     }
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
-        this.variant = Type.byName(compound.getString("Type"))
+    override fun readAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueInput) {
+        this.variant = Type.byName(compound.getStringOr("Type", ""))
         super.readAdditionalSaveData(compound)
     }
     //#endregion

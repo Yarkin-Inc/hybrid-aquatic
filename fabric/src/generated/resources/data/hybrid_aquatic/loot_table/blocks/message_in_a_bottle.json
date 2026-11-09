@@ -9,37 +9,29 @@
           "children": [
             {
               "type": "minecraft:item",
-              "conditions": [
-                {
-                  "condition": "minecraft:match_tool",
-                  "predicate": {
-                    "predicates": {
-                      "minecraft:enchantments": [
-                        {
-                          "enchantments": "minecraft:silk_touch",
-                          "levels": {
-                            "min": 1
-                          }
+              "name": "hybrid_aquatic:message_in_a_bottle",
+              "modifier": {
+                "type": "minecraft:copy_components",
+                "source": "block_entity",
+                "include": [
+                  "minecraft:block_entity_data"
+                ]
+              },
+              "condition": {
+                "predicate": {
+                  "predicates": {
+                    "minecraft:enchantments": [
+                      {
+                        "enchantments": "minecraft:silk_touch",
+                        "levels": {
+                          "min": 1
                         }
-                      ]
-                    }
+                      }
+                    ]
                   }
-                }
-              ],
-              "functions": [
-                {
-                  "function": "minecraft:copy_custom_data",
-                  "ops": [
-                    {
-                      "op": "replace",
-                      "source": "variant",
-                      "target": "variant"
-                    }
-                  ],
-                  "source": "block_entity"
-                }
-              ],
-              "name": "hybrid_aquatic:message_in_a_bottle"
+                },
+                "type": "minecraft:match_tool"
+              }
             },
             {
               "type": "minecraft:loot_table",

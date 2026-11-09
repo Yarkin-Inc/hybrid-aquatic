@@ -15,17 +15,17 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.biome.Biome
 import net.minecraft.world.level.biome.Biomes
 import net.minecraft.world.level.block.Blocks
-import net.minecraft.world.level.levelgen.SurfaceRules.DEEP_UNDER_FLOOR
-import net.minecraft.world.level.levelgen.SurfaceRules.ON_FLOOR
-import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource
-import net.minecraft.world.level.levelgen.SurfaceRules.UNDER_FLOOR
-import net.minecraft.world.level.levelgen.SurfaceRules.abovePreliminarySurface
-import net.minecraft.world.level.levelgen.SurfaceRules.ifTrue
-import net.minecraft.world.level.levelgen.SurfaceRules.isBiome
-import net.minecraft.world.level.levelgen.SurfaceRules.sequence
-import net.minecraft.world.level.levelgen.SurfaceRules.state
+import net.minecraft.world.level.levelgen.material.rule.MaterialRule as RuleSource
+import net.minecraft.world.level.levelgen.material.MaterialRules.abovePreliminarySurface
+import net.minecraft.world.level.levelgen.material.MaterialRules.ifTrue
+import net.minecraft.world.level.levelgen.material.MaterialRules.isBiome
+import net.minecraft.world.level.levelgen.material.MaterialRules.sequence
+import net.minecraft.world.level.levelgen.material.MaterialRules.state
 
 object HABiomes {
+    private val ON_FLOOR = net.minecraft.world.level.levelgen.material.MaterialRules.stoneDepthCheck(0, false, net.minecraft.world.level.levelgen.placement.CaveSurface.FLOOR)
+    private val UNDER_FLOOR = net.minecraft.world.level.levelgen.material.MaterialRules.stoneDepthCheck(0, true, net.minecraft.world.level.levelgen.placement.CaveSurface.FLOOR)
+    private val DEEP_UNDER_FLOOR = net.minecraft.world.level.levelgen.material.MaterialRules.stoneDepthCheck(0, true, 6, net.minecraft.world.level.levelgen.placement.CaveSurface.FLOOR)
     val config = ConfigHelper.initializeConfig(CommonClass.CONFIG_FILE)
 
     val TIDE_POOLS: ResourceKey<Biome> = ResourceKey.create(Registries.BIOME, CommonClass.locate("tide_pools"))
@@ -151,12 +151,12 @@ object HABiomes {
         register(
             ResourceKey.create(
                 LithostitchedRegistries.WORLDGEN_MODIFIER,
-                CommonClass.locate("surface_rule/${biome.location().path}")
+                CommonClass.locate("surface_rule/${biome.identifier().path}")
             ),
-            WorldgenModifier.builder(BiomeEnabledPredicate(biome)).addSurfaceRule(
-                Level.OVERWORLD,
-                InjectionType.PREPEND,
-                ifTrue(abovePreliminarySurface(), ifTrue(isBiome(biome), rule))
+            WorldgenModifier.builder(BiomeEnabledPredicate(biome)).setMaterialRule(
+                lookup(Registries.MATERIAL_RULE).getOrThrow(ResourceKey.create(Registries.MATERIAL_RULE, net.minecraft.resources.Identifier.withDefaultNamespace("overworld/surface"))),
+                net.minecraft.core.Holder.direct(ifTrue(abovePreliminarySurface(), ifTrue(isBiome(lookup(Registries.BIOME), biome), rule))),
+                InjectionType.PREPEND
             )
         )
     }

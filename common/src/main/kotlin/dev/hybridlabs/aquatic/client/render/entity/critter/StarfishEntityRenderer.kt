@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider.Context
 class StarfishEntityRenderer(context: Context) :
     BaseCritterEntityRenderer<StarfishEntity>(context, StarfishEntityModel(), true) {
     init {
-        addRenderLayer(StarfishColorLayer(this))
-        addRenderLayer(StarfishOverlayLayer(this))
+        withRenderLayer(StarfishColorLayer(this))
+        withRenderLayer(StarfishOverlayLayer(this))
     }
 }

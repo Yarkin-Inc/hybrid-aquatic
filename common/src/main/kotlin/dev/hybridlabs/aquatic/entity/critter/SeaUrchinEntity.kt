@@ -1,5 +1,6 @@
 package dev.hybridlabs.aquatic.entity.critter
 
+import dev.hybridlabs.hapi.entity.VariantHolder
 import dev.hybridlabs.aquatic.entity.ai.goal.UrchinEatKelpGoal
 import dev.hybridlabs.aquatic.tag.HABlockTags
 import dev.hybridlabs.hapi.entity.base.aquatic.BaseCritterEntity
@@ -29,7 +30,7 @@ class SeaUrchinEntity(type: EntityType<out SeaUrchinEntity>, world: Level) :
     override fun finalizeSpawn(
         world: ServerLevelAccessor,
         difficulty: DifficultyInstance,
-        spawnReason: MobSpawnType,
+        spawnReason: EntitySpawnReason,
         entityData: SpawnGroupData?,
     ): SpawnGroupData? {
         variant = Type.entries.random(Random)
@@ -81,7 +82,7 @@ class SeaUrchinEntity(type: EntityType<out SeaUrchinEntity>, world: Level) :
                 )
 
                 fun byName(name: String?): Type {
-                    return CODEC.byName(name, SMALL) as Type
+                    return CODEC.byName(name ?: "", SMALL) as Type
                 }
 
                 fun fromId(id: Int): Type {
@@ -92,7 +93,7 @@ class SeaUrchinEntity(type: EntityType<out SeaUrchinEntity>, world: Level) :
     }
 
     override fun playerTouch(entity: Player) {
-        if (entity is ServerPlayer && entity.hurt(damageSources().mobAttack(this), 0.5f)) {
+        if (entity is ServerPlayer && entity.hurtServer(entity.level(), damageSources().mobAttack(this), 0.5f)) {
             if (!this.isSilent) {
                 entity.connection.send(ClientboundGameEventPacket(ClientboundGameEventPacket.PUFFER_FISH_STING, 0.0f))
             }
@@ -112,13 +113,13 @@ class SeaUrchinEntity(type: EntityType<out SeaUrchinEntity>, world: Level) :
         super.defineSynchedData(builder)
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
+    override fun addAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueOutput) {
         compound.putString("Type", this.variant.serializedName)
         super.addAdditionalSaveData(compound)
     }
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
-        this.variant = Type.byName(compound.getString("Type"))
+    override fun readAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueInput) {
+        this.variant = Type.byName(compound.getStringOr("Type", ""))
         super.readAdditionalSaveData(compound)
     }
 

@@ -16,7 +16,8 @@ object HAPlatformFluids {
     val BRINE = registerFluidBlock("brine") {
         LiquidBlock(
             BRINE_STILL.get(),
-            Properties.ofFullCopy(Blocks.WATER).liquid()
+            Properties.ofFullCopy(Blocks.WATER).setId(net.minecraft.resources.ResourceKey.create(
+                net.minecraft.core.registries.Registries.BLOCK, CommonClass.locate("brine"))).liquid()
         )
     }
 

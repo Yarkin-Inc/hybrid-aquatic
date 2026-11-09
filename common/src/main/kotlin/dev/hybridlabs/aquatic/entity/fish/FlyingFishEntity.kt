@@ -10,16 +10,16 @@ import dev.hybridlabs.hapi.tag.HAPIEntityTags
 import net.minecraft.core.BlockPos
 import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.MobSpawnType
+import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.ServerLevelAccessor
 import net.minecraft.world.phys.Vec3
-import software.bernie.geckolib.animation.AnimatableManager
-import software.bernie.geckolib.animation.AnimationController
-import software.bernie.geckolib.animation.AnimationState
-import software.bernie.geckolib.constant.DefaultAnimations
+import com.geckolib.animatable.manager.AnimatableManager
+import com.geckolib.animation.AnimationController
+import com.geckolib.animation.state.AnimationTest
+import com.geckolib.constant.DefaultAnimations
 
 @Suppress("DEPRECATION", "UNUSED_PARAMETER")
 class FlyingFishEntity(type: EntityType<out FlyingFishEntity>, world: Level) :
@@ -78,9 +78,9 @@ class FlyingFishEntity(type: EntityType<out FlyingFishEntity>, world: Level) :
 
     override fun registerControllers(controllers: AnimatableManager.ControllerRegistrar) {
         controllers.add(
-            AnimationController(
-                this, "Fly/Swim/Idle", 5
-            ) { state: AnimationState<BaseFishEntity> ->
+            AnimationController<FlyingFishEntity>(
+                 "Fly/Swim/Idle", 5
+            ) { state: AnimationTest<FlyingFishEntity> ->
                 when {
                     this.isGliding -> state.setAndContinue(DefaultAnimations.FLY)
                     state.isMoving -> state.setAndContinue(DefaultAnimations.SWIM)
@@ -103,7 +103,7 @@ class FlyingFishEntity(type: EntityType<out FlyingFishEntity>, world: Level) :
         fun canSpawn(
             type: EntityType<out FlyingFishEntity>,
             world: ServerLevelAccessor,
-            reason: MobSpawnType,
+            reason: EntitySpawnReason,
             pos: BlockPos,
             random: RandomSource,
         ): Boolean {
@@ -114,7 +114,7 @@ class FlyingFishEntity(type: EntityType<out FlyingFishEntity>, world: Level) :
                     world.isWaterAt(pos) &&
                     !world.level.isRaining &&
                     !world.level.isThundering &&
-                    world.level.isDay
+                    (world.level.environmentAttributes().getValue(net.minecraft.world.attribute.EnvironmentAttributes.SKY_LIGHT_LEVEL, pos) > 11.0f)
         }
     }
 }

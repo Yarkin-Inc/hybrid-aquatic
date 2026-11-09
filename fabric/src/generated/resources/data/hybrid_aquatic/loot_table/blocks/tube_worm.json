@@ -6,51 +6,45 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "functions": [
+          "name": "hybrid_aquatic:tube_worm",
+          "modifier": [
             {
               "add": false,
-              "conditions": [
-                {
-                  "block": "hybrid_aquatic:tube_worm",
-                  "condition": "minecraft:block_state_property",
-                  "properties": {
-                    "worms": "2"
-                  }
-                }
-              ],
               "count": 2.0,
-              "function": "minecraft:set_count"
+              "type": "minecraft:set_count",
+              "condition": {
+                "type": "minecraft:match_block",
+                "blocks": "hybrid_aquatic:tube_worm",
+                "state": {
+                  "worms": "2"
+                }
+              }
             },
             {
               "add": false,
-              "conditions": [
-                {
-                  "block": "hybrid_aquatic:tube_worm",
-                  "condition": "minecraft:block_state_property",
-                  "properties": {
-                    "worms": "3"
-                  }
-                }
-              ],
               "count": 3.0,
-              "function": "minecraft:set_count"
+              "type": "minecraft:set_count",
+              "condition": {
+                "type": "minecraft:match_block",
+                "blocks": "hybrid_aquatic:tube_worm",
+                "state": {
+                  "worms": "3"
+                }
+              }
             },
             {
               "add": false,
-              "conditions": [
-                {
-                  "block": "hybrid_aquatic:tube_worm",
-                  "condition": "minecraft:block_state_property",
-                  "properties": {
-                    "worms": "4"
-                  }
-                }
-              ],
               "count": 4.0,
-              "function": "minecraft:set_count"
+              "type": "minecraft:set_count",
+              "condition": {
+                "type": "minecraft:match_block",
+                "blocks": "hybrid_aquatic:tube_worm",
+                "state": {
+                  "worms": "4"
+                }
+              }
             }
-          ],
-          "name": "hybrid_aquatic:tube_worm"
+          ]
         }
       ],
       "rolls": 1.0

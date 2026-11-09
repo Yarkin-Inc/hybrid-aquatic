@@ -3,39 +3,39 @@ package dev.hybridlabs.aquatic.client.model.entity.misc
 import dev.hybridlabs.aquatic.CommonClass
 import dev.hybridlabs.aquatic.entity.projectile.CavitationBubbleEntity
 import net.minecraft.client.model.geom.PartNames
-import net.minecraft.client.renderer.RenderType
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.client.renderer.rendertype.RenderType
+import net.minecraft.resources.Identifier
 import net.minecraft.util.Mth
-import software.bernie.geckolib.animation.AnimationState
-import software.bernie.geckolib.model.GeoModel
+import dev.hybridlabs.hapi.client.model.PoseContext
+import dev.hybridlabs.hapi.client.model.HybridGeoModel as GeoModel
 
 class CavitationBubbleEntityModel() :
     GeoModel<CavitationBubbleEntity>() {
-    override fun getModelResource(animatable: CavitationBubbleEntity): ResourceLocation {
-        return CommonClass.locate("geo/misc/cavitation_bubble.geo.json")
+    override fun getModelResource(animatable: CavitationBubbleEntity): Identifier {
+        return CommonClass.locate("misc/cavitation_bubble")
     }
 
-    override fun getTextureResource(animatable: CavitationBubbleEntity): ResourceLocation {
+    override fun getTextureResource(animatable: CavitationBubbleEntity): Identifier {
         return CommonClass.locate("textures/entity/misc/cavitation_bubble/cavitation_bubble.png")
     }
 
-    override fun getAnimationResource(p0: CavitationBubbleEntity?): ResourceLocation? {
-        return CommonClass.locate("animations/entity/misc/cavitation_bubble.animation.json")
+    override fun getAnimationResource(p0: CavitationBubbleEntity): Identifier {
+        return CommonClass.locate("entity/misc/cavitation_bubble")
     }
 
-    override fun getRenderType(animatable: CavitationBubbleEntity, texture: ResourceLocation): RenderType {
-        return RenderType.entityTranslucent(texture)
+    override fun getRenderType(animatable: CavitationBubbleEntity, texture: Identifier): RenderType {
+        return net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucent(texture)
     }
 
     override fun setCustomAnimations(
         animatable: CavitationBubbleEntity,
         instanceId: Long,
-        animationState: AnimationState<CavitationBubbleEntity>
+        animationState: PoseContext
     ) {
         super.setCustomAnimations(animatable, instanceId, animationState)
 
         val deltaTime = animationState.partialTick
-        val body = animationProcessor.getBone(PartNames.BODY)
+        val body = animationState.bones.getBone(PartNames.BODY)
 
         val tilt = Mth.clamp(
             Mth.lerp(deltaTime, animatable.xRotO, animatable.xRot),

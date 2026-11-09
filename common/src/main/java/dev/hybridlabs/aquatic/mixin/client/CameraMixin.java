@@ -18,6 +18,7 @@ public abstract class CameraMixin {
 	
 	@Shadow
 	private Entity entity;
+	@Shadow private boolean detached;
 	
 	@Shadow
 	protected abstract float getMaxZoom(float startingDistance);
@@ -26,10 +27,10 @@ public abstract class CameraMixin {
 	protected abstract void move(float distanceOffset, float verticalOffset, float horizontalOffset);
 	
 	@Inject(
-		method = "setup",
-		at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setPosition(DDD)V", shift = At.Shift.AFTER)
+		method = "alignWithEntity",
+		at = @At("TAIL")
 	)
-	private void changeCameraPosInArgonaut(BlockGetter level, Entity entity, boolean detached, boolean thirdPersonReverse, float partialTick, CallbackInfo ci) {
+	private void changeCameraPosInArgonaut(float partialTick, CallbackInfo ci) {
 		if (!detached && entity.getRootVehicle() != entity && entity.getRootVehicle() instanceof ArgonautEntity argonaut) {
 			var argonautRotationRadX = Math.toRadians(argonaut.getRotationVector().x);
 			this.move((float)(argonautRotationRadX * 0.25), (float)(Math.abs(argonautRotationRadX * 0.25)), 0.0f);
@@ -37,21 +38,15 @@ public abstract class CameraMixin {
 	}
 	
 	@ModifyArg(
-		method = "setup",
+		method = "alignWithEntity",
 		at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;getMaxZoom(F)F"), index = 0
 	)
 	private float changeCameraDistance(float original) {
 		return entity.getRootVehicle() != entity && entity.getRootVehicle() instanceof ArgonautEntity ? 7.5f : original;
 	}
 	
-	@ModifyExpressionValue(
-		method = "setup",
-		slice = @Slice(
-			from = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;getMaxZoom(F)F", ordinal = 0),
-			to = @At(value = "TAIL")),
-		at = @At(value = "CONSTANT", args = "floatValue=0.0", ordinal = 0)
-	)
-	private float changeCameraHeight(float original) {
-		return entity.getRootVehicle() != entity && entity.getRootVehicle() instanceof ArgonautEntity ? getMaxZoom(3.0f) : original;
-	}
+	@ModifyArg(method = "alignWithEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;move(FFF)V", ordinal = 0), index = 1)
+    private float changeCameraHeight(float original) {
+        return entity.getRootVehicle() instanceof ArgonautEntity ? getMaxZoom(3.0f) : original;
+    }
 }

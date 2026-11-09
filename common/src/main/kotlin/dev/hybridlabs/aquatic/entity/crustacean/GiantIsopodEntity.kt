@@ -7,12 +7,12 @@ import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.level.Level
-import software.bernie.geckolib.animation.AnimatableManager
-import software.bernie.geckolib.animation.AnimationController
-import software.bernie.geckolib.animation.AnimationController.AnimationStateHandler
-import software.bernie.geckolib.animation.AnimationState
-import software.bernie.geckolib.animation.PlayState
-import software.bernie.geckolib.constant.DefaultAnimations
+import com.geckolib.animatable.manager.AnimatableManager
+import com.geckolib.animation.AnimationController
+import com.geckolib.animation.AnimationController.AnimationStateHandler
+import com.geckolib.animation.state.AnimationTest
+import com.geckolib.animation.`object`.PlayState
+import com.geckolib.constant.DefaultAnimations
 
 class GiantIsopodEntity(entityType: EntityType<out GiantIsopodEntity>, world: Level) :
     BaseCrustaceanEntity(entityType, world, false) {
@@ -44,14 +44,14 @@ class GiantIsopodEntity(entityType: EntityType<out GiantIsopodEntity>, world: Le
         }
     }
 
-    override fun hurt(source: DamageSource, amount: Float): Boolean {
+    override fun hurtServer(level: net.minecraft.server.level.ServerLevel, source: DamageSource, amount: Float): Boolean {
         if (!isHiding) {
             startHiding()
         }
 
         lastDamageTime = level().gameTime
 
-        return super.hurt(source, amount)
+        return super.hurtServer(level, source, amount)
     }
     //#endregion
 
@@ -59,9 +59,9 @@ class GiantIsopodEntity(entityType: EntityType<out GiantIsopodEntity>, world: Le
     override fun registerControllers(controllerRegistrar: AnimatableManager.ControllerRegistrar) {
         super.registerControllers(controllerRegistrar)
         controllerRegistrar.add(
-            AnimationController(
-                this, "Spawning",
-                AnimationStateHandler { state: AnimationState<BaseCrustaceanEntity> ->
+            AnimationController<GiantIsopodEntity>(
+                 "Spawning",
+                AnimationStateHandler { state: AnimationTest<GiantIsopodEntity> ->
                     if (this.tickCount < 20)
                         return@AnimationStateHandler state.setAndContinue(DefaultAnimations.SPAWN)
                     PlayState.STOP
@@ -71,8 +71,8 @@ class GiantIsopodEntity(entityType: EntityType<out GiantIsopodEntity>, world: Le
         )
 
         controllerRegistrar.add(
-            AnimationController(this, "Hide", 4,
-                AnimationController.AnimationStateHandler { state: AnimationState<BaseCrustaceanEntity> ->
+            AnimationController<GiantIsopodEntity>( "Hide", 4,
+                AnimationController.AnimationStateHandler { state: AnimationTest<GiantIsopodEntity> ->
                     if (this.isHiding) {
                         return@AnimationStateHandler state.setAndContinue(HIDE_ANIMATION)
                     } else {

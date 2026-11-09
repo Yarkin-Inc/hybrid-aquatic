@@ -1,16 +1,4 @@
 package dev.hybridlabs.aquatic.client.item
 
-import dev.hybridlabs.aquatic.item.HAItems
-import net.fabricmc.fabric.api.`object`.builder.v1.client.model.FabricModelPredicateProviderRegistry
-import net.minecraft.resources.ResourceLocation
-
-object HAItemProperties {
-    init {
-        FabricModelPredicateProviderRegistry.register(
-            HAItems.OMINOUS_CONCH.get(),
-            ResourceLocation.fromNamespaceAndPath("minecraft","tooting")
-        ) { stack, _, entity, _ ->
-            if (entity != null && entity.isUsingItem && entity.useItem == stack) 1.0f else 0.0f
-        }
-    }
-}
+/** Item state predicates are declared in assets/hybrid_aquatic/items in 26.3. */
+object HAItemProperties

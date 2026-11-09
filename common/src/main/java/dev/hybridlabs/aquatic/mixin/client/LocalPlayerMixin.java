@@ -2,7 +2,7 @@ package dev.hybridlabs.aquatic.mixin.client;
 
 import dev.hybridlabs.aquatic.entity.misc.ArgonautEntity;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.Input;
+import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class LocalPlayerMixin {
 
     @Shadow
-    public Input input;
+    public ClientInput input;
 
     @Inject(method = "rideTick", at = @At("TAIL"))
     private void handleArgonautInput(CallbackInfo ci) {
@@ -28,11 +28,11 @@ public abstract class LocalPlayerMixin {
             boolean sprint = Minecraft.getInstance().options.keySprint.isDown();
 
             argonaut.setInput(
-                    this.input.left,
-                    this.input.right,
-                    this.input.up,
-                    this.input.down,
-                    this.input.jumping,
+                    this.input.keyPresses.left(),
+                    this.input.keyPresses.right(),
+                    this.input.keyPresses.forward(),
+                    this.input.keyPresses.backward(),
+                    this.input.keyPresses.jump(),
                     sprint
             );
         }

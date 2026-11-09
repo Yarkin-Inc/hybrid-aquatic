@@ -30,12 +30,11 @@ open class BaseDunegrassBlock(settings: Properties) : BushBlock(settings), Bonem
     override fun isValidBonemealTarget(
         p0: LevelReader,
         p1: BlockPos,
-        p2: BlockState
-    ): Boolean {
+        p2: BlockState, source: net.minecraft.world.level.block.BonemealSource): Boolean {
         return true
     }
 
-    override fun isBonemealSuccess(world: Level, random: RandomSource, pos: BlockPos, state: BlockState): Boolean {
+    override fun isBonemealSuccess(world: Level, random: RandomSource, pos: BlockPos, state: BlockState, source: net.minecraft.world.level.block.BonemealSource): Boolean {
         return true
     }
 
@@ -43,8 +42,7 @@ open class BaseDunegrassBlock(settings: Properties) : BushBlock(settings), Bonem
         level: ServerLevel,
         random: RandomSource,
         pos: BlockPos,
-        state: BlockState
-    ) {
+        state: BlockState, source: net.minecraft.world.level.block.BonemealSource) {
     }
 
     override fun mayPlaceOn(state: BlockState, level: BlockGetter, pos: BlockPos): Boolean {
@@ -53,20 +51,15 @@ open class BaseDunegrassBlock(settings: Properties) : BushBlock(settings), Bonem
 
     override fun updateShape(
         state: BlockState,
-        facing: Direction,
-        facingState: BlockState,
-        level: LevelAccessor,
+        level: net.minecraft.world.level.LevelReader,
+        tickAccess: net.minecraft.world.level.ScheduledTickAccess,
         currentPos: BlockPos,
+        facing: Direction,
         facingPos: BlockPos,
+        facingState: BlockState,
+        random: net.minecraft.util.RandomSource,
     ): BlockState {
-        return if (!state.canSurvive(level, currentPos)) Blocks.AIR.defaultBlockState() else super.updateShape(
-            state,
-            facing,
-            facingState,
-            level,
-            currentPos,
-            facingPos
-        )
+        return if (!state.canSurvive(level, currentPos)) Blocks.AIR.defaultBlockState() else super.updateShape(state, level, tickAccess, currentPos, facing, facingPos, facingState, random)
     }
 
     override fun canSurvive(state: BlockState, level: LevelReader, pos: BlockPos): Boolean {
@@ -74,12 +67,9 @@ open class BaseDunegrassBlock(settings: Properties) : BushBlock(settings), Bonem
         return this.mayPlaceOn(level.getBlockState(blockPos), level, blockPos)
     }
 
-    override fun codec(): MapCodec<out BushBlock> {
-        return CODEC
-    }
 
     companion object {
-        val CODEC: MapCodec<BaseDunegrassBlock> = simpleCodec(::BaseDunegrassBlock)
+
         private val SHAPE: VoxelShape = box(2.0, 0.0, 2.0, 14.0, 16.0, 14.0)
     }
 }

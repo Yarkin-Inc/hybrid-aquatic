@@ -28,15 +28,14 @@ object HABlockEntityTypes {
     val GIANT_THERMAL_VENT =
         register("giant_thermal_vent", ::GiantThermalVentBlockEntity, HABlocks.GIANT_THERMAL_VENT)
 
-    fun <T : BlockEntity?> register(
+    fun <T : BlockEntity> register(
         id: String,
         factory: BlockEntityType.BlockEntitySupplier<T>, vararg validBlocks: RegistryObject<Block>?,
-    ): RegistryObject<BlockEntityType<T?>> {
+    ): RegistryObject<BlockEntityType<T>> {
 
         return CommonClass.BLOCK_ENTITY_TYPES.register(id) {
-            val blocks = validBlocks.map { block -> block?.get() }.toTypedArray()
-            val builder = BlockEntityType.Builder.of(factory, *blocks)
-            builder.build(null)
+            val blocks = validBlocks.mapNotNull { it?.get() }.toSet()
+            BlockEntityType(factory, blocks)
         }
     }
 }

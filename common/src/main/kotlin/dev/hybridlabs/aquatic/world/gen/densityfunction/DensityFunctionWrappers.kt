@@ -13,11 +13,13 @@ import net.minecraft.core.registries.Registries
 import net.minecraft.resources.FileToIdConverter
 import net.minecraft.resources.RegistryOps
 import net.minecraft.resources.ResourceKey
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.server.MinecraftServer
-import net.minecraft.util.KeyDispatchDataCodec
-import net.minecraft.world.level.levelgen.DensityFunction
-import net.minecraft.world.level.levelgen.DensityFunctions
+import net.minecraft.world.level.levelgen.densityfunction.DfRewriteRule
+import net.minecraft.world.level.levelgen.densityfunction.DensitySampler
+import net.minecraft.util.Interval
+import net.minecraft.world.level.levelgen.densityfunction.DensityFunction
+import net.minecraft.world.level.levelgen.densityfunction.DensityFunctions
 
 /**
  * Wraps registered density functions with datapack-defined wrappers before the server loads its levels.
@@ -30,13 +32,13 @@ object DensityFunctionWrappers {
     private val WRAPPER_FILES = FileToIdConverter.json("${Constants.MOD_ID}/density_function_wrapper")
 
     private val DENSITY_FUNCTION_TYPES = CommonClass.DENSITY_FUNCTION_TYPES
-    val WRAPPED_MARKER = DENSITY_FUNCTION_TYPES.register("wrapped_marker") { WrappedMarker.CODEC.codec() }
+    val WRAPPED_MARKER = DENSITY_FUNCTION_TYPES.register("wrapped_marker") { WrappedMarker.CODEC }
 
-    private data class Wrapper(val targetFunction: ResourceLocation, val wrapperFunction: Holder<DensityFunction>) {
+    private data class Wrapper(val targetFunction: Identifier, val wrapperFunction: DensityFunction) {
         companion object {
             val CODEC: Codec<Wrapper> = RecordCodecBuilder.create { instance ->
                 instance.group(
-                    ResourceLocation.CODEC.fieldOf("target_function").forGetter(Wrapper::targetFunction),
+                    Identifier.CODEC.fieldOf("target_function").forGetter(Wrapper::targetFunction),
                     DensityFunction.CODEC.fieldOf("wrapper_function").forGetter(Wrapper::wrapperFunction),
                 ).apply(instance, ::Wrapper)
             }
@@ -46,7 +48,7 @@ object DensityFunctionWrappers {
     @JvmStatic
     fun apply(server: MinecraftServer) {
         val ops = RegistryOps.create(JsonOps.INSTANCE, server.registryAccess())
-        val densityFunctions = server.registryAccess().registryOrThrow(Registries.DENSITY_FUNCTION)
+        val densityFunctions = server.registryAccess().lookupOrThrow(Registries.DENSITY_FUNCTION)
 
         WRAPPER_FILES.listMatchingResources(server.resourceManager).toSortedMap().forEach { (file, resource) ->
             val id = WRAPPER_FILES.fileToId(file)
@@ -54,29 +56,39 @@ object DensityFunctionWrappers {
             val wrapper = Wrapper.CODEC.parse(ops, json)
                 .getOrThrow { error -> IllegalStateException("Invalid density function wrapper $id: $error") }
 
-            val target = densityFunctions.getHolder(ResourceKey.create(Registries.DENSITY_FUNCTION, wrapper.targetFunction))
+            val target = densityFunctions.get(ResourceKey.create(Registries.DENSITY_FUNCTION, wrapper.targetFunction))
                 .orElseThrow { IllegalStateException("Density function wrapper $id targets unknown density function ${wrapper.targetFunction}") }
 
             val wrapped = target.value()
-            val full = wrapper.wrapperFunction.value().mapAll { function -> if (isMarker(function)) wrapped else function }
+            val full = rewrite(wrapper.wrapperFunction) { function -> if (function is WrappedMarker) wrapped else function }
 
             @Suppress("UNCHECKED_CAST")
             (target as HolderReferenceInvoker<DensityFunction>).`hybridAquatic$bindValue`(full)
         }
     }
 
-    private fun isMarker(function: DensityFunction): Boolean =
-        function is DensityFunctions.HolderHolder && function.function().value() is WrappedMarker
+    /** Rewrite children recursively, preserving registry references unless their contents change. */
+    fun rewrite(root: DensityFunction, transform: (DensityFunction) -> DensityFunction): DensityFunction {
+        val rule = object : DfRewriteRule {
+            override fun rewrite(function: DensityFunction): DensityFunction {
+                val replacement = transform(function)
+                return if (replacement !== function) replacement else function.rewriteChildren(this)
+            }
+        }
+        return rule.rewrite(root)
+    }
 
     /**
      * Placeholder for the wrapped function. [apply] replaces every marker, so it never reaches world generation.
      */
-    object WrappedMarker : DensityFunction.SimpleFunction {
-        val CODEC: KeyDispatchDataCodec<WrappedMarker> = KeyDispatchDataCodec.of(MapCodec.unit(WrappedMarker))
+    object WrappedMarker : DensityFunction {
+        val CODEC: MapCodec<WrappedMarker> = MapCodec.unit(WrappedMarker)
 
-        override fun compute(context: DensityFunction.FunctionContext): Double = 0.0
-        override fun minValue(): Double = 0.0
-        override fun maxValue(): Double = 0.0
-        override fun codec(): KeyDispatchDataCodec<out DensityFunction> = CODEC
+        override fun compileSampler(context: DensityFunction.CompileContext): DensitySampler =
+            error("Unresolved wrapped_marker reached world generation")
+        override fun rewriteChildren(rule: DfRewriteRule): DensityFunction = this
+        override fun range(): Interval = Interval.INFINITE
+        override fun domainAxes(): Int = DensityFunction.ALL_AXES
+        override fun codec(): MapCodec<out DensityFunction> = CODEC
     }
 }

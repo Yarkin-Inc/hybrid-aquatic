@@ -11,7 +11,7 @@ import dev.hybridlabs.aquatic.client.model.block.entity.plushie.HammerheadSharkP
 import dev.hybridlabs.aquatic.client.model.block.entity.plushie.ThresherSharkPlushieModel
 import dev.hybridlabs.aquatic.client.model.block.entity.plushie.TigerSharkPlushieModel
 import dev.hybridlabs.aquatic.client.model.block.entity.plushie.WhaleSharkPlushieModel
-import net.minecraft.client.model.SkullModelBase
+import net.minecraft.client.model.`object`.skull.SkullModelBase
 import net.minecraft.client.model.geom.EntityModelSet
 import net.minecraft.client.model.geom.ModelLayerLocation
 import net.minecraft.world.level.block.SkullBlock

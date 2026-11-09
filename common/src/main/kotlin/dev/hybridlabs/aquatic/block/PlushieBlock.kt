@@ -4,7 +4,7 @@ import dev.hybridlabs.aquatic.CommonClass
 import dev.hybridlabs.aquatic.block.HABlocks.addBlocks
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.util.StringRepresentable
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
@@ -20,24 +20,15 @@ import net.minecraft.world.level.block.state.StateDefinition
  */
 class PlushieBlock(variant: Variant, settings: Properties) : SkullBlock(variant, settings) {
     init {
-        BlockEntityType.SKULL.addBlocks(this)
+        Type.TYPES[variant.serializedName] = variant
+        net.minecraft.world.level.block.entity.BlockEntityTypes.SKULL.addBlocks(this)
     }
 
     override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
         super.createBlockStateDefinition(builder)
     }
 
-    override fun appendHoverText(
-        stack: ItemStack,
-        context: Item.TooltipContext,
-        tooltip: MutableList<Component>,
-        options: TooltipFlag
-    ) {
-        val text = Component.translatable(this.descriptionId.plus(".description")).withStyle(ChatFormatting.GRAY)
 
-        tooltip.add(text)
-        super.appendHoverText(stack, context, tooltip, options)
-    }
 
     enum class Variant(val id: String) : Type, StringRepresentable {
         BASKING_SHARK("basking_shark"),
@@ -49,8 +40,8 @@ class PlushieBlock(variant: Variant, settings: Properties) : SkullBlock(variant,
         TIGER_SHARK("tiger_shark"),
         WHALE_SHARK("whale_shark");
 
-        val textureLocation: ResourceLocation by lazy { CommonClass.locate("textures/entity/block/plushie/${id}_plushie.png") }
+        val textureLocation: Identifier by lazy { CommonClass.locate("textures/entity/block/plushie/${id}_plushie.png") }
 
-        override fun getSerializedName(): String = id
+        override fun getSerializedName(): String = "hybrid_aquatic:$id"
     }
 }

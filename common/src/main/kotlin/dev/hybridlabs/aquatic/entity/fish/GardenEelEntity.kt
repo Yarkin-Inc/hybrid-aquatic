@@ -8,7 +8,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.util.RandomSource
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.MobSpawnType
+import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.MoverType
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
@@ -22,10 +22,10 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.ServerLevelAccessor
 import net.minecraft.world.level.pathfinder.PathType
 import net.minecraft.world.phys.Vec3
-import software.bernie.geckolib.animation.AnimatableManager
-import software.bernie.geckolib.animation.AnimationController
-import software.bernie.geckolib.animation.RawAnimation
-import software.bernie.geckolib.constant.DefaultAnimations
+import com.geckolib.animatable.manager.AnimatableManager
+import com.geckolib.animation.AnimationController
+import com.geckolib.animation.RawAnimation
+import com.geckolib.constant.DefaultAnimations
 
 @Suppress("unused", "DEPRECATION")
 class GardenEelEntity(type: EntityType<out GardenEelEntity>, world: Level) :
@@ -39,8 +39,8 @@ class GardenEelEntity(type: EntityType<out GardenEelEntity>, world: Level) :
 
     init {
         setPathfindingMalus(PathType.WATER, 0.0f)
-        setPathfindingMalus(PathType.DANGER_FIRE, 16.0f)
-        setPathfindingMalus(PathType.DAMAGE_FIRE, -1.0f)
+        setPathfindingMalus(PathType.FIRE_IN_NEIGHBOR, 16.0f)
+        setPathfindingMalus(PathType.FIRE, -1.0f)
         moveControl = MoveControl(this)
         lookControl = LookControl(this)
         navigation = GroundPathNavigation(this, world)
@@ -77,7 +77,7 @@ class GardenEelEntity(type: EntityType<out GardenEelEntity>, world: Level) :
     //#region Animations
     override fun registerControllers(controllers: AnimatableManager.ControllerRegistrar) {
         controllers.add(
-            AnimationController(this, "Garden Eel Controller", 4) { state ->
+            AnimationController<GardenEelEntity>( "Garden Eel Controller", 4) { state ->
                 when {
                     isInWater && onGround() && !isHiding -> {
                         state.setAndContinue(DefaultAnimations.IDLE)
@@ -127,12 +127,12 @@ class GardenEelEntity(type: EntityType<out GardenEelEntity>, world: Level) :
         attributes.getInstance(Attributes.ARMOR)?.baseValue = 5.0
     }
 
-    override fun hurt(source: DamageSource, amount: Float): Boolean {
+    override fun hurtServer(level: net.minecraft.server.level.ServerLevel, source: DamageSource, amount: Float): Boolean {
         if (!isHiding) startHiding()
 
         lastDamageTime = level().gameTime
 
-        return super.hurt(source, amount)
+        return super.hurtServer(level, source, amount)
     }
 
     override fun tick() {
@@ -157,7 +157,7 @@ class GardenEelEntity(type: EntityType<out GardenEelEntity>, world: Level) :
         fun canSpawn(
             type: EntityType<out GardenEelEntity>,
             world: ServerLevelAccessor,
-            reason: MobSpawnType,
+            reason: EntitySpawnReason,
             pos: BlockPos,
             random: RandomSource,
         ): Boolean {

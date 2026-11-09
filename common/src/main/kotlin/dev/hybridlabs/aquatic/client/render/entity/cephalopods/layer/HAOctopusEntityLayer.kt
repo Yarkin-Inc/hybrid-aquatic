@@ -1,41 +1,28 @@
 package dev.hybridlabs.aquatic.client.render.entity.cephalopods.layer
 
-import com.mojang.blaze3d.vertex.PoseStack
-import com.mojang.blaze3d.vertex.VertexConsumer
 import dev.hybridlabs.aquatic.entity.cephalopod.OctopusEntity
 import dev.hybridlabs.aquatic.entity.feature.OverlayTextureFeature
 import dev.hybridlabs.hapi.client.model.entity.aquatic.BaseOctopusEntityModel
 import dev.hybridlabs.hapi.client.render.entity.aquatic.BaseOctopusEntityRenderer
 import dev.hybridlabs.hapi.entity.base.aquatic.BaseOctopusEntity
-import net.minecraft.client.renderer.MultiBufferSource
-import net.minecraft.client.renderer.RenderType
+import net.minecraft.client.renderer.rendertype.RenderType
 import net.minecraft.client.renderer.entity.LivingEntityRenderer
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.util.Mth
-import software.bernie.geckolib.cache.`object`.BakedGeoModel
-import software.bernie.geckolib.renderer.layer.GeoRenderLayer
-import software.bernie.geckolib.util.Color
+import dev.hybridlabs.hapi.client.render.HybridTextureLayer
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState
 
 
 class HAOctopusEntityLayer<T: BaseOctopusEntity>(
     renderer: BaseOctopusEntityRenderer<T>,
-) : GeoRenderLayer<T>(renderer) {
+) : HybridTextureLayer<T, LivingEntityRenderState>(renderer) {
 
-    private fun getLayerTextureResource(): ResourceLocation {
-        return (geoModel as BaseOctopusEntityModel).getLayerTextureResource()
+    private fun getLayerTextureResource(): Identifier {
+        return (geoModel as BaseOctopusEntityModel<*>).getLayerTextureResource()
     }
 
-    override fun render(
-        poseStack: PoseStack,
-        animatable: T,
-        bakedModel: BakedGeoModel,
-        renderType: RenderType?,
-        bufferSource: MultiBufferSource,
-        buffer: VertexConsumer?,
-        partialTick: Float,
-        packedLight: Int,
-        packedOverlay: Int
-    ) {
+    override fun addRenderData(animatable: T, related: Void?, renderState: LivingEntityRenderState, partialTick: Float) {
+        super.addRenderData(animatable, related, renderState, partialTick)
         if (animatable !is OverlayTextureFeature) return
 
         if (animatable is OctopusEntity &&
@@ -49,32 +36,17 @@ class HAOctopusEntityLayer<T: BaseOctopusEntity>(
         if (overlayName.isEmpty()) return
 
         val layerTexture = getLayerTextureResource()
-        val tintRenderType = RenderType.entityTranslucent(layerTexture)
+        val tintRenderType = net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucent(layerTexture)
 
-        var current = Color.ofOpaque(animatable.getCurrentColor())
-        val target = Color.ofOpaque(animatable.getTargetColor())
+        var current = net.minecraft.util.ARGB.opaque(animatable.getCurrentColor())
+        val target = net.minecraft.util.ARGB.opaque(animatable.getTargetColor())
 
         if (current != target) {
             val blendSpeed = 0.025f
-            current = Color.ofRGB(
-                Mth.lerp(blendSpeed, current.redFloat, target.redFloat),
-                Mth.lerp(blendSpeed, current.greenFloat, target.greenFloat),
-                Mth.lerp(blendSpeed, current.blueFloat, target.blueFloat)
-            )
-            animatable.setCurrentColor(current.color)
+            current = net.minecraft.util.ARGB.srgbLerp(blendSpeed, current, target)
+            animatable.setCurrentColor(current)
         }
 
-        getRenderer().reRender(
-            getDefaultBakedModel(animatable),
-            poseStack,
-            bufferSource,
-            animatable,
-            tintRenderType,
-            bufferSource.getBuffer(tintRenderType),
-            partialTick,
-            packedLight,
-            LivingEntityRenderer.getOverlayCoords(animatable, 0.0f),
-            current.brighter(1.2).argbInt
-        )
+        setLayerData(renderState, tintRenderType, net.minecraft.util.ARGB.scaleRGB(current, 1.2f), LivingEntityRenderer.getOverlayCoords(renderState, 0.0f))
     }
 }

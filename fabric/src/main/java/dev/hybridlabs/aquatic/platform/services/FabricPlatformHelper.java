@@ -52,8 +52,8 @@ public class FabricPlatformHelper implements PlatformHelper {
     public <T extends Mob> Supplier<SpawnEggItem> registerSpawnEggItem(@NotNull String name,
                                                                        Supplier<EntityType<T>> entityType,
                                                                        int backgroundColor, int highlightColor) {
-        return CommonClass.ITEMS.register(name, () -> new SpawnEggItem(entityType.get(), backgroundColor,
-                highlightColor, new Item.Properties()));
+        return CommonClass.ITEMS.register(name, () -> new SpawnEggItem(new Item.Properties().setId(net.minecraft.resources.ResourceKey.create(
+                net.minecraft.core.registries.Registries.ITEM, CommonClass.locate(name))).spawnEgg(entityType.get())));
     }
 
     @Override
@@ -100,7 +100,7 @@ public class FabricPlatformHelper implements PlatformHelper {
         } else if (block.equals(HABlocks.INSTANCE.getGIANT_GREEN_ANEMONE().get())) {
             return new GiantGreenAnemoneBlockItem(block, properties);
         }
-        return new BlockItem(block, properties);
+        return new BlockItem(block, properties.overrideDescription(block.getDescriptionId()));
     }
 
     @Override

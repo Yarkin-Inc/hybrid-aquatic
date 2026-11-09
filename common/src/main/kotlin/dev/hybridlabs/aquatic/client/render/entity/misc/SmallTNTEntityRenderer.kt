@@ -2,63 +2,36 @@ package dev.hybridlabs.aquatic.client.render.entity.misc
 
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
+import dev.hybridlabs.aquatic.block.HABlocks
 import dev.hybridlabs.aquatic.entity.misc.SmallTNTEntity
-import net.minecraft.client.renderer.MultiBufferSource
-import net.minecraft.client.renderer.block.BlockRenderDispatcher
+import net.minecraft.client.renderer.SubmitNodeCollector
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.EntityRendererProvider
+import net.minecraft.client.renderer.entity.TntRenderer
 import net.minecraft.client.renderer.entity.TntMinecartRenderer
-import net.minecraft.client.renderer.texture.TextureAtlas
-import net.minecraft.resources.ResourceLocation
-import net.minecraft.util.Mth
-import net.minecraft.world.level.block.Blocks
+import net.minecraft.client.renderer.entity.state.TntRenderState
+import net.minecraft.client.renderer.state.level.CameraRenderState
 
-class SmallTNTEntityRenderer(context: EntityRendererProvider.Context) :
-    EntityRenderer<SmallTNTEntity>(context) {
-    private val blockRenderer: BlockRenderDispatcher
-
-    init {
-        this.shadowRadius = 0.25f
-        this.blockRenderer = context.blockRenderDispatcher
+class SmallTNTEntityRenderer(context: EntityRendererProvider.Context) : EntityRenderer<SmallTNTEntity, TntRenderState>(context) {
+    private val blocks = context.blockModelResolver
+    init { shadowRadius = 0.25f }
+    override fun createRenderState() = TntRenderState()
+    override fun extractRenderState(entity: SmallTNTEntity, state: TntRenderState, partialTick: Float) {
+        super.extractRenderState(entity, state, partialTick)
+        state.fuseRemainingInTicks = entity.fuse - partialTick + 1f
+        blocks.update(state.blockState, net.minecraft.world.level.block.Blocks.TNT.defaultBlockState(), TntRenderer.BLOCK_DISPLAY_CONTEXT)
     }
-
-    override fun render(
-        entity: SmallTNTEntity,
-        entityYaw: Float,
-        partialTicks: Float,
-        poseStack: PoseStack,
-        buffer: MultiBufferSource,
-        packedLight: Int,
-    ) {
-        poseStack.pushPose()
-        poseStack.translate(0.0f, 0.5f, 0.0f)
-        val i = entity.fuse
-        if (i.toFloat() - partialTicks + 1.0f < 10.0f) {
-            var f = 1.0f - (i.toFloat() - partialTicks + 1.0f) / 10.0f
-            f = Mth.clamp(f, 0.0f, 1.0f)
-            f *= f
-            f *= f
-            val f1 = 1.0f + f * 0.3f
-            poseStack.scale(f1, f1, f1)
-        }
-
-        poseStack.mulPose(Axis.YP.rotationDegrees(-90.0f))
-        poseStack.translate(-0.25f, -0.5f, 0.25f)
-        poseStack.mulPose(Axis.YP.rotationDegrees(90.0f))
-        poseStack.scale(0.5f, 0.5f, 0.5f)
-        TntMinecartRenderer.renderWhiteSolidBlock(
-            this.blockRenderer,
-            Blocks.TNT.defaultBlockState(),
-            poseStack,
-            buffer,
-            packedLight,
-            i / 5 % 2 == 0
-        )
-        poseStack.popPose()
-        super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight)
-    }
-
-    override fun getTextureLocation(p0: SmallTNTEntity): ResourceLocation {
-        return TextureAtlas.LOCATION_BLOCKS
+    override fun submit(state: TntRenderState, pose: PoseStack, collector: SubmitNodeCollector, camera: CameraRenderState) {
+        pose.pushPose()
+        pose.translate(0f, 0.5f, 0f)
+        val swell = 1f + TntRenderer.getSwellAmount(state.fuseRemainingInTicks)
+        pose.scale(swell, swell, swell)
+        pose.rotateDegrees(Axis.YP, -90f)
+        pose.translate(-0.25f, -0.5f, 0.25f)
+        pose.rotateDegrees(Axis.YP, 90f)
+        pose.scale(0.5f, 0.5f, 0.5f)
+        TntMinecartRenderer.submitWhiteSolidBlock(state.blockState, pose, collector, state.lightCoords, TntRenderer.isLit(state.fuseRemainingInTicks), state.outlineColor)
+        pose.popPose()
+        super.submit(state, pose, collector, camera)
     }
 }

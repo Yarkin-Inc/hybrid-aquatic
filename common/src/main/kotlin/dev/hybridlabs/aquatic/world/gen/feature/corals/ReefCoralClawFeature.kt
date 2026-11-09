@@ -1,13 +1,13 @@
 package dev.hybridlabs.aquatic.world.gen.feature.corals
 
 import com.mojang.serialization.Codec
-import net.minecraft.Util
+import net.minecraft.util.Util
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.util.RandomSource
 import net.minecraft.world.level.LevelAccessor
 import net.minecraft.world.level.block.state.BlockState
-import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration
+import dev.hybridlabs.aquatic.world.gen.feature.config.NoneFeatureConfiguration
 import java.util.stream.Stream
 
 class ReefCoralClawFeature(codec: Codec<NoneFeatureConfiguration>) : ReefCoralFeature(codec) {

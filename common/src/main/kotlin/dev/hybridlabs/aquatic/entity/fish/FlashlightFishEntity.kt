@@ -1,5 +1,6 @@
 package dev.hybridlabs.aquatic.entity.fish
 
+import dev.hybridlabs.aquatic.entity.spawnDrop
 import dev.hybridlabs.hapi.entity.ai.MobTargetConfiguration
 import dev.hybridlabs.hapi.entity.ai.goal.aquatic.boids.BoidGoal
 import dev.hybridlabs.hapi.entity.ai.goal.aquatic.boids.StayInWaterGoal
@@ -17,12 +18,12 @@ import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityDimensions
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.MobSpawnType
+import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.Pose
 import net.minecraft.world.entity.SpawnGroupData
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
-import net.minecraft.world.level.GameRules
+import net.minecraft.world.level.gamerules.GameRules
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.ServerLevelAccessor
 
@@ -67,14 +68,14 @@ class FlashlightFishEntity(type: EntityType<out FlashlightFishEntity>, world: Le
         refreshDimensions()
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
+    override fun addAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueOutput) {
         super.addAdditionalSaveData(compound)
         compound.putInt("FishCount", getFishCount())
     }
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
+    override fun readAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueInput) {
         super.readAdditionalSaveData(compound)
-        setFishCount(compound.getInt("FishCount").coerceAtMost(THREE_FISH))
+        setFishCount(compound.getIntOr("FishCount", 0).coerceAtMost(THREE_FISH))
     }
 
     override fun tick() {
@@ -95,7 +96,7 @@ class FlashlightFishEntity(type: EntityType<out FlashlightFishEntity>, world: Le
     override fun finalizeSpawn(
         world: ServerLevelAccessor,
         difficulty: DifficultyInstance,
-        spawnReason: MobSpawnType,
+        spawnReason: EntitySpawnReason,
         entityData: SpawnGroupData?
     ): SpawnGroupData? {
         val maxHp = getAttributeValue(Attributes.MAX_HEALTH).toFloat()
@@ -139,11 +140,11 @@ class FlashlightFishEntity(type: EntityType<out FlashlightFishEntity>, world: Le
         super.doPush(entity)
     }
 
-    override fun hurt(source: DamageSource, amount: Float): Boolean {
+    override fun hurtServer(level: net.minecraft.server.level.ServerLevel, source: DamageSource, amount: Float): Boolean {
         val maxHp = getAttributeValue(Attributes.MAX_HEALTH).toFloat()
         val oldFraction = health / maxHp
 
-        val result = super.hurt(source, amount)
+        val result = super.hurtServer(level, source, amount)
 
         if (result && !level().isClientSide) {
             val newFraction = health / maxHp
@@ -160,8 +161,8 @@ class FlashlightFishEntity(type: EntityType<out FlashlightFishEntity>, world: Le
                 else -> ONE_FISH
             }
 
-            if (newFishCount in 1..<oldFishCount && level().gameRules.getBoolean(GameRules.RULE_DOENTITYDROPS)) {
-                spawnAtLocation(HAItems.FLASHLIGHT_FISH.get())
+            if (newFishCount in 1..<oldFishCount && ((level() as? net.minecraft.server.level.ServerLevel)?.gameRules?.get(GameRules.ENTITY_DROPS) == true)) {
+                spawnDrop(HAItems.FLASHLIGHT_FISH.get())
             }
         }
 
@@ -188,7 +189,7 @@ class FlashlightFishEntity(type: EntityType<out FlashlightFishEntity>, world: Le
         fun canSpawn(
             type: EntityType<out FlashlightFishEntity>,
             world: ServerLevelAccessor,
-            reason: MobSpawnType,
+            reason: EntitySpawnReason,
             pos: BlockPos,
             random: RandomSource,
         ): Boolean {
@@ -196,7 +197,7 @@ class FlashlightFishEntity(type: EntityType<out FlashlightFishEntity>, world: Le
             val nightSpawn = (seaLevel - 16)..< seaLevel
             val daySpawn = (seaLevel - 256)..(seaLevel - 48)
 
-            val spawnY = if (!world.level.isDay) nightSpawn else daySpawn
+            val spawnY = if (!(world.level.environmentAttributes().getValue(net.minecraft.world.attribute.EnvironmentAttributes.SKY_LIGHT_LEVEL, pos) > 11.0f)) nightSpawn else daySpawn
 
             return pos.y in spawnY && world.isWaterAt(pos)
         }

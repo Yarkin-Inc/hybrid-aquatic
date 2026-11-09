@@ -1,6 +1,13 @@
 {
-    "pack": {
-        "description": "${mod_name}",
-        "pack_format": 8
-    }
+  "pack": {
+    "description": "Hybrid Aquatic \u2014 Minecraft 26.3",
+    "min_format": [
+      97,
+      1
+    ],
+    "max_format": [
+      121,
+      0
+    ]
+  }
 }

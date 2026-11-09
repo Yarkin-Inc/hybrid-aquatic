@@ -244,5 +244,13 @@
       "hybrid_aquatic:item/ominous_conch_blows"
     ],
     "subtitle": "subtitles.hybrid_aquatic.item.ominous_conch.blows"
+  },
+  "entity.sirenian.eat": {
+    "sounds": [
+      {
+        "name": "minecraft:entity.generic.eat",
+        "type": "event"
+      }
+    ]
   }
 }

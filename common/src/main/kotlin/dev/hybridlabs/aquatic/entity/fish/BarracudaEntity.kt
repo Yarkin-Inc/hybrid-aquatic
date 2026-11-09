@@ -22,14 +22,14 @@ import net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
-import java.util.*
+import net.minecraft.world.entity.EntityReference
 
 class BarracudaEntity(type: EntityType<out BarracudaEntity>, world: Level) :
     BaseFishEntity(type, world),
     NeutralMob {
 
-    private var angerTime = 0
-    private var angryAt: UUID? = null
+    private var angerTime = NeutralMob.NO_ANGER_END_TIME
+    private var angryAt: EntityReference<LivingEntity>? = null
 
     override fun getTargetConfig() = TARGET_CONFIG
 
@@ -69,12 +69,12 @@ class BarracudaEntity(type: EntityType<out BarracudaEntity>, world: Level) :
         targetSelector.addGoal(1, HurtByTargetGoal(this).setAlertOthers())
         goalSelector.addGoal(2, WaterAnimalEatItemGoal(this))
         targetSelector.addGoal(3, ResetUniversalAngerTargetGoal(this, false))
-        targetSelector.addGoal(1, NearestAttackableTargetGoal(this, Player::class.java, 10, true, true) { this.isAngryAt(it) })
-        targetSelector.addGoal(2, NearestAttackableTargetGoal(this, LivingEntity::class.java, 10, true, true) { it.hasEffect(HAMobEffects.BLEEDING.asHolder()) && it !is BarracudaEntity })
+        targetSelector.addGoal(1, NearestAttackableTargetGoal(this, Player::class.java, 10, true, true) { candidate, server -> this.isAngryAt(candidate, server) })
+        targetSelector.addGoal(2, NearestAttackableTargetGoal(this, LivingEntity::class.java, 10, true, true) { candidate, _ -> candidate.hasEffect(HAMobEffects.BLEEDING.asHolder()) && candidate !is BarracudaEntity })
     }
 
-    override fun doHurtTarget(target: Entity): Boolean {
-        if (super.doHurtTarget(target)) {
+    override fun doHurtTarget(level: net.minecraft.server.level.ServerLevel, target: Entity): Boolean {
+        if (super.doHurtTarget(level, target)) {
             if (target is LivingEntity) {
                 var i = 0
                 if (level().difficulty == Difficulty.NORMAL) {
@@ -102,25 +102,40 @@ class BarracudaEntity(type: EntityType<out BarracudaEntity>, world: Level) :
         }
     }
 
+    override fun addAdditionalSaveData(output: net.minecraft.world.level.storage.ValueOutput) {
+        super.addAdditionalSaveData(output)
+        addPersistentAngerSaveData(output)
+    }
+
+    override fun readAdditionalSaveData(input: net.minecraft.world.level.storage.ValueInput) {
+        super.readAdditionalSaveData(input)
+        readPersistentAngerSaveData(level(), input)
+    }
+
+    override fun customServerAiStep(level: net.minecraft.server.level.ServerLevel) {
+        updatePersistentAnger(level, true)
+        super.customServerAiStep(level)
+    }
+
     //#region Angerable Implementation Details
-    override fun getRemainingPersistentAngerTime(): Int {
+    override fun getPersistentAngerEndTime(): Long {
         return angerTime
     }
 
-    override fun setRemainingPersistentAngerTime(angerTime: Int) {
+    override fun setPersistentAngerEndTime(angerTime: Long) {
         this.angerTime = angerTime
     }
 
-    override fun getPersistentAngerTarget(): UUID? {
+    override fun getPersistentAngerTarget(): EntityReference<LivingEntity>? {
         return angryAt
     }
 
-    override fun setPersistentAngerTarget(angryAt: UUID?) {
+    override fun setPersistentAngerTarget(angryAt: EntityReference<LivingEntity>?) {
         this.angryAt = angryAt
     }
 
     override fun startPersistentAngerTimer() {
-        this.remainingPersistentAngerTime = ANGER_TIME_RANGE.sample(this.random)
+        this.setTimeToRemainAngry(ANGER_TIME_RANGE.sample(this.random).toLong())
     }
     //#endregion
 }

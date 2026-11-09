@@ -6,8 +6,8 @@ import dev.hybridlabs.aquatic.block.entity.MessageInABottleBlockEntity
 import net.minecraft.core.Direction
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED
-import net.minecraft.world.level.levelgen.feature.Feature
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext
+import dev.hybridlabs.aquatic.world.gen.feature.FeatureAlgorithm as Feature
+import dev.hybridlabs.aquatic.world.gen.feature.FeatureContext as FeaturePlaceContext
 
 /**
  * A feature for placing Message in a Bottle blocks in the world.
@@ -19,7 +19,7 @@ class MessageInABottleFeature(codec: Codec<MessageInABottleFeatureConfig>) :
         val world = context.level()
         val origin = context.origin()
         val random = context.random()
-        val placedState = config.toPlace.getState(random, origin)
+        val placedState = config.toPlace.getState(world, random, origin)
         val originalState = world.getBlockState(origin.mutable())
 
         if (originalState.isSolid || placedState.block !is MessageInABottleBlock) {

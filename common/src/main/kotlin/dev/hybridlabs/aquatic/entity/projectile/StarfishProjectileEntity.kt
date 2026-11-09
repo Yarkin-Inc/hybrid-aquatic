@@ -10,20 +10,20 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.entity.projectile.AbstractArrow
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow
 import net.minecraft.world.entity.projectile.ItemSupplier
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.BlockHitResult
-import software.bernie.geckolib.animatable.GeoEntity
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
-import software.bernie.geckolib.animation.AnimatableManager
-import software.bernie.geckolib.animation.AnimationController
-import software.bernie.geckolib.animation.AnimationController.AnimationStateHandler
-import software.bernie.geckolib.animation.AnimationState
-import software.bernie.geckolib.animation.RawAnimation
-import software.bernie.geckolib.animation.PlayState
-import software.bernie.geckolib.util.GeckoLibUtil
+import com.geckolib.animatable.GeoEntity
+import com.geckolib.animatable.instance.AnimatableInstanceCache
+import com.geckolib.animatable.manager.AnimatableManager
+import com.geckolib.animation.AnimationController
+import com.geckolib.animation.AnimationController.AnimationStateHandler
+import com.geckolib.animation.state.AnimationTest
+import com.geckolib.animation.RawAnimation
+import com.geckolib.animation.`object`.PlayState
+import com.geckolib.util.GeckoLibUtil
 
 class StarfishProjectileEntity : AbstractArrow, ItemSupplier, GeoEntity {
     private val animCache = GeckoLibUtil.createInstanceCache(this)
@@ -40,10 +40,10 @@ class StarfishProjectileEntity : AbstractArrow, ItemSupplier, GeoEntity {
 
     override fun registerControllers(controllers: AnimatableManager.ControllerRegistrar) {
         controllers.add(
-            AnimationController(
-                this, "thrown_controller",
-                AnimationStateHandler { state: AnimationState<StarfishProjectileEntity> ->
-                    if (!inGround) return@AnimationStateHandler state.setAndContinue(THROWN_ANIMATION)
+            AnimationController<StarfishProjectileEntity>(
+                 "thrown_controller",
+                AnimationStateHandler { state: AnimationTest<StarfishProjectileEntity> ->
+                    if (!isInGround) return@AnimationStateHandler state.setAndContinue(THROWN_ANIMATION)
                     else {
                         state.setControllerSpeed(0.0f)
                         PlayState.CONTINUE
@@ -53,12 +53,12 @@ class StarfishProjectileEntity : AbstractArrow, ItemSupplier, GeoEntity {
         )
     }
 
-    override fun getAnimatableInstanceCache(): AnimatableInstanceCache? {
+    override fun getAnimatableInstanceCache(): AnimatableInstanceCache {
         return animCache
     }
 
-    override fun canBeCollidedWith(): Boolean {
-        return inGround
+    override fun canBeCollidedWith(other: net.minecraft.world.entity.Entity?): Boolean {
+        return isInGround
     }
 
     override fun canCollideWith(entity: Entity): Boolean {
@@ -79,12 +79,12 @@ class StarfishProjectileEntity : AbstractArrow, ItemSupplier, GeoEntity {
         return ItemStack(HAItems.STARFISH.get())
     }
 
-    override fun interact(player: Player, hand: InteractionHand): InteractionResult {
-        if (!this.level().isClientSide && this.inGround) {
+    override fun interact(player: Player, hand: InteractionHand, location: net.minecraft.world.phys.Vec3): InteractionResult {
+        if (!this.level().isClientSide && this.isInGround) {
             val item = ItemStack(HAItems.STARFISH.get())
 
             if (!player.addItem(item)) {
-                player.drop(item, false)
+                player.drop(item, false, net.minecraft.util.Prediction.SERVER_ONLY)
             }
 
             this.discard()
@@ -115,7 +115,7 @@ class StarfishProjectileEntity : AbstractArrow, ItemSupplier, GeoEntity {
     override fun tick() {
         super.tick()
 
-        if (isInWater && !inGround) {
+        if (isInWater && !isInGround) {
             deltaMovement = deltaMovement.add(0.0, 0.05, 0.0)
         }
     }

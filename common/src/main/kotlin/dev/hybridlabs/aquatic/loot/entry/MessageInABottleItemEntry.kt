@@ -11,8 +11,9 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.level.storage.loot.LootContext
-import net.minecraft.world.level.storage.loot.entries.LootPoolEntryType
-import net.minecraft.world.level.storage.loot.entries.LootPoolSingletonContainer
+import net.minecraft.core.Holder
+import java.util.Optional
+import net.minecraft.world.level.storage.loot.entries.SingleEntryContainerBase
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition
 import java.util.function.Consumer
@@ -20,26 +21,26 @@ import java.util.function.Consumer
 class MessageInABottleItemEntry(
     weight: Int,
     quality: Int,
-    conditions: List<LootItemCondition>,
-    functions: List<LootItemFunction>
-) : LootPoolSingletonContainer(weight, quality, conditions, functions) {
-    override fun getType(): LootPoolEntryType {
-        return HybridAquaticLootPoolEntryTypes.MESSAGE_IN_A_BOTTLE.get()
-    }
+    conditions: Optional<Holder<LootItemCondition>>,
+    functions: Optional<Holder<LootItemFunction>>
+) : SingleEntryContainerBase(weight, quality, conditions, functions) {
+    override fun codec(): MapCodec<MessageInABottleItemEntry> = CODEC
 
-    public override fun createItemStack(consumer: Consumer<ItemStack?>, context: LootContext) {
+    public override fun createItemStack(consumer: Consumer<ItemStack>, context: LootContext) {
         val random = context.random
         val stack = ItemStack(HAItems.MESSAGE_IN_A_BOTTLE.get())
         val stuff = CompoundTag().apply {
             val variants = MessageInABottleBlock.Variant.entries
             putString(MessageInABottleBlockEntity.VARIANT_KEY, variants[random.nextInt(variants.size)].id)
         }
-        stack.set(DataComponents.CUSTOM_DATA, CustomData.of(stuff))
+        stack.set(DataComponents.BLOCK_ENTITY_DATA, net.minecraft.world.item.component.TypedEntityData.of(
+            dev.hybridlabs.aquatic.block.entity.HABlockEntityTypes.MESSAGE_IN_A_BOTTLE.get(), stuff))
+        consumer.accept(stack)
     }
 
     companion object {
         val CODEC: MapCodec<MessageInABottleItemEntry> = RecordCodecBuilder.mapCodec {
-                inst -> singletonFields(inst).apply(inst, ::MessageInABottleItemEntry)
+                inst -> uniformFields(inst).apply(inst, ::MessageInABottleItemEntry)
         }
 
         fun builder(): Builder<*> {

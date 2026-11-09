@@ -12,9 +12,9 @@ import net.minecraft.util.ByIdMap
 import net.minecraft.util.StringRepresentable
 import net.minecraft.world.DifficultyInstance
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.MobSpawnType
+import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.SpawnGroupData
-import net.minecraft.world.entity.VariantHolder
+import dev.hybridlabs.hapi.entity.VariantHolder
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal
@@ -39,7 +39,7 @@ class HoundSharkEntity(type: EntityType<out HoundSharkEntity>, world: Level) :
     override fun finalizeSpawn(
         world: ServerLevelAccessor,
         difficulty: DifficultyInstance,
-        spawnReason: MobSpawnType,
+        spawnReason: EntitySpawnReason,
         entityData: SpawnGroupData?
     ): SpawnGroupData? {
         variant = Type.entries.random(Random)
@@ -83,13 +83,13 @@ class HoundSharkEntity(type: EntityType<out HoundSharkEntity>, world: Level) :
         super.defineSynchedData(builder)
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
+    override fun addAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueOutput) {
         compound.putString("Type", this.variant.serializedName)
         super.addAdditionalSaveData(compound)
     }
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
-        this.variant = Type.byName(compound.getString("Type"))
+    override fun readAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueInput) {
+        this.variant = Type.byName(compound.getStringOr("Type", ""))
         super.readAdditionalSaveData(compound)
     }
 
@@ -109,7 +109,7 @@ class HoundSharkEntity(type: EntityType<out HoundSharkEntity>, world: Level) :
             )
 
             fun byName(name: String?): Type {
-                return CODEC.byName(name, LEOPARD) as Type
+                return CODEC.byName(name ?: "", LEOPARD) as Type
             }
 
             fun fromId(id: Int): Type {

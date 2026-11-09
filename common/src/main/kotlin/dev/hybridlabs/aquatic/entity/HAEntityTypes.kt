@@ -1340,7 +1340,7 @@ object HAEntityTypes {
                 .sized(dimensions.width, dimensions.height)
                 .clientTrackingRange(10)
                 .updateInterval(10)
-                .build(id)
+                .build(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ENTITY_TYPE, CommonClass.locate(id)))
         }
     }
     //#endregion
@@ -1402,8 +1402,13 @@ object HAEntityTypes {
         attributeContainer: Callable<AttributeSupplier.Builder>,
     ): RegistryObject<EntityType<T>> {
         return CommonClass.ENTITY_TYPES.register(id) {
-            val entityType = entity.build(id)
-            Services.PLATFORM.registerAttributes(id, entityType, attributeContainer)
+            val entityType = entity.build(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ENTITY_TYPE, CommonClass.locate(id)))
+            // TemptGoal in 26.3 reads TEMPT_RANGE. Our AgeableMob-based aquatic
+            // classes do not inherit Animal.createAnimalAttributes(), which supplies it.
+            // Keep the vanilla animal range for every registered aquatic mob.
+            Services.PLATFORM.registerAttributes(id, entityType) {
+                attributeContainer.call().add(net.minecraft.world.entity.ai.attributes.Attributes.TEMPT_RANGE, 10.0)
+            }
             entityType
         }
     }

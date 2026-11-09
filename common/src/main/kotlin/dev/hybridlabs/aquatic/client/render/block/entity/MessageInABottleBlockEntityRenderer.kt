@@ -1,70 +1,41 @@
-@file:Suppress("DEPRECATION")
-
 package dev.hybridlabs.aquatic.client.render.block.entity
 
-import com.mojang.blaze3d.vertex.PoseStack
-import com.mojang.blaze3d.vertex.VertexConsumer
+import com.geckolib.constant.dataticket.DataTicket
+import com.geckolib.renderer.base.GeoRenderState
+import com.geckolib.renderer.base.RenderPassInfo
 import com.mojang.math.Axis
 import dev.hybridlabs.aquatic.block.MessageInABottleBlock
 import dev.hybridlabs.aquatic.block.entity.MessageInABottleBlockEntity
 import dev.hybridlabs.aquatic.client.model.block.entity.MessageInABottleBlockEntityModel
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
-import net.minecraft.client.renderer.MultiBufferSource
+import dev.hybridlabs.hapi.client.render.HybridGeoBlockRenderer
+import net.minecraft.client.renderer.SubmitNodeCollector
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState
 import net.minecraft.util.Mth
 import net.minecraft.util.RandomSource
 import net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED
-import software.bernie.geckolib.cache.`object`.BakedGeoModel
-import software.bernie.geckolib.renderer.GeoBlockRenderer
 
 class MessageInABottleBlockEntityRenderer(context: BlockEntityRendererProvider.Context) :
-    GeoBlockRenderer<MessageInABottleBlockEntity>(MessageInABottleBlockEntityModel()) {
-    private val random = RandomSource.create()
-
-    override fun preRender(
-        matrices: PoseStack,
-        blockEntity: MessageInABottleBlockEntity,
-        model: BakedGeoModel,
-        consumerProvider: MultiBufferSource?,
-        consumer: VertexConsumer?,
-        isReRender: Boolean,
-        partialTick: Float,
-        packedLight: Int,
-        packedOverlay: Int,
-        colour: Int
-    ) {
-        val pos = blockEntity.blockPos
-
-        // random rotation
-        val hashCode = Mth.getSeed(pos.x, 0, pos.z)
-        random.setSeed(hashCode)
-        matrices.translate(0.5, 0.0, 0.5)
-        matrices.mulPose(Axis.YP.rotationDegrees(random.nextFloat() * 360.0f + (ROTATION_PER * (blockEntity.variant.ordinal + 1))))
-        matrices.translate(-0.5, 0.0, -0.5)
-
-        // translate in water
-        if (blockEntity.blockState.getValue(WATERLOGGED)) {
-            matrices.translate(0.0, 0.8, 0.0)
-        } else {
-            matrices.translate(0.0, 0.001, 0.0)
-        }
-
-        // super
-        super.preRender(
-            matrices,
-            blockEntity,
-            model,
-            consumerProvider,
-            consumer,
-            isReRender,
-            partialTick,
-            packedLight,
-            packedOverlay,
-            colour
-        )
+    HybridGeoBlockRenderer<MessageInABottleBlockEntity>(context, MessageInABottleBlockEntityModel()) {
+    override fun addRenderData(entity: MessageInABottleBlockEntity, relatedObject: Void?, state: BlockEntityRenderState, partialTick: Float) {
+        val random = RandomSource.create(Mth.getSeed(entity.blockPos.x, 0, entity.blockPos.z))
+        (state as GeoRenderState).addGeckolibData(POSE, BottlePose(
+            random.nextFloat() * 360f + ROTATION_PER * (entity.variant.ordinal + 1),
+            if (entity.blockState.getValue(WATERLOGGED)) 0.8 else 0.001))
     }
 
+    override fun preRenderPass(pass: RenderPassInfo<BlockEntityRenderState>, collector: SubmitNodeCollector) {
+        val pose = pass.getGeckolibData(POSE) ?: BottlePose(0f, 0.001)
+        val matrices = pass.poseStack()
+        matrices.translate(0.5, pose.height, 0.5)
+        matrices.rotateDegrees(Axis.YP, pose.rotation)
+        matrices.translate(-0.5, 0.0, -0.5)
+        super.preRenderPass(pass, collector)
+    }
+
+    private data class BottlePose(val rotation: Float, val height: Double)
     companion object {
-        val ROTATION_PER = 360.0f / MessageInABottleBlock.Variant.entries.size
+        private val POSE = DataTicket.create("hybrid_aquatic:bottle_pose", BottlePose::class.java)
+        private val ROTATION_PER = 360f / MessageInABottleBlock.Variant.entries.size
     }
 }

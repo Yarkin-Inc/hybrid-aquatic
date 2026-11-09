@@ -1,39 +1,20 @@
 package dev.hybridlabs.aquatic.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-
 import dev.hybridlabs.aquatic.block.PlushieBlock;
-
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.layers.CustomHeadLayer;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.ItemStack;
-
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(CustomHeadLayer.class)
-public abstract class HeadFeatureRendererMixin<T extends LivingEntity> {
-    /**
-     * Translates the Plushie models up when on the player's head.
-     */
-    @Inject(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;"+
-                    "ILnet/minecraft/world/entity/LivingEntity;FFFFFF)V",
-
-            at = @At(value = "INVOKE", target =
-                    "Lnet/minecraft/world/entity/WalkAnimationState;position(F)F",
-                     ordinal = 0, shift = At.Shift.AFTER))
-
-    private void translatePlushieUp(PoseStack matrices, MultiBufferSource vertices, int light, T entity,
-                                    float limbAngle, float limbDistance, float tickDelta, float animationProgress,
-                                    float headYaw, float headPitch, CallbackInfo ci) {
-        ItemStack stack = entity.getItemBySlot(EquipmentSlot.HEAD);
-        if (stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof PlushieBlock) {
-            matrices.translate(0.0, 6.75 / 16.0, 0.0);
-        }
+public abstract class HeadFeatureRendererMixin {
+    @Inject(method = "submit", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/blockentity/SkullBlockRenderer;submitSkull(FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/client/model/object/skull/SkullModelBase;Lnet/minecraft/client/renderer/rendertype/RenderType;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V"))
+    private void hybrid$translatePlushie(PoseStack poses, SubmitNodeCollector collector, int light,
+                                       LivingEntityRenderState state, float yaw, float pitch, CallbackInfo ci) {
+        if (state.wornHeadType instanceof PlushieBlock.Variant) poses.translate(0, -6.75 / 16.0, 0);
     }
 }

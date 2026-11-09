@@ -16,8 +16,8 @@ import net.minecraft.resources.ResourceKey
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.biome.Biome
 import net.minecraft.world.level.biome.Biomes
-import net.minecraft.world.level.levelgen.DensityFunction
-import net.minecraft.world.level.levelgen.DensityFunctions
+import net.minecraft.world.level.levelgen.densityfunction.DensityFunction
+import net.minecraft.world.level.levelgen.densityfunction.DensityFunctions
 import net.minecraft.world.level.levelgen.synth.NormalNoise
 
 /**
@@ -32,7 +32,7 @@ object HABiomeInjectors {
         RegistrationProvider.get(LithostitchedBuiltInRegistries.LOAD_PREDICATE_TYPE, Constants.MOD_ID)
     val BIOME_ENABLED = LOAD_PREDICATE_TYPES.register("biome_enabled") { BiomeEnabledPredicate.CODEC }
 
-    val REEF_SELECTOR_NOISE: ResourceKey<NormalNoise.NoiseParameters> =
+    val REEF_SELECTOR_NOISE: ResourceKey<net.minecraft.world.level.levelgen.synth.NormalNoise> =
         ResourceKey.create(Registries.NOISE, CommonClass.locate("reef_selector"))
     val REEF_SELECTOR: ResourceKey<DensityFunction> =
         ResourceKey.create(Registries.DENSITY_FUNCTION, CommonClass.locate("biome/reef_selector"))
@@ -107,11 +107,11 @@ object HABiomeInjectors {
     private const val SHALLOW_REEF_PRIORITY = 1200
 
     // Vanilla's deep ocean continentalness band; warm ocean has no deep variant there
-    private const val DEEP_OCEAN_MIN_CONTINENTALNESS = -1.05
-    private const val DEEP_OCEAN_MAX_CONTINENTALNESS = -0.455
+    private const val DEEP_OCEAN_MIN_CONTINENTALNESS = -1.05f
+    private const val DEEP_OCEAN_MAX_CONTINENTALNESS = -0.455f
 
-    fun bootstrapNoises(context: BootstrapContext<NormalNoise.NoiseParameters>) {
-        context.register(REEF_SELECTOR_NOISE, NormalNoise.NoiseParameters(-9, 1.0, 1.0))
+    fun bootstrapNoises(context: BootstrapContext<net.minecraft.world.level.levelgen.synth.NormalNoise>) {
+        context.register(REEF_SELECTOR_NOISE, net.minecraft.world.level.levelgen.synth.NormalNoise.createParity(-9, 1.0, 1.0))
     }
 
     fun bootstrapDensityFunctions(context: BootstrapContext<DensityFunction>) {
@@ -131,8 +131,8 @@ object HABiomeInjectors {
                 biomes.getOrThrow(Biomes.BEACH),
                 biomes.getOrThrow(HABiomes.TIDE_POOLS),
                 ParameterBuilder.create()
-                    .climateRange(ClimateParameter.TEMPERATURE, 0.2, 0.55)
-                    .climateRange(ClimateParameter.CONTINENTALNESS, -0.19, -0.16)
+                    .climateRange(ClimateParameter.TEMPERATURE, 0.2f, 0.55f)
+                    .climateRange(ClimateParameter.CONTINENTALNESS, -0.19f, -0.16f)
             )
         )
 
@@ -142,12 +142,12 @@ object HABiomeInjectors {
                 biomes.getOrThrow(Biomes.DESERT),
                 biomes.getOrThrow(HABiomes.TIDE_POOLS),
                 ParameterBuilder.create()
-                    .climateRange(ClimateParameter.TEMPERATURE, 0.55, 1.0)
-                    .climateRange(ClimateParameter.CONTINENTALNESS, -0.19, -0.16)
+                    .climateRange(ClimateParameter.TEMPERATURE, 0.55f, 1.0f)
+                    .climateRange(ClimateParameter.CONTINENTALNESS, -0.19f, -0.16f)
             )
         )
 
-        // Reef selector values cluster around 0 (roughly normal, sd ~0.33), so these
+        // Reef selector values cluster around 0 (roughly normal, sd ~0.33f), so these
         // bands give coral reef and red meadow ~15% of warm ocean each and seagrass
         // bed ~28%, with plain warm ocean left in the gaps between them
         context.register(
@@ -158,7 +158,7 @@ object HABiomeInjectors {
                     biomes.getOrThrow(Biomes.WARM_OCEAN),
                     biomes.getOrThrow(HABiomes.CORAL_REEF),
                     ParameterBuilder.create()
-                        .densityFunctionRange(densityFunctions.getOrThrow(REEF_SELECTOR), -1.0, -0.32)
+                        .densityFunctionRange(densityFunctions.getOrThrow(REEF_SELECTOR), -1.0f, -0.32f)
                 )
         )
 
@@ -170,7 +170,7 @@ object HABiomeInjectors {
                     biomes.getOrThrow(Biomes.WARM_OCEAN),
                     biomes.getOrThrow(HABiomes.SEAGRASS_BED),
                     ParameterBuilder.create()
-                        .densityFunctionRange(densityFunctions.getOrThrow(REEF_SELECTOR), -0.12, 0.12)
+                        .densityFunctionRange(densityFunctions.getOrThrow(REEF_SELECTOR), -0.12f, 0.12f)
                 )
         )
 
@@ -182,7 +182,7 @@ object HABiomeInjectors {
                     biomes.getOrThrow(Biomes.WARM_OCEAN),
                     biomes.getOrThrow(HABiomes.RED_MEADOW),
                     ParameterBuilder.create()
-                        .densityFunctionRange(densityFunctions.getOrThrow(REEF_SELECTOR), 0.32, 1.0)
+                        .densityFunctionRange(densityFunctions.getOrThrow(REEF_SELECTOR), 0.32f, 1.0f)
                 )
         )
 
@@ -198,7 +198,7 @@ object HABiomeInjectors {
                             DEEP_OCEAN_MIN_CONTINENTALNESS,
                             DEEP_OCEAN_MAX_CONTINENTALNESS
                         )
-                        .densityFunctionMin(densityFunctions.getOrThrow(REEF_SELECTOR), 0.2)
+                        .densityFunctionMin(densityFunctions.getOrThrow(REEF_SELECTOR), 0.2f)
                 )
         )
 
@@ -209,7 +209,7 @@ object HABiomeInjectors {
                     biomes.getOrThrow(Biomes.DEEP_LUKEWARM_OCEAN),
                     biomes.getOrThrow(HABiomes.TROPICAL_DEEP_CORAL_REEF),
                     ParameterBuilder.create()
-                        .densityFunctionMin(densityFunctions.getOrThrow(REEF_SELECTOR), 0.2)
+                        .densityFunctionMin(densityFunctions.getOrThrow(REEF_SELECTOR), 0.2f)
                 )
         )
 
@@ -219,7 +219,7 @@ object HABiomeInjectors {
                 biomes.getOrThrow(Biomes.DEEP_OCEAN),
                 biomes.getOrThrow(HABiomes.DEEP_CORAL_REEF),
                 ParameterBuilder.create()
-                    .densityFunctionMin(densityFunctions.getOrThrow(REEF_SELECTOR), 0.2)
+                    .densityFunctionMin(densityFunctions.getOrThrow(REEF_SELECTOR), 0.2f)
             )
         )
 
@@ -229,7 +229,7 @@ object HABiomeInjectors {
                 biomes.getOrThrow(Biomes.DEEP_COLD_OCEAN),
                 biomes.getOrThrow(HABiomes.DEEP_CORAL_REEF),
                 ParameterBuilder.create()
-                    .densityFunctionMin(densityFunctions.getOrThrow(REEF_SELECTOR), 0.2)
+                    .densityFunctionMin(densityFunctions.getOrThrow(REEF_SELECTOR), 0.2f)
             )
         )
 
@@ -239,7 +239,7 @@ object HABiomeInjectors {
                 biomes.getOrThrow(Biomes.DEEP_FROZEN_OCEAN),
                 biomes.getOrThrow(HABiomes.DEEP_CORAL_REEF),
                 ParameterBuilder.create()
-                    .densityFunctionMin(densityFunctions.getOrThrow(REEF_SELECTOR), 0.2)
+                    .densityFunctionMin(densityFunctions.getOrThrow(REEF_SELECTOR), 0.2f)
             )
         )
 
@@ -269,7 +269,7 @@ object HABiomeInjectors {
                     biomes.getOrThrow(Biomes.WARM_OCEAN),
                     biomes.getOrThrow(HABiomes.WARM_TRENCH),
                     ParameterBuilder.create()
-                        .climateRange(ClimateParameter.CONTINENTALNESS, -0.71, -0.63)
+                        .climateRange(ClimateParameter.CONTINENTALNESS, -0.71f, -0.63f)
                 )
         )
 
@@ -281,7 +281,7 @@ object HABiomeInjectors {
                     biomes.getOrThrow(Biomes.DEEP_LUKEWARM_OCEAN),
                     biomes.getOrThrow(HABiomes.LUKEWARM_TRENCH),
                     ParameterBuilder.create()
-                        .climateRange(ClimateParameter.CONTINENTALNESS, -0.71, -0.63)
+                        .climateRange(ClimateParameter.CONTINENTALNESS, -0.71f, -0.63f)
                 )
         )
 
@@ -293,7 +293,7 @@ object HABiomeInjectors {
                     biomes.getOrThrow(Biomes.DEEP_OCEAN),
                     biomes.getOrThrow(HABiomes.TRENCH),
                     ParameterBuilder.create()
-                        .climateRange(ClimateParameter.CONTINENTALNESS, -0.71, -0.63)
+                        .climateRange(ClimateParameter.CONTINENTALNESS, -0.71f, -0.63f)
                 )
         )
 
@@ -305,7 +305,7 @@ object HABiomeInjectors {
                     biomes.getOrThrow(Biomes.DEEP_COLD_OCEAN),
                     biomes.getOrThrow(HABiomes.COLD_TRENCH),
                     ParameterBuilder.create()
-                        .climateRange(ClimateParameter.CONTINENTALNESS, -0.71, -0.63)
+                        .climateRange(ClimateParameter.CONTINENTALNESS, -0.71f, -0.63f)
                 )
         )
 
@@ -317,7 +317,7 @@ object HABiomeInjectors {
                     biomes.getOrThrow(Biomes.DEEP_FROZEN_OCEAN),
                     biomes.getOrThrow(HABiomes.FROZEN_TRENCH),
                     ParameterBuilder.create()
-                        .climateRange(ClimateParameter.CONTINENTALNESS, -0.71, -0.63)
+                        .climateRange(ClimateParameter.CONTINENTALNESS, -0.71f, -0.63f)
                 )
         )
 
@@ -335,7 +335,7 @@ object HABiomeInjectors {
                             DEEP_OCEAN_MIN_CONTINENTALNESS,
                             DEEP_OCEAN_MAX_CONTINENTALNESS
                         )
-                        .climateRange(ClimateParameter.DEPTH, 0.2, 0.5)
+                        .climateRange(ClimateParameter.DEPTH, 0.2f, 0.5f)
                 )
         )
 
@@ -347,7 +347,7 @@ object HABiomeInjectors {
                     biomes.getOrThrow(Biomes.DEEP_LUKEWARM_OCEAN),
                     biomes.getOrThrow(HABiomes.SULFURIC_CAVES),
                     ParameterBuilder.create()
-                        .climateRange(ClimateParameter.DEPTH, 0.2, 0.5)
+                        .climateRange(ClimateParameter.DEPTH, 0.2f, 0.5f)
                 )
         )
 
@@ -359,7 +359,7 @@ object HABiomeInjectors {
                     biomes.getOrThrow(Biomes.DEEP_OCEAN),
                     biomes.getOrThrow(HABiomes.SULFURIC_CAVES),
                     ParameterBuilder.create()
-                        .climateRange(ClimateParameter.DEPTH, 0.2, 0.5)
+                        .climateRange(ClimateParameter.DEPTH, 0.2f, 0.5f)
                 )
         )
 
@@ -371,7 +371,7 @@ object HABiomeInjectors {
                     biomes.getOrThrow(Biomes.DEEP_COLD_OCEAN),
                     biomes.getOrThrow(HABiomes.SULFURIC_CAVES),
                     ParameterBuilder.create()
-                        .climateRange(ClimateParameter.DEPTH, 0.2, 0.5)
+                        .climateRange(ClimateParameter.DEPTH, 0.2f, 0.5f)
                 )
         )
 
@@ -383,7 +383,7 @@ object HABiomeInjectors {
                     biomes.getOrThrow(Biomes.DEEP_FROZEN_OCEAN),
                     biomes.getOrThrow(HABiomes.SULFURIC_CAVES),
                     ParameterBuilder.create()
-                        .climateRange(ClimateParameter.DEPTH, 0.2, 0.5)
+                        .climateRange(ClimateParameter.DEPTH, 0.2f, 0.5f)
                 )
         )
 
@@ -393,8 +393,8 @@ object HABiomeInjectors {
                 biomes.getOrThrow(Biomes.RIVER),
                 biomes.getOrThrow(HABiomes.TROPICAL_RIVER),
                 ParameterBuilder.create()
-                    .climateRange(ClimateParameter.TEMPERATURE, 0.2, 1.0)
-                    .climateRange(ClimateParameter.HUMIDITY, 0.1, 1.0)
+                    .climateRange(ClimateParameter.TEMPERATURE, 0.2f, 1.0f)
+                    .climateRange(ClimateParameter.HUMIDITY, 0.1f, 1.0f)
             )
         )
     }

@@ -3,7 +3,7 @@ package dev.hybridlabs.aquatic.mixin.client;
 import dev.hybridlabs.aquatic.block.PlushieBlock;
 import kotlin.enums.EnumEntries;
 import net.minecraft.client.renderer.blockentity.SkullBlockRenderer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.SkullBlock;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,7 +21,7 @@ public abstract class SkullBlockEntityTextureMixin {
      */
 
     @Inject(method = "lambda$static$0(Ljava/util/HashMap;)V", at = @At("TAIL"))
-    private static void injectTextures(HashMap<SkullBlock.Type, ResourceLocation> map, CallbackInfo info) {
+    private static void injectTextures(HashMap<SkullBlock.Type, Identifier> map, CallbackInfo info) {
         // inject plushie variants
         EnumEntries<PlushieBlock.Variant> variants = PlushieBlock.Variant.getEntries();
         for (PlushieBlock.Variant variant : variants) {

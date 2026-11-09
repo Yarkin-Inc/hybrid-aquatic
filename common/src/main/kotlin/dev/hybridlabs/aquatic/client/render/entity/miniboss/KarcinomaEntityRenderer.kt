@@ -10,7 +10,7 @@ class KarcinomaEntityRenderer(context: Context) :
         return 0.0025f
     }
 
-    override fun getDeathMaxRotation(animatable: KarcinomaEntity): Float {
+    override fun getDeathMaxRotation(state: com.geckolib.renderer.base.GeoRenderState): Float {
         return 180f
     }
 

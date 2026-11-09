@@ -6,11 +6,11 @@ import dev.hybridlabs.aquatic.platform.registration.RegistrationProvider;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.decoration.PaintingVariant;
+import net.minecraft.world.entity.decoration.painting.PaintingVariant;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Instrument;
@@ -18,10 +18,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.levelgen.DensityFunction;
+import net.minecraft.world.level.levelgen.densityfunction.DensityFunction;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.storage.loot.entries.LootPoolEntryType;
+import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
 
 import java.nio.file.Path;
 
@@ -40,8 +40,6 @@ public class CommonClass {
             RegistrationProvider.get(BuiltInRegistries.BLOCK, MOD_ID);
     public static final RegistrationProvider<Item> ITEMS =
             RegistrationProvider.get(BuiltInRegistries.ITEM, MOD_ID);
-    public static final RegistrationProvider<Instrument> INSTRUMENTS =
-            RegistrationProvider.get(BuiltInRegistries.INSTRUMENT, MOD_ID);
     public static final RegistrationProvider<SoundEvent> SOUND_EVENTS =
             RegistrationProvider.get(BuiltInRegistries.SOUND_EVENT, MOD_ID);
     public static final RegistrationProvider<Fluid> FLUIDS =
@@ -60,11 +58,11 @@ public class CommonClass {
             RegistrationProvider.get(BuiltInRegistries.BLOCK_ENTITY_TYPE, MOD_ID);
     public static final RegistrationProvider<CreativeModeTab> CREATIVE_MODE_TABS =
             RegistrationProvider.get(BuiltInRegistries.CREATIVE_MODE_TAB, MOD_ID);
-    public static final RegistrationProvider<Feature<?>> FEATURE =
-            RegistrationProvider.get(BuiltInRegistries.FEATURE, MOD_ID);
+    public static final RegistrationProvider<MapCodec<? extends Feature>> FEATURE =
+            RegistrationProvider.get(BuiltInRegistries.FEATURE_TYPE, MOD_ID);
     public static final RegistrationProvider<MapCodec<? extends DensityFunction>> DENSITY_FUNCTION_TYPES =
             RegistrationProvider.get(BuiltInRegistries.DENSITY_FUNCTION_TYPE, MOD_ID);
-    public static final RegistrationProvider<LootPoolEntryType> LOOT_POOL_ENTRY_TYPE =
+    public static final RegistrationProvider<MapCodec<? extends LootPoolEntryContainer>> LOOT_POOL_ENTRY_TYPE =
             RegistrationProvider.get(BuiltInRegistries.LOOT_POOL_ENTRY_TYPE, MOD_ID);
 	public static final RegistrationProvider<ParticleType<?>> PARTICLE_TYPE =
 			RegistrationProvider.get(BuiltInRegistries.PARTICLE_TYPE, MOD_ID);
@@ -73,8 +71,8 @@ public class CommonClass {
 	
     public static final Path CONFIG_FILE = Services.PLATFORM.getConfigDir().resolve(MOD_ID + ".json");
 
-    public static ResourceLocation locate(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+    public static Identifier locate(String path) {
+        return Identifier.fromNamespaceAndPath(MOD_ID, path);
     }
 
     public static void init() {

@@ -2,12 +2,12 @@ package dev.hybridlabs.aquatic.client.model.entity.fish
 
 import dev.hybridlabs.aquatic.entity.fish.MahiEntity
 import dev.hybridlabs.hapi.client.model.entity.aquatic.BaseFishEntityModel
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import kotlin.random.Random
 
 class MahiEntityModel : BaseFishEntityModel<MahiEntity>("hybrid_aquatic", "mahi") {
 
-    override fun getTextureResource(animatable: MahiEntity): ResourceLocation {
+    override fun getTextureResource(animatable: MahiEntity): Identifier {
         val seed = animatable.uuid.leastSignificantBits
         val random = Random(seed)
 
@@ -17,7 +17,7 @@ class MahiEntityModel : BaseFishEntityModel<MahiEntity>("hybrid_aquatic", "mahi"
         }
     }
 
-    override fun getModelResource(animatable: MahiEntity): ResourceLocation {
+    override fun getModelResource(animatable: MahiEntity): Identifier {
         return when (animatable.variant) {
             MahiEntity.Companion.Type.MAHI -> MAHI_MODEL
             MahiEntity.Companion.Type.POMPANO -> POMPANO_MODEL
@@ -26,17 +26,17 @@ class MahiEntityModel : BaseFishEntityModel<MahiEntity>("hybrid_aquatic", "mahi"
 
     companion object {
         private val POMPANO_TEXTURE =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/fish/mahi/mahi_pompano.png")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/fish/mahi/mahi_pompano.png")
 
         private val mahiTextures = listOf(
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/fish/mahi/mahi_mahi.png"),
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/fish/mahi/mahi_mahi_2.png"),
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/fish/mahi/mahi_mahi_3.png"),
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/fish/mahi/mahi_mahi.png"),
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/fish/mahi/mahi_mahi_2.png"),
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/fish/mahi/mahi_mahi_3.png"),
         )
 
         private val MAHI_MODEL =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "geo/fish/mahi/mahi_mahi.geo.json")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "fish/mahi/mahi_mahi")
         private val POMPANO_MODEL =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "geo/fish/mahi/mahi_pompano.geo.json")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "fish/mahi/mahi_pompano")
     }
 }

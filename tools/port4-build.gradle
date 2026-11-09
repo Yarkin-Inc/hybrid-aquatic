@@ -1,0 +1,4 @@
+// Separate Gradle output from the IDE's shared build/classes directories.
+gradle.beforeProject { project ->
+    project.layout.buildDirectory.set(project.file('build-port4'))
+}

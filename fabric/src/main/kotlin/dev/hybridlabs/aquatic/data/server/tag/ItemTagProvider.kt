@@ -10,7 +10,7 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.tags.ItemTags
 import net.minecraft.world.item.Items
 import java.util.concurrent.CompletableFuture
@@ -53,10 +53,10 @@ class ItemTagProvider(output: FabricDataOutput, registriesFuture: CompletableFut
                 HAItems.REINFORCED_DIVING_HELMET.get(),
                 HAItems.GLOWING_DIVING_HELMET.get(),
             )
-            .addOptional(ResourceLocation.fromNamespaceAndPath("create", "copper_diving_helmet"))
-            .addOptional(ResourceLocation.fromNamespaceAndPath("create", "netherite_diving_helmet"))
-            .addOptional(ResourceLocation.fromNamespaceAndPath("aquamirae", "three_bolt_helmet"))
-            .addOptional(ResourceLocation.fromNamespaceAndPath("alexscaves", "diving_helmet"))
+            .addOptional(Identifier.fromNamespaceAndPath("create", "copper_diving_helmet"))
+            .addOptional(Identifier.fromNamespaceAndPath("create", "netherite_diving_helmet"))
+            .addOptional(Identifier.fromNamespaceAndPath("aquamirae", "three_bolt_helmet"))
+            .addOptional(Identifier.fromNamespaceAndPath("alexscaves", "diving_helmet"))
 
         getOrCreateTagBuilder(HAItemTags.DIVING_SUIT)
             .add(
@@ -64,10 +64,10 @@ class ItemTagProvider(output: FabricDataOutput, registriesFuture: CompletableFut
                 HAItems.REINFORCED_DIVING_SUIT.get(),
                 HAItems.GLOWING_DIVING_SUIT.get(),
             )
-            .addOptional(ResourceLocation.fromNamespaceAndPath("create", "copper_backtank"))
-            .addOptional(ResourceLocation.fromNamespaceAndPath("create", "netherite_backtank"))
-            .addOptional(ResourceLocation.fromNamespaceAndPath("aquamirae", "three_bolt_chestplate"))
-            .addOptional(ResourceLocation.fromNamespaceAndPath("alexscaves", "diving_chestplate"))
+            .addOptional(Identifier.fromNamespaceAndPath("create", "copper_backtank"))
+            .addOptional(Identifier.fromNamespaceAndPath("create", "netherite_backtank"))
+            .addOptional(Identifier.fromNamespaceAndPath("aquamirae", "three_bolt_chestplate"))
+            .addOptional(Identifier.fromNamespaceAndPath("alexscaves", "diving_chestplate"))
 
         getOrCreateTagBuilder(HAItemTags.DIVING_LEGGINGS)
             .add(
@@ -75,8 +75,8 @@ class ItemTagProvider(output: FabricDataOutput, registriesFuture: CompletableFut
                 HAItems.REINFORCED_DIVING_LEGGINGS.get(),
                 HAItems.GLOWING_DIVING_LEGGINGS.get(),
             )
-            .addOptional(ResourceLocation.fromNamespaceAndPath("aquamirae", "three_bolt_leggings"))
-            .addOptional(ResourceLocation.fromNamespaceAndPath("alexscaves", "diving_leggings"))
+            .addOptional(Identifier.fromNamespaceAndPath("aquamirae", "three_bolt_leggings"))
+            .addOptional(Identifier.fromNamespaceAndPath("alexscaves", "diving_leggings"))
 
         getOrCreateTagBuilder(HAItemTags.DIVING_BOOTS)
             .add(
@@ -84,10 +84,10 @@ class ItemTagProvider(output: FabricDataOutput, registriesFuture: CompletableFut
                 HAItems.REINFORCED_DIVING_BOOTS.get(),
                 HAItems.GLOWING_DIVING_BOOTS.get(),
             )
-            .addOptional(ResourceLocation.fromNamespaceAndPath("create", "copper_diving_boots"))
-            .addOptional(ResourceLocation.fromNamespaceAndPath("create", "netherite_diving_boots"))
-            .addOptional(ResourceLocation.fromNamespaceAndPath("aquamirae", "three_bolt_boots"))
-            .addOptional(ResourceLocation.fromNamespaceAndPath("alexscaves", "diving_boots"))
+            .addOptional(Identifier.fromNamespaceAndPath("create", "copper_diving_boots"))
+            .addOptional(Identifier.fromNamespaceAndPath("create", "netherite_diving_boots"))
+            .addOptional(Identifier.fromNamespaceAndPath("aquamirae", "three_bolt_boots"))
+            .addOptional(Identifier.fromNamespaceAndPath("alexscaves", "diving_boots"))
         //#endregion
 
         //#region Effect Tags
@@ -128,9 +128,9 @@ class ItemTagProvider(output: FabricDataOutput, registriesFuture: CompletableFut
                 HAItems.REINFORCED_DIVING_LEGGINGS.get(),
                 HAItems.REINFORCED_DIVING_BOOTS.get(),
             )
-            .addOptional(ResourceLocation.fromNamespaceAndPath("create", "netherite_diving_helmet"))
-            .addOptional(ResourceLocation.fromNamespaceAndPath("create", "netherite_backtank"))
-            .addOptional(ResourceLocation.fromNamespaceAndPath("create", "netherite_diving_boots"))
+            .addOptional(Identifier.fromNamespaceAndPath("create", "netherite_diving_helmet"))
+            .addOptional(Identifier.fromNamespaceAndPath("create", "netherite_backtank"))
+            .addOptional(Identifier.fromNamespaceAndPath("create", "netherite_diving_boots"))
         //#endregion
 
         //#region Wood Tags
@@ -612,12 +612,12 @@ class ItemTagProvider(output: FabricDataOutput, registriesFuture: CompletableFut
 
         getOrCreateTagBuilder(HAItemTags.CRAB_WEARABLES)
             .addOptionalTag(ItemTags.WOOL.location())
-            .addOptionalTag(ResourceLocation.fromNamespaceAndPath("c", "skulls"))
-            .addOptionalTag(ResourceLocation.fromNamespaceAndPath("c", "bookshelves"))
-            .addOptionalTag(ResourceLocation.fromNamespaceAndPath("c", "barrels"))
-            .addOptionalTag(ResourceLocation.fromNamespaceAndPath("c", "chests"))
-            .addOptionalTag(ResourceLocation.fromNamespaceAndPath("c", "pumpkins"))
-            .addOptionalTag(ResourceLocation.fromNamespaceAndPath("c", "shulker_boxes"))
+            .addOptionalTag(Identifier.fromNamespaceAndPath("c", "skulls"))
+            .addOptionalTag(Identifier.fromNamespaceAndPath("c", "bookshelves"))
+            .addOptionalTag(Identifier.fromNamespaceAndPath("c", "barrels"))
+            .addOptionalTag(Identifier.fromNamespaceAndPath("c", "chests"))
+            .addOptionalTag(Identifier.fromNamespaceAndPath("c", "pumpkins"))
+            .addOptionalTag(Identifier.fromNamespaceAndPath("c", "shulker_boxes"))
             .add(
                 Items.NAUTILUS_SHELL,
                 Items.SKELETON_SKULL,

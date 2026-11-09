@@ -3,6 +3,8 @@ package dev.hybridlabs.aquatic.particle
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.particle.*
 import net.minecraft.core.particles.SimpleParticleType
+import net.minecraft.client.renderer.texture.TextureAtlasSprite
+import net.minecraft.util.RandomSource
 
 class VentSmokeParticle(
     world: ClientLevel,
@@ -11,8 +13,7 @@ class VentSmokeParticle(
     z: Double,
     xSpeed: Double,
     ySpeed: Double,
-    zSpeed: Double
-) : TextureSheetParticle(world, x, y, z) {
+    zSpeed: Double, initialSprite: TextureAtlasSprite) : SingleQuadParticle(world, x, y, z, initialSprite) {
 
     init {
         this.scale(3.0f)
@@ -42,8 +43,8 @@ class VentSmokeParticle(
         }
     }
 
-    override fun getRenderType(): ParticleRenderType {
-        return ParticleRenderType.PARTICLE_SHEET_OPAQUE
+    override fun getLayer(): SingleQuadParticle.Layer {
+        return SingleQuadParticle.Layer.OPAQUE
     }
 
     companion object {
@@ -56,10 +57,9 @@ class VentSmokeParticle(
                 z: Double,
                 xSpeed: Double,
                 ySpeed: Double,
-                zSpeed: Double,
-            ): Particle {
-                val ventSmokeParticle = VentSmokeParticle(level, x, y, z, xSpeed, ySpeed, zSpeed)
-                ventSmokeParticle.pickSprite(this.sprites)
+                zSpeed: Double, random: RandomSource): SingleQuadParticle {
+                val ventSmokeParticle = VentSmokeParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, this.sprites.get(random))
+
                 return ventSmokeParticle
             }
         }

@@ -12,14 +12,17 @@ import net.minecraft.util.ByIdMap
 import net.minecraft.util.StringRepresentable
 import net.minecraft.world.DifficultyInstance
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.MobSpawnType
+import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.SpawnGroupData
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.ServerLevelAccessor
-import software.bernie.geckolib.animation.*
-import software.bernie.geckolib.animation.AnimationController.AnimationStateHandler
+import com.geckolib.animation.*
+import com.geckolib.animation.state.AnimationTest
+import com.geckolib.animatable.manager.AnimatableManager
+import com.geckolib.animation.`object`.PlayState
+import com.geckolib.animation.AnimationController.AnimationStateHandler
 import java.util.function.IntFunction
 
 class ShrimpEntity(entityType: EntityType<out ShrimpEntity>, world: Level) :
@@ -52,9 +55,9 @@ class ShrimpEntity(entityType: EntityType<out ShrimpEntity>, world: Level) :
         super.registerControllers(controllerRegistrar)
 
         controllerRegistrar.add(
-            AnimationController(
-                this, "Cleaning",
-                AnimationStateHandler { state: AnimationState<ShrimpEntity> ->
+            AnimationController<ShrimpEntity>(
+                 "Cleaning",
+                AnimationStateHandler { state: AnimationTest<ShrimpEntity> ->
                     if (this.isCleaning())
                         return@AnimationStateHandler state.setAndContinue(CLEAN_ANIMATION)
                     PlayState.STOP
@@ -113,7 +116,7 @@ class ShrimpEntity(entityType: EntityType<out ShrimpEntity>, world: Level) :
     override fun finalizeSpawn(
         world: ServerLevelAccessor,
         difficulty: DifficultyInstance,
-        spawnReason: MobSpawnType,
+        spawnReason: EntitySpawnReason,
         entityData: SpawnGroupData?
     ): SpawnGroupData? {
         val overlayID = world.random.nextIntBetweenInclusive(0, OverlayTextures.entries.size - 1)
@@ -146,15 +149,15 @@ class ShrimpEntity(entityType: EntityType<out ShrimpEntity>, world: Level) :
         super.defineSynchedData(builder)
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
+    override fun addAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueOutput) {
         compound.putInt("texture_overlay", this.overlayTexture.id)
-        this.setCleaning(compound.getBoolean("Cleaning"))
+        compound.putBoolean("Cleaning", isCleaning())
         super.addAdditionalSaveData(compound)
     }
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
-        if(compound.contains("texture_overlay")) this.overlayTexture = OverlayTextures.byId(compound.getInt("texture_overlay"))
-        this.setCleaning(compound.getBoolean("Cleaning"))
+    override fun readAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueInput) {
+        if(compound.contains("texture_overlay")) this.overlayTexture = OverlayTextures.byId(compound.getIntOr("texture_overlay", 0))
+        this.setCleaning(compound.getBooleanOr("Cleaning", false))
         super.readAdditionalSaveData(compound)
     }
 }

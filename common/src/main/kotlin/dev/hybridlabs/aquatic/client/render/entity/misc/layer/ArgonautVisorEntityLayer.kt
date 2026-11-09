@@ -1,51 +1,27 @@
 package dev.hybridlabs.aquatic.client.render.entity.misc.layer
 
-import com.mojang.blaze3d.vertex.PoseStack
-import com.mojang.blaze3d.vertex.VertexConsumer
 import dev.hybridlabs.aquatic.client.model.entity.misc.ArgonautEntityModel
 import dev.hybridlabs.aquatic.client.render.entity.misc.ArgonautEntityRenderer
 import dev.hybridlabs.aquatic.entity.misc.ArgonautEntity
-import net.minecraft.client.renderer.MultiBufferSource
-import net.minecraft.client.renderer.RenderType
+import net.minecraft.client.renderer.rendertype.RenderType
 import net.minecraft.client.renderer.texture.OverlayTexture
-import net.minecraft.resources.ResourceLocation
-import software.bernie.geckolib.cache.`object`.BakedGeoModel
-import software.bernie.geckolib.renderer.layer.GeoRenderLayer
-import software.bernie.geckolib.util.Color
+import net.minecraft.resources.Identifier
+import dev.hybridlabs.hapi.client.render.HybridTextureLayer
+import net.minecraft.client.renderer.entity.state.EntityRenderState
 
 class ArgonautVisorEntityLayer<T: ArgonautEntity>(
     renderer: ArgonautEntityRenderer<T>
-): GeoRenderLayer<T>(renderer) {
+): HybridTextureLayer<T, EntityRenderState>(renderer) {
 
-    private fun getVisorTexture(): ResourceLocation {
-        return (geoModel as ArgonautEntityModel).getVisorTextureResource()
+    private fun getVisorTexture(): Identifier {
+        return (geoModel as ArgonautEntityModel<ArgonautEntity> ).getVisorTextureResource()
     }
 
-    override fun render(
-        poseStack: PoseStack,
-        animatable: T,
-        bakedModel: BakedGeoModel,
-        renderType: RenderType?,
-        bufferSource: MultiBufferSource,
-        buffer: VertexConsumer?,
-        partialTick: Float,
-        packedLight: Int,
-        packedOverlay: Int
-    ) {
+    override fun addRenderData(animatable: T, related: Void?, renderState: EntityRenderState, partialTick: Float) {
+        super.addRenderData(animatable, related, renderState, partialTick)
         val visorTexture = getVisorTexture()
-        val visorRenderType = RenderType.entityTranslucentCull(visorTexture)
+        val visorRenderType = net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucentCull(visorTexture)
 
-        getRenderer().reRender(
-            getDefaultBakedModel(animatable),
-            poseStack,
-            bufferSource,
-            animatable,
-            visorRenderType,
-            bufferSource.getBuffer(visorRenderType),
-            partialTick,
-            packedLight,
-            OverlayTexture.NO_OVERLAY,
-            Color.WHITE.argbInt
-        )
+        setLayerData(renderState, visorRenderType, -1, OverlayTexture.NO_OVERLAY)
     }
 }

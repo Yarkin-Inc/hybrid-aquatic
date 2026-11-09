@@ -2,25 +2,25 @@ package dev.hybridlabs.aquatic.client.model.entity.fish
 
 import dev.hybridlabs.aquatic.entity.fish.TroutEntity
 import dev.hybridlabs.hapi.client.model.entity.aquatic.BaseFishEntityModel
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 
 class TroutEntityModel : BaseFishEntityModel<TroutEntity>("hybrid_aquatic", "trout") {
 
-    override fun getTextureResource(animatable: TroutEntity): ResourceLocation {
+    override fun getTextureResource(animatable: TroutEntity): Identifier {
         return when (animatable.variant) {
             TroutEntity.Companion.Type.BULL_TROUT -> BULL_TROUT_TEXTURE
             TroutEntity.Companion.Type.REDBAND_TROUT -> REDBAND_TROUT_TEXTURE
         }
     }
 
-    override fun getModelResource(animatable: TroutEntity): ResourceLocation {
+    override fun getModelResource(animatable: TroutEntity): Identifier {
         return when (animatable.variant) {
             TroutEntity.Companion.Type.BULL_TROUT -> BULL_TROUT_MODEL
             TroutEntity.Companion.Type.REDBAND_TROUT -> REDBAND_TROUT_MODEL
         }
     }
 
-    override fun getAnimationResource(animatable: TroutEntity): ResourceLocation {
+    override fun getAnimationResource(animatable: TroutEntity): Identifier {
         return when (animatable.variant) {
             TroutEntity.Companion.Type.BULL_TROUT -> BULL_TROUT_ANIMATION
             TroutEntity.Companion.Type.REDBAND_TROUT -> REDBAND_TROUT_ANIMATION
@@ -29,18 +29,18 @@ class TroutEntityModel : BaseFishEntityModel<TroutEntity>("hybrid_aquatic", "tro
 
     companion object {
         private val BULL_TROUT_TEXTURE =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/fish/trout/bull_trout.png")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/fish/trout/bull_trout.png")
         private val REDBAND_TROUT_TEXTURE =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/fish/trout/redband_trout.png")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/fish/trout/redband_trout.png")
 
         private val BULL_TROUT_MODEL =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "geo/fish/trout/bull_trout.geo.json")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "fish/trout/bull_trout")
         private val REDBAND_TROUT_MODEL =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "geo/fish/trout/redband_trout.geo.json")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "fish/trout/redband_trout")
 
         private val BULL_TROUT_ANIMATION =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "animations/entity/fish/trout/bull_trout.animation.json")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "entity/fish/trout/bull_trout")
         private val REDBAND_TROUT_ANIMATION =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "animations/entity/fish/trout/redband_trout.animation.json")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "entity/fish/trout/redband_trout")
     }
 }

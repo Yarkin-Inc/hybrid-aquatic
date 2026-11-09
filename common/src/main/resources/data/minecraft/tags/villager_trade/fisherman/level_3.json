@@ -1,0 +1,11 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "hybrid_aquatic:trades_enabled"
+    }
+  ],
+  "values": [
+    "hybrid_aquatic:fisherman/3/pearl",
+    "hybrid_aquatic:fisherman/3/black_pearl"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "hybrid_aquatic:item/great_white_shark_plushie",
+    "model": {
+      "type": "minecraft:head",
+      "kind": "hybrid_aquatic:great_white_shark"
+    }
+  }
+}

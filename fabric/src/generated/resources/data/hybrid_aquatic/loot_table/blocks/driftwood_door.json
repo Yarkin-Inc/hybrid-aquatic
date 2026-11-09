@@ -3,27 +3,23 @@
   "pools": [
     {
       "bonus_rolls": 0.0,
-      "conditions": [
-        {
-          "condition": "minecraft:survives_explosion"
-        }
-      ],
       "entries": [
         {
           "type": "minecraft:item",
-          "conditions": [
-            {
-              "block": "hybrid_aquatic:driftwood_door",
-              "condition": "minecraft:block_state_property",
-              "properties": {
-                "half": "lower"
-              }
+          "name": "hybrid_aquatic:driftwood_door",
+          "condition": {
+            "type": "minecraft:match_block",
+            "blocks": "hybrid_aquatic:driftwood_door",
+            "state": {
+              "half": "lower"
             }
-          ],
-          "name": "hybrid_aquatic:driftwood_door"
+          }
         }
       ],
-      "rolls": 1.0
+      "rolls": 1.0,
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      }
     }
   ]
 }

@@ -7,14 +7,14 @@ import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.MobSpawnType
+import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.monster.Monster
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.ServerLevelAccessor
-import software.bernie.geckolib.animatable.GeoEntity
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
-import software.bernie.geckolib.util.GeckoLibUtil
+import com.geckolib.animatable.GeoEntity
+import com.geckolib.animatable.instance.AnimatableInstanceCache
+import com.geckolib.util.GeckoLibUtil
 
 @Suppress("LeakingThis", "UNUSED_PARAMETER")
 abstract class HAMinibossEntity(type: EntityType<out Monster>, world: Level) :
@@ -28,19 +28,18 @@ abstract class HAMinibossEntity(type: EntityType<out Monster>, world: Level) :
         builder.define(ATTEMPT_ATTACK, false)
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
+    override fun addAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueOutput) {
         super.addAdditionalSaveData(compound)
         compound.putInt("AttackTick", this.attackTick)
     }
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
+    override fun readAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueInput) {
         super.readAdditionalSaveData(compound)
-        this.attackTick = compound.getInt("AttackTick")
+        this.attackTick = compound.getIntOr("AttackTick", 0)
     }
     //#endregion
 
     override fun aiStep() {
-        this.updateSwingTime()
         super.aiStep()
     }
 
@@ -52,7 +51,7 @@ abstract class HAMinibossEntity(type: EntityType<out Monster>, world: Level) :
         return false
     }
 
-    override fun isPreventingPlayerRest(player: Player): Boolean {
+    override fun isPreventingPlayerRest(level: net.minecraft.server.level.ServerLevel, player: Player): Boolean {
         return true
     }
 
@@ -68,7 +67,7 @@ abstract class HAMinibossEntity(type: EntityType<out Monster>, world: Level) :
         fun canSpawn(
             type: EntityType<out Monster>,
             world: ServerLevelAccessor,
-            reason: MobSpawnType,
+            reason: EntitySpawnReason,
             pos: BlockPos,
             random: RandomSource,
         ): Boolean {

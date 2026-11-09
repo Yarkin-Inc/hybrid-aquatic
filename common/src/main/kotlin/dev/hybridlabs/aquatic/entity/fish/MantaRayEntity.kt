@@ -16,7 +16,7 @@ import net.minecraft.util.ByIdMap
 import net.minecraft.util.StringRepresentable
 import net.minecraft.world.DifficultyInstance
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.MobSpawnType
+import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.SpawnGroupData
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
@@ -86,7 +86,7 @@ class MantaRayEntity(type: EntityType<out MantaRayEntity>, world: Level) :
     override fun finalizeSpawn(
         world: ServerLevelAccessor,
         difficulty: DifficultyInstance,
-        spawnReason: MobSpawnType,
+        spawnReason: EntitySpawnReason,
         entityData: SpawnGroupData?
     ): SpawnGroupData? {
         val overlayID = world.random.nextIntBetweenInclusive(0, OverlayTextures.entries.size - 1)
@@ -110,14 +110,14 @@ class MantaRayEntity(type: EntityType<out MantaRayEntity>, world: Level) :
         super.defineSynchedData(builder)
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
+    override fun addAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueOutput) {
         compound.putInt("texture_overlay", this.overlayTexture.id)
         super.addAdditionalSaveData(compound)
     }
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
+    override fun readAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueInput) {
         if (compound.contains("texture_overlay")) this.overlayTexture =
-            OverlayTextures.byId(compound.getInt("texture_overlay"))
+            OverlayTextures.byId(compound.getIntOr("texture_overlay", 0))
         super.readAdditionalSaveData(compound)
     }
 

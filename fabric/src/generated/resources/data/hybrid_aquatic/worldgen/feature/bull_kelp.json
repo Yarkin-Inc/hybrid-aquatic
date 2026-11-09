@@ -1,0 +1,14 @@
+{
+  "type": "hybrid_aquatic:bull_kelp",
+  "config": {
+    "to_place": {
+      "type": "minecraft:simple",
+      "state": {
+        "id": "hybrid_aquatic:bull_kelp",
+        "properties": {
+          "age": "0"
+        }
+      }
+    }
+  }
+}

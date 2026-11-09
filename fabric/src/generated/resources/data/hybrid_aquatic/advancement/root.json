@@ -8,7 +8,7 @@
     }
   },
   "display": {
-    "background": "hybrid_aquatic:textures/block/coralstone.png",
+    "background": "hybrid_aquatic:block/coralstone",
     "description": {
       "translate": "advancements.hybrid_aquatic.enter_water.description"
     },

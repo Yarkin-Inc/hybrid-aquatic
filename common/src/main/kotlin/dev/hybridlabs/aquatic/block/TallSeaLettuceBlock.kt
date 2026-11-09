@@ -36,7 +36,7 @@ class TallSeaLettuceBlock(settings: Properties) : DoublePlantBlock(settings), Li
         return floor.isFaceSturdy(world, pos, Direction.UP) && !floor.`is`(Blocks.MAGMA_BLOCK) && !floor.`is`(HABlocks.AERATED_SAND.get()) && !floor.`is`(HABlocks.BUBBLE_GEYSER.get())
     }
 
-    override fun getCloneItemStack(level: LevelReader, pos: BlockPos, state: BlockState): ItemStack {
+    override fun getCloneItemStack(level: LevelReader, pos: BlockPos, state: BlockState, includeData: Boolean): ItemStack {
         return ItemStack(HABlocks.SEA_LETTUCE.get())
     }
 
@@ -67,7 +67,7 @@ class TallSeaLettuceBlock(settings: Properties) : DoublePlantBlock(settings), Li
     }
 
     override fun canPlaceLiquid(
-        p0: Player?,
+        p0: net.minecraft.world.entity.LivingEntity?,
         world: BlockGetter,
         pos: BlockPos,
         state: BlockState,

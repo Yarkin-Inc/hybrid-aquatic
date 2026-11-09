@@ -6,8 +6,8 @@ import dev.hybridlabs.aquatic.block.WildMusselBlock
 import net.minecraft.tags.BlockTags
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
-import net.minecraft.world.level.levelgen.feature.Feature
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext
+import dev.hybridlabs.aquatic.world.gen.feature.FeatureAlgorithm as Feature
+import dev.hybridlabs.aquatic.world.gen.feature.FeatureContext as FeaturePlaceContext
 
 class BrineLakeFeature(codec: Codec<BrineLakeFeatureConfig>) : Feature<BrineLakeFeatureConfig>(codec) {
     override fun place(context: FeaturePlaceContext<BrineLakeFeatureConfig>): Boolean {
@@ -15,7 +15,7 @@ class BrineLakeFeature(codec: Codec<BrineLakeFeatureConfig>) : Feature<BrineLake
         val worldGenLevel = context.level()
         val randomSource = context.random()
         val configuration = context.config()
-        if (blockPos.y <= worldGenLevel.minBuildHeight + 4) {
+        if (blockPos.y <= worldGenLevel.minY + 4) {
             return false
         } else {
             blockPos = blockPos.below(4)
@@ -45,7 +45,7 @@ class BrineLakeFeature(codec: Codec<BrineLakeFeatureConfig>) : Feature<BrineLake
                 }
             }
 
-            val blockState = configuration.fluidProvider.getState(randomSource, blockPos)
+            val blockState = configuration.fluidProvider.getState(worldGenLevel, randomSource, blockPos)
 
             for (s in 0..15) {
                 for (t in 0..15) {
@@ -88,7 +88,7 @@ class BrineLakeFeature(codec: Codec<BrineLakeFeatureConfig>) : Feature<BrineLake
                 }
             }
 
-            val blockState3 = configuration.barrierProvider.getState(randomSource, blockPos)
+            val blockState3 = configuration.barrierProvider.getState(worldGenLevel, randomSource, blockPos)
             if (!blockState3.isAir) {
                 for (t in 0..15) {
                     for (u in 0..15) {

@@ -1,6 +1,5 @@
 package dev.hybridlabs.aquatic.mixin.compat.carpet;
 
-import carpet.fakes.BlockPistonBehaviourInterface;
 import dev.hybridlabs.aquatic.block.impl.StickyBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -13,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(HoneyBlock.class)
-abstract class HoneyCarpetHACompatMixin implements BlockPistonBehaviourInterface {
+abstract class HoneyCarpetHACompatMixin {
 	
 	@Inject(
 			method = "isStickyToNeighbor",

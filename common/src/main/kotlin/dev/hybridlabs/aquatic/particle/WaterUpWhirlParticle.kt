@@ -4,10 +4,12 @@ import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.particle.*
 import net.minecraft.core.BlockPos
 import net.minecraft.core.particles.SimpleParticleType
+import net.minecraft.client.renderer.texture.TextureAtlasSprite
+import net.minecraft.util.RandomSource
 import net.minecraft.tags.FluidTags
 import net.minecraft.util.Mth
 
-class WaterUpWhirlParticle(world: ClientLevel, x: Double, y: Double, z: Double): TextureSheetParticle(world, x, y, z) {
+class WaterUpWhirlParticle(world: ClientLevel, x: Double, y: Double, z: Double, initialSprite: TextureAtlasSprite): SingleQuadParticle(world, x, y, z, initialSprite) {
     private var angle: Float = 0f
 
     init {
@@ -21,8 +23,8 @@ class WaterUpWhirlParticle(world: ClientLevel, x: Double, y: Double, z: Double):
         this.gravity = 0.002f
     }
 
-    override fun getRenderType(): ParticleRenderType {
-        return ParticleRenderType.PARTICLE_SHEET_OPAQUE
+    override fun getLayer(): SingleQuadParticle.Layer {
+        return SingleQuadParticle.Layer.OPAQUE
     }
 
     override fun tick() {
@@ -33,8 +35,8 @@ class WaterUpWhirlParticle(world: ClientLevel, x: Double, y: Double, z: Double):
             this.remove()
         } else {
             val f = 0.6f
-            this.xd += (f * Mth.cos(this.angle)).toDouble()
-            this.zd += (f * Mth.sin(this.angle)).toDouble()
+            this.xd += (f * kotlin.math.cos(this.angle)).toDouble()
+            this.zd += (f * kotlin.math.sin(this.angle)).toDouble()
             this.xd *= 0.07
             this.zd *= 0.07
             this.move(this.xd, this.yd, this.zd)
@@ -53,10 +55,9 @@ class WaterUpWhirlParticle(world: ClientLevel, x: Double, y: Double, z: Double):
             override fun createParticle(
                 type: SimpleParticleType, level: ClientLevel,
                 x: Double, y: Double, z: Double,
-                xSpeed: Double, ySpeed: Double, zSpeed: Double
-            ): Particle {
-                val waterUpWhirlParticle = WaterUpWhirlParticle(level, x, y, z)
-                waterUpWhirlParticle.pickSprite(this.sprite)
+                xSpeed: Double, ySpeed: Double, zSpeed: Double, random: RandomSource): SingleQuadParticle {
+                val waterUpWhirlParticle = WaterUpWhirlParticle(level, x, y, z, this.sprite.get(random))
+
                 return waterUpWhirlParticle
             }
         }

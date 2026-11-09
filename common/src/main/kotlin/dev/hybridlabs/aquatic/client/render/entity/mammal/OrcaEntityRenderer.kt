@@ -11,7 +11,7 @@ class OrcaEntityRenderer(context: Context) :
     BaseDolphinEntityRenderer<OrcaEntity>(context, OrcaEntityModel(), true) {
 
     init {
-        addRenderLayer(OrcaEyeSpotEntityLayer(this))
-        addRenderLayer(OrcaSaddleEntityLayer(this))
+        withRenderLayer(OrcaEyeSpotEntityLayer(this))
+        withRenderLayer(OrcaSaddleEntityLayer(this))
     }
 }

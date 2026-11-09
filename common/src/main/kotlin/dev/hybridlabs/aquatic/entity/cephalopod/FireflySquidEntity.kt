@@ -7,7 +7,7 @@ import dev.hybridlabs.hapi.entity.base.aquatic.InkConfiguration
 import net.minecraft.core.BlockPos
 import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.MobSpawnType
+import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.level.Level
@@ -46,7 +46,7 @@ class FireflySquidEntity(type: EntityType<out FireflySquidEntity>, world: Level)
         fun canSpawn(
             type: EntityType<out FireflySquidEntity>,
             world: ServerLevelAccessor,
-            reason: MobSpawnType,
+            reason: EntitySpawnReason,
             pos: BlockPos,
             random: RandomSource,
         ): Boolean {
@@ -54,9 +54,9 @@ class FireflySquidEntity(type: EntityType<out FireflySquidEntity>, world: Level)
             val nightSpawn = (seaLevel - 16)..<seaLevel
             val daySpawn = (seaLevel - 256)..(seaLevel - 48)
 
-            val newMoon = world.moonPhase == 4
+            val newMoon = world.environmentAttributes().getValue(net.minecraft.world.attribute.EnvironmentAttributes.MOON_PHASE, pos) == net.minecraft.world.level.MoonPhase.NEW_MOON
 
-            val spawnY = if ((newMoon) && !world.level.isDay) nightSpawn else daySpawn
+            val spawnY = if ((newMoon) && !(world.level.environmentAttributes().getValue(net.minecraft.world.attribute.EnvironmentAttributes.SKY_LIGHT_LEVEL, pos) > 11.0f)) nightSpawn else daySpawn
 
             return pos.y in spawnY && world.isWaterAt(pos)
         }

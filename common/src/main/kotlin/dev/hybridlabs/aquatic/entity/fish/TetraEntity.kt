@@ -1,5 +1,6 @@
 package dev.hybridlabs.aquatic.entity.fish
 
+import dev.hybridlabs.hapi.entity.VariantHolder
 import dev.hybridlabs.hapi.tag.HAPIBiomeTags
 import dev.hybridlabs.hapi.tag.HAPIEntityTags
 import dev.hybridlabs.hapi.entity.ai.MobTargetConfiguration
@@ -63,7 +64,7 @@ class TetraEntity(type: EntityType<out TetraEntity>, world: Level) :
     override fun finalizeSpawn(
         world: ServerLevelAccessor,
         difficulty: DifficultyInstance,
-        spawnReason: MobSpawnType,
+        spawnReason: EntitySpawnReason,
         entityData: SpawnGroupData?
     ): SpawnGroupData? {
         val biome = world.getBiome(this.blockPosition())
@@ -85,7 +86,7 @@ class TetraEntity(type: EntityType<out TetraEntity>, world: Level) :
         fun canSpawn(
             type: EntityType<out TetraEntity>,
             world: ServerLevelAccessor,
-            reason: MobSpawnType,
+            reason: EntitySpawnReason,
             pos: BlockPos,
             random: RandomSource,
         ): Boolean {
@@ -120,7 +121,7 @@ class TetraEntity(type: EntityType<out TetraEntity>, world: Level) :
                 )
 
                 fun byName(name: String?): Type {
-                    return CODEC.byName(name, CARDINAL_TETRA) as Type
+                    return CODEC.byName(name ?: "", CARDINAL_TETRA) as Type
                 }
 
                 fun fromId(id: Int): Type {
@@ -147,13 +148,13 @@ class TetraEntity(type: EntityType<out TetraEntity>, world: Level) :
         super.defineSynchedData(builder)
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
+    override fun addAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueOutput) {
         compound.putString("Type", this.variant.serializedName)
         super.addAdditionalSaveData(compound)
     }
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
-        this.variant = Type.byName(compound.getString("Type"))
+    override fun readAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueInput) {
+        this.variant = Type.byName(compound.getStringOr("Type", ""))
         super.readAdditionalSaveData(compound)
     }
 

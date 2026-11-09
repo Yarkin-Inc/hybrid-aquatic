@@ -1,0 +1,14 @@
+{
+  "type": "hybrid_aquatic:delesseria",
+  "config": {
+    "to_place": {
+      "type": "minecraft:simple",
+      "state": {
+        "id": "hybrid_aquatic:delesseria",
+        "properties": {
+          "age": "0"
+        }
+      }
+    }
+  }
+}

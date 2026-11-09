@@ -1,47 +1,36 @@
 package dev.hybridlabs.aquatic.mixin.client;
 
 import com.google.common.collect.ImmutableMap;
-import com.llamalad7.mixinextras.sugar.Local;
 import dev.hybridlabs.aquatic.block.PlushieBlock;
 import dev.hybridlabs.aquatic.client.model.HAEntityModelLayers;
-import kotlin.enums.EnumEntries;
-import net.minecraft.client.model.SkullModelBase;
+import net.minecraft.client.model.object.skull.SkullModelBase;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.blockentity.SkullBlockRenderer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.SkullBlock;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Mixin(SkullBlockRenderer.class)
 public abstract class SkullBlockEntityModelMixin {
-    /**
-     * Injects custom skull textures into the skull renderer.
-     */
-    @Inject(method = "method_3580", at = @At("TAIL"))
-    private static void injectTextures(
-            HashMap<SkullBlock.Type, ResourceLocation> map, CallbackInfo info) {
-        // inject plushie variants
-        EnumEntries<PlushieBlock.Variant> variants = PlushieBlock.Variant.getEntries();
-        for (PlushieBlock.Variant variant : variants) {
-            map.put(variant, variant.getTextureLocation());
+    @Inject(method = "createModel", at = @At("HEAD"), cancellable = true)
+    private static void hybrid$plushieModel(EntityModelSet models, SkullBlock.Type type,
+                                           CallbackInfoReturnable<SkullModelBase> cir) {
+        if (type instanceof PlushieBlock.Variant) {
+            ImmutableMap.Builder<SkullBlock.Type, SkullModelBase> builder = ImmutableMap.builder();
+            HAEntityModelLayers.INSTANCE.injectModels(models, builder);
+            cir.setReturnValue(builder.build().get(type));
         }
     }
 
-    /**
-     * Injects custom skull models into the skull renderer.
-     */
-    @Inject(method = "createSkullRenderers", at = @At(value = "RETURN",
-            shift = At.Shift.BEFORE))
-    private static void injectModels(EntityModelSet modelLoader, CallbackInfoReturnable<Map<SkullBlock.Type,
-            SkullModelBase>> cir, @Local ImmutableMap.Builder<SkullBlock.Type, SkullModelBase> builder) {
-        // inject plushie variants
-        HAEntityModelLayers.INSTANCE.injectModels(modelLoader, builder);
+    @Inject(method = "getSkullRenderType", at = @At("HEAD"), cancellable = true)
+    private static void hybrid$plushieTexture(SkullBlock.Type type, Identifier texture,
+                                             CallbackInfoReturnable<RenderType> cir) {
+        if (type instanceof PlushieBlock.Variant variant)
+            cir.setReturnValue(RenderTypes.entityCutoutZOffset(texture != null ? texture : variant.getTextureLocation()));
     }
 }

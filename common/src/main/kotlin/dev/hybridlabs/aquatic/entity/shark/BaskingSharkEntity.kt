@@ -9,8 +9,11 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
-import software.bernie.geckolib.animation.*
-import software.bernie.geckolib.animation.AnimationController.AnimationStateHandler
+import com.geckolib.animation.*
+import com.geckolib.animation.state.AnimationTest
+import com.geckolib.animatable.manager.AnimatableManager
+import com.geckolib.animation.`object`.PlayState
+import com.geckolib.animation.AnimationController.AnimationStateHandler
 
 class BaskingSharkEntity(type: EntityType<out BaskingSharkEntity>, world: Level) :
     BaseSharkEntity(type, world) {
@@ -29,9 +32,9 @@ class BaskingSharkEntity(type: EntityType<out BaskingSharkEntity>, world: Level)
     override fun registerControllers(controllers: AnimatableManager.ControllerRegistrar) {
         super.registerControllers(controllers)
         controllers.add(
-            AnimationController(
-                this, "Feeding",
-                AnimationStateHandler { state: AnimationState<BaseSharkEntity> ->
+            AnimationController<BaseSharkEntity>(
+                 "Feeding",
+                AnimationStateHandler { state: AnimationTest<BaseSharkEntity> ->
                     if (this.isFeeding())
                         return@AnimationStateHandler state.setAndContinue(FEED_ANIMATION)
                     PlayState.STOP

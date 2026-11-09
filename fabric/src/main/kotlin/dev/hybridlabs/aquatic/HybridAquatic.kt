@@ -39,15 +39,12 @@ import net.fabricmc.fabric.api.biome.v1.BiomeModifications
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STARTING
 import net.fabricmc.fabric.api.event.registry.DynamicRegistries
-import net.fabricmc.fabric.api.`object`.builder.v1.trade.TradeOfferHelper
-import net.fabricmc.fabric.api.registry.FabricBrewingRecipeRegistryBuilder
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry
-import net.fabricmc.fabric.api.registry.StrippableBlockRegistry
 import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.world.entity.npc.VillagerTrades
+import net.minecraft.world.item.trading.VillagerTrades
 import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.crafting.Ingredient
-import net.minecraft.world.level.levelgen.feature.configurations.ProbabilityFeatureConfiguration
+import dev.hybridlabs.aquatic.world.gen.feature.config.ProbabilityFeatureConfiguration
 
 object HybridAquatic : ModInitializer {
     val DUNEGRASS_PATCH = HAFeatures.register("dunegrass_patch", DunegrassFeature(ProbabilityFeatureConfiguration.CODEC))
@@ -59,6 +56,10 @@ object HybridAquatic : ModInitializer {
         val configHandler = ConfigHelper.initializeConfig(CommonClass.CONFIG_FILE)
         logger.info("Initializing ${Constants.MOD_NAME}")
         CommonClass.init()
+        net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK.register(
+            dev.hybridlabs.aquatic.item.OminousConchItem::tickSummons)
+        net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPED.register(
+            dev.hybridlabs.aquatic.item.OminousConchItem::clearSummons)
 
         HABlocks
         HAPlatformFluids
@@ -78,7 +79,6 @@ object HybridAquatic : ModInitializer {
 
         HAMobEffects
         HAPotions
-        registerBrewingRecipes()
 
         HAItems
         HAPlatformItems
@@ -104,12 +104,7 @@ object HybridAquatic : ModInitializer {
 
 
         registerDynamicRegistries()
-        if (configHandler.config.enableWanderingTraderTrades) {
-            registerWanderingTraderTrades()
-        }
-        if (configHandler.config.enableWanderingTraderTrades) {
-            registerCustomTrades()
-        }
+        registerCustomTrades(configHandler.config.enableWanderingTraderTrades)
 
         FlammableProperty
         StrippableProperty
@@ -124,18 +119,6 @@ object HybridAquatic : ModInitializer {
     private fun registerDynamicRegistries() {
         DynamicRegistries.register(HARegistryKeys.STRUCTURE_SPAWN_MODIFIER, SpawnModifier.CODEC)
     }
-
-    private fun registerWanderingTraderTrades() {
-        // plushies
-        BuiltInRegistries.ITEM
-            .filter { it is BlockItem && it.block is PlushieBlock }
-            .forEach { block ->
-                TradeOfferHelper.registerWanderingTraderOffers(2) { list ->
-                    list.add(VillagerTrades.ItemsForEmeralds(block, 8, 1, 2, 2))
-                }
-            }
-    }
-
 
     private fun registerFlammables(registry: FlammableBlockRegistry) {
         // same as vanilla grass
@@ -155,11 +138,11 @@ object HybridAquatic : ModInitializer {
     }
 
     private fun registerStrippables() {
-        StrippableBlockRegistry.register(
+        StrippableProperty.register(
             HAPlatformBlocks.DRIFTWOOD_LOG.get(),
             HAPlatformBlocks.STRIPPED_DRIFTWOOD_LOG.get()
         )
-        StrippableBlockRegistry.register(
+        StrippableProperty.register(
             HAPlatformBlocks.DRIFTWOOD_WOOD.get(),
             HAPlatformBlocks.STRIPPED_DRIFTWOOD_WOOD.get()
         )
@@ -178,15 +161,5 @@ object HybridAquatic : ModInitializer {
         }
     }
 
-    private fun registerBrewingRecipes() {
-        FabricBrewingRecipeRegistryBuilder.BUILD.register { builder ->
-            for (recipe in HAPotions.recipes.get()) {
-                builder.registerPotionRecipe(
-                    recipe.inputPotion,
-                    Ingredient.of(recipe.addition),
-                    recipe.outputPotion
-                )
-            }
-        }
-    }
+
 }

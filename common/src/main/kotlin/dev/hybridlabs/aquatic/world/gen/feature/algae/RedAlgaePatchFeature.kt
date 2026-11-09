@@ -7,9 +7,9 @@ import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.TallSeagrassBlock
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf
 import net.minecraft.world.level.levelgen.Heightmap
-import net.minecraft.world.level.levelgen.feature.Feature
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext
-import net.minecraft.world.level.levelgen.feature.configurations.ProbabilityFeatureConfiguration
+import dev.hybridlabs.aquatic.world.gen.feature.FeatureAlgorithm as Feature
+import dev.hybridlabs.aquatic.world.gen.feature.FeatureContext as FeaturePlaceContext
+import dev.hybridlabs.aquatic.world.gen.feature.config.ProbabilityFeatureConfiguration
 import kotlin.math.sqrt
 
 class RedAlgaePatchFeature(codec: Codec<ProbabilityFeatureConfiguration>) :

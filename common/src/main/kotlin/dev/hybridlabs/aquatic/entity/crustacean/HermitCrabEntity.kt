@@ -1,5 +1,6 @@
 package dev.hybridlabs.aquatic.entity.crustacean
 
+import dev.hybridlabs.aquatic.entity.spawnDrop
 import dev.hybridlabs.aquatic.entity.misc.SmallTNTEntity
 import dev.hybridlabs.aquatic.item.HAItems
 import dev.hybridlabs.aquatic.tag.HAItemTags
@@ -16,7 +17,7 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.MobSpawnType
+import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.SpawnGroupData
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
@@ -33,10 +34,10 @@ import net.minecraft.world.level.block.NoteBlock
 import net.minecraft.world.level.block.TntBlock
 import net.minecraft.world.level.gameevent.GameEvent
 import net.minecraft.world.phys.Vec3
-import software.bernie.geckolib.animation.AnimatableManager
-import software.bernie.geckolib.animation.AnimationController
-import software.bernie.geckolib.animation.AnimationState
-import software.bernie.geckolib.animation.PlayState
+import com.geckolib.animatable.manager.AnimatableManager
+import com.geckolib.animation.AnimationController
+import com.geckolib.animation.state.AnimationTest
+import com.geckolib.animation.`object`.PlayState
 import kotlin.jvm.optionals.getOrDefault
 
 @Suppress("DEPRECATION")
@@ -51,22 +52,19 @@ class HermitCrabEntity(entityType: EntityType<out HermitCrabEntity>, world: Leve
         goalSelector.addGoal(1, WaterAnimalFleeFromEntityGoal(this, SmallTNTEntity::class.java, 15.0, 0.3, 0.75))
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
+    override fun addAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueOutput) {
         super.addAdditionalSaveData(compound)
         compound.putBoolean("HasShell", hasShell)
-        if (!shellItem.isEmpty) compound.put("ShellItem", shellItem.save(this.registryAccess()))
+        if (!shellItem.isEmpty) compound.store("ShellItem", ItemStack.CODEC, shellItem)
     }
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
+    override fun readAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueInput) {
         super.readAdditionalSaveData(compound)
 
-        hasShell = compound.getBoolean("HasShell")
+        hasShell = compound.getBooleanOr("HasShell", false)
 
         if (hasShell && compound.contains("ShellItem")) {
-            shellItem = ItemStack.parse(
-                registryAccess(),
-                compound.getCompound("ShellItem")
-            ).getOrDefault(Items.NAUTILUS_SHELL.defaultInstance)
+            shellItem = compound.read("ShellItem", ItemStack.CODEC).orElse(Items.NAUTILUS_SHELL.defaultInstance)
         } else {
             shellItem = ItemStack.EMPTY
         }
@@ -76,7 +74,7 @@ class HermitCrabEntity(entityType: EntityType<out HermitCrabEntity>, world: Leve
     override fun finalizeSpawn(
         world: ServerLevelAccessor,
         difficulty: DifficultyInstance,
-        spawnReason: MobSpawnType,
+        spawnReason: EntitySpawnReason,
         entityData: SpawnGroupData?,
     ): SpawnGroupData? {
         this.setCanPickUpLoot(true)
@@ -93,7 +91,7 @@ class HermitCrabEntity(entityType: EntityType<out HermitCrabEntity>, world: Leve
         return super.finalizeSpawn(world, difficulty, spawnReason, entityData)
     }
 
-    override fun canTakeItem(itemstack: ItemStack): Boolean {
+    fun canTakeItem(itemstack: ItemStack): Boolean {
         return itemstack.`is`(HAItemTags.CRAB_WEARABLES)
     }
 
@@ -101,11 +99,11 @@ class HermitCrabEntity(entityType: EntityType<out HermitCrabEntity>, world: Leve
         return ITEM_PICKUP_REACH
     }
 
-    override fun wantsToPickUp(stack: ItemStack): Boolean {
+    override fun wantsToPickUp(level: ServerLevel, stack: ItemStack): Boolean {
         return canTakeItem(stack)
     }
 
-    override fun pickUpItem(itemEntity: ItemEntity) {
+    override fun pickUpItem(level: ServerLevel, itemEntity: ItemEntity) {
         if (!shellItem.isEmpty) return
 
         val itemStack = itemEntity.item
@@ -141,11 +139,11 @@ class HermitCrabEntity(entityType: EntityType<out HermitCrabEntity>, world: Leve
 
             if (!oldStack.isEmpty) {
                 if (!player.addItem(oldStack)) {
-                    player.drop(oldStack, false)
+                    player.drop(oldStack, false, net.minecraft.util.Prediction.SERVER_ONLY)
                 }
             }
 
-            return InteractionResult.sidedSuccess(level().isClientSide)
+            return InteractionResult.SUCCESS
         }
 
         return super.mobInteract(player, hand)
@@ -159,7 +157,7 @@ class HermitCrabEntity(entityType: EntityType<out HermitCrabEntity>, world: Leve
                 return
             }
 
-            spawnAtLocation(shellItem)
+            spawnDrop(shellItem)
             shellItem = ItemStack.EMPTY
         }
     }
@@ -244,12 +242,12 @@ class HermitCrabEntity(entityType: EntityType<out HermitCrabEntity>, world: Leve
         attributes.getInstance(Attributes.ARMOR)?.baseValue = 5.0
     }
 
-    override fun hurt(source: DamageSource, amount: Float): Boolean {
+    override fun hurtServer(level: net.minecraft.server.level.ServerLevel, source: DamageSource, amount: Float): Boolean {
         if (!isHiding && !shellItem.isEmpty) startHiding()
 
         lastDamageTime = level().gameTime
 
-        return super.hurt(source, amount)
+        return super.hurtServer(level, source, amount)
     }
     //#endregion
 
@@ -264,9 +262,9 @@ class HermitCrabEntity(entityType: EntityType<out HermitCrabEntity>, world: Leve
     override fun registerControllers(controllerRegistrar: AnimatableManager.ControllerRegistrar) {
         super.registerControllers(controllerRegistrar)
         controllerRegistrar.add(
-            AnimationController(
-                this, "Hide", 4,
-                AnimationController.AnimationStateHandler { state: AnimationState<BaseCrustaceanEntity> ->
+            AnimationController<HermitCrabEntity>(
+                 "Hide", 4,
+                AnimationController.AnimationStateHandler { state: AnimationTest<HermitCrabEntity> ->
                     if (this.isHiding) {
                         return@AnimationStateHandler state.setAndContinue(HIDE_ANIMATION)
                     } else {

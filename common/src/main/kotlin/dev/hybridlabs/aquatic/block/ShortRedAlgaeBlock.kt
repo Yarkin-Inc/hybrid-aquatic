@@ -24,7 +24,7 @@ import net.minecraft.world.phys.shapes.CollisionContext
 import net.minecraft.world.phys.shapes.VoxelShape
 
 @Suppress("OVERRIDE_DEPRECATION")
-class ShortRedAlgaeBlock(settings: Properties?) :
+class ShortRedAlgaeBlock(settings: Properties) :
     BushBlock(settings), BonemealableBlock, LiquidBlockContainer {
     override fun getShape(
         state: BlockState,
@@ -46,25 +46,27 @@ class ShortRedAlgaeBlock(settings: Properties?) :
 
     override fun updateShape(
         state: BlockState,
-        direction: Direction,
-        neighborState: BlockState,
-        world: LevelAccessor,
+        world: net.minecraft.world.level.LevelReader,
+        tickAccess: net.minecraft.world.level.ScheduledTickAccess,
         pos: BlockPos,
+        direction: Direction,
         neighborPos: BlockPos,
+        neighborState: BlockState,
+        random: net.minecraft.util.RandomSource,
     ): BlockState {
-        val blockState = super.updateShape(state, direction, neighborState, world, pos, neighborPos)
+        val blockState = super.updateShape(state, world, tickAccess, pos, direction, neighborPos, neighborState, random)
         if (!blockState.isAir) {
-            world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world))
+            tickAccess.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world))
         }
 
         return blockState
     }
 
-    override fun isValidBonemealTarget(world: LevelReader, pos: BlockPos, state: BlockState): Boolean {
+    override fun isValidBonemealTarget(world: LevelReader, pos: BlockPos, state: BlockState, source: net.minecraft.world.level.block.BonemealSource): Boolean {
         return true
     }
 
-    override fun isBonemealSuccess(world: Level, random: RandomSource, pos: BlockPos, state: BlockState): Boolean {
+    override fun isBonemealSuccess(world: Level, random: RandomSource, pos: BlockPos, state: BlockState, source: net.minecraft.world.level.block.BonemealSource): Boolean {
         return true
     }
 
@@ -72,13 +74,13 @@ class ShortRedAlgaeBlock(settings: Properties?) :
         return Fluids.WATER.getSource(false)
     }
 
-    override fun performBonemeal(world: ServerLevel, random: RandomSource, pos: BlockPos, state: BlockState) {
+    override fun performBonemeal(world: ServerLevel, random: RandomSource, pos: BlockPos, state: BlockState, source: net.minecraft.world.level.block.BonemealSource) {
         val blockState = HABlocks.RED_ALGAE.get().defaultBlockState()
         world.setBlock(pos, blockState, 2)
     }
 
     override fun canPlaceLiquid(
-        p0: Player?,
+        p0: net.minecraft.world.entity.LivingEntity?,
         world: BlockGetter,
         pos: BlockPos,
         state: BlockState,
@@ -96,12 +98,9 @@ class ShortRedAlgaeBlock(settings: Properties?) :
         return false
     }
 
-    override fun codec(): MapCodec<out BushBlock> {
-        return CODEC
-    }
 
     companion object {
-        val CODEC: MapCodec<ShortRedAlgaeBlock> = simpleCodec(::ShortRedAlgaeBlock)
+
         private val SHAPE: VoxelShape = box(2.0, 0.0, 2.0, 14.0, 12.0, 14.0)
     }
 }

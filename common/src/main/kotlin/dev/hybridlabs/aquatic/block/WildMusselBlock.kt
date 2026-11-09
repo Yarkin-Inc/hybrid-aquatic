@@ -53,32 +53,34 @@ class WildMusselBlock(properties: Properties) :
         }
     }
 
-    override fun getOcclusionShape(state: BlockState, world: BlockGetter, pos: BlockPos): VoxelShape {
+    override fun getOcclusionShape(state: BlockState): VoxelShape {
         return Shapes.empty()
     }
 
     override fun updateShape(
         state: BlockState,
-        direction: Direction,
-        neighborState: BlockState,
-        world: LevelAccessor,
+        world: net.minecraft.world.level.LevelReader,
+        tickAccess: net.minecraft.world.level.ScheduledTickAccess,
         pos: BlockPos,
+        direction: Direction,
         neighborPos: BlockPos,
+        neighborState: BlockState,
+        random: net.minecraft.util.RandomSource,
     ): BlockState {
-        val blockState = super.updateShape(state, direction, neighborState, world, pos, neighborPos)
+        val blockState = super.updateShape(state, world, tickAccess, pos, direction, neighborPos, neighborState, random)
         if (!blockState.isAir) {
-            world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world))
+            tickAccess.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world))
         }
 
         return blockState
     }
 
-    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block?, BlockState?>) {
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
         builder.add(WATERLOGGED)
     }
 
     override fun canPlaceLiquid(
-        player: Player?,
+        player: net.minecraft.world.entity.LivingEntity?,
         world: BlockGetter,
         pos: BlockPos,
         state: BlockState,
@@ -96,12 +98,9 @@ class WildMusselBlock(properties: Properties) :
         return false
     }
 
-    override fun codec(): MapCodec<out BushBlock> {
-        return CODEC
-    }
 
     companion object {
-        val CODEC: MapCodec<WildMusselBlock> = simpleCodec(::WildMusselBlock)
+
         private val SHAPE: VoxelShape = box(2.0, 0.0, 2.0, 14.0, 12.0, 14.0)
 
         val WATERLOGGED: BooleanProperty = BlockStateProperties.WATERLOGGED

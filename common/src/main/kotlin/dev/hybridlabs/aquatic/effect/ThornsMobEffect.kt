@@ -13,7 +13,7 @@ class ThornsMobEffect : MobEffect(MobEffectCategory.BENEFICIAL, 0x695672) {
         return true
     }
 
-    override fun applyEffectTick(entity: LivingEntity, amplifier: Int): Boolean {
+    override fun applyEffectTick(server: net.minecraft.server.level.ServerLevel, entity: LivingEntity, amplifier: Int): Boolean {
         val level = amplifier + 1
         val damageSource = entity.lastDamageSource ?: return true
         val attacker = damageSource.directEntity as? LivingEntity ?: return true

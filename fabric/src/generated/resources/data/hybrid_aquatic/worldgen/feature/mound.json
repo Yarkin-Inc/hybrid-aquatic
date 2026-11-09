@@ -1,0 +1,142 @@
+{
+  "type": "minecraft:simple_random_selector",
+  "features": [
+    {
+      "feature": {
+        "type": "minecraft:disk",
+        "half_height": 1,
+        "radius": {
+          "type": "minecraft:uniform",
+          "max_inclusive": 5,
+          "min_inclusive": 3
+        },
+        "state_provider": {
+          "fallback": {
+            "type": "minecraft:weighted",
+            "entries": [
+              {
+                "data": {
+                  "id": "minecraft:dead_horn_coral_block"
+                },
+                "weight": 1
+              },
+              {
+                "data": {
+                  "id": "minecraft:dead_fire_coral_block"
+                },
+                "weight": 1
+              },
+              {
+                "data": {
+                  "id": "minecraft:dead_bubble_coral_block"
+                },
+                "weight": 1
+              },
+              {
+                "data": {
+                  "id": "minecraft:dead_brain_coral_block"
+                },
+                "weight": 1
+              },
+              {
+                "data": {
+                  "id": "minecraft:dead_tube_coral_block"
+                },
+                "weight": 1
+              },
+              {
+                "data": {
+                  "id": "minecraft:stone"
+                },
+                "weight": 2
+              }
+            ]
+          },
+          "rules": [
+            {
+              "if_true": {
+                "type": "minecraft:not",
+                "predicate": {
+                  "type": "minecraft:matching_blocks",
+                  "blocks": [
+                    "minecraft:gravel",
+                    "minecraft:sand",
+                    "minecraft:dead_horn_coral_block",
+                    "minecraft:dead_fire_coral_block",
+                    "minecraft:dead_brain_coral_block",
+                    "minecraft:dead_bubble_coral_block",
+                    "minecraft:dead_tube_coral_block",
+                    "hybrid_aquatic:grassy_sand"
+                  ],
+                  "offset": [
+                    0,
+                    -1,
+                    0
+                  ]
+                }
+              },
+              "then": {
+                "type": "minecraft:simple",
+                "state": {
+                  "id": "minecraft:water",
+                  "properties": {
+                    "level": "0"
+                  }
+                }
+              }
+            }
+          ],
+          "type": "minecraft:rule_based"
+        },
+        "target": {
+          "type": "minecraft:matching_blocks",
+          "blocks": [
+            "minecraft:gravel",
+            "minecraft:sand",
+            "minecraft:dead_horn_coral_block",
+            "minecraft:dead_fire_coral_block",
+            "minecraft:dead_brain_coral_block",
+            "minecraft:dead_bubble_coral_block",
+            "minecraft:dead_tube_coral_block",
+            "hybrid_aquatic:grassy_sand"
+          ],
+          "offset": [
+            0,
+            -1,
+            0
+          ]
+        }
+      },
+      "placement": [
+        {
+          "type": "minecraft:count",
+          "count": 6
+        },
+        {
+          "type": "minecraft:offset",
+          "x": {
+            "type": "minecraft:trapezoid",
+            "min": -7,
+            "max": 7,
+            "plateau": 0
+          },
+          "y": 0,
+          "z": {
+            "type": "minecraft:trapezoid",
+            "min": -7,
+            "max": 7,
+            "plateau": 0
+          }
+        },
+        {
+          "type": "minecraft:count",
+          "count": 1
+        },
+        {
+          "type": "minecraft:heightmap",
+          "heightmap": "OCEAN_FLOOR"
+        }
+      ]
+    }
+  ]
+}

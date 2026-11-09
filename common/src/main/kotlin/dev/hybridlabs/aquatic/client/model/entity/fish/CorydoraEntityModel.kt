@@ -2,16 +2,16 @@ package dev.hybridlabs.aquatic.client.model.entity.fish
 
 import dev.hybridlabs.hapi.client.model.entity.aquatic.BaseFishEntityModel
 import dev.hybridlabs.aquatic.entity.fish.CorydoraEntity
-import net.minecraft.client.renderer.RenderType
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.client.renderer.rendertype.RenderType
+import net.minecraft.resources.Identifier
 import kotlin.random.Random
 
 class CorydoraEntityModel : BaseFishEntityModel<CorydoraEntity>("hybrid_aquatic", "corydora") {
-    override fun getRenderType(animatable: CorydoraEntity, texture: ResourceLocation): RenderType {
-        return RenderType.entityTranslucent(texture)
+    override fun getRenderType(animatable: CorydoraEntity, texture: Identifier): RenderType {
+        return net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucent(texture)
     }
 
-    override fun getTextureResource(animatable: CorydoraEntity): ResourceLocation {
+    override fun getTextureResource(animatable: CorydoraEntity): Identifier {
         val seed = animatable.uuid.leastSignificantBits
         val random = Random(seed)
         return commonTextures[random.nextInt(commonTextures.size)]
@@ -19,10 +19,10 @@ class CorydoraEntityModel : BaseFishEntityModel<CorydoraEntity>("hybrid_aquatic"
 
     companion object {
         private val commonTextures = listOf(
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/fish/corydora/corydora_albino.png"),
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/fish/corydora/corydora_panda.png"),
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/fish/corydora/corydora_bronze.png"),
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/fish/corydora/corydora_nattereri.png"),
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/fish/corydora/corydora_albino.png"),
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/fish/corydora/corydora_panda.png"),
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/fish/corydora/corydora_bronze.png"),
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/fish/corydora/corydora_nattereri.png"),
         )
     }
 }

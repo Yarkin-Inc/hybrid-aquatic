@@ -2,34 +2,34 @@ package dev.hybridlabs.aquatic.client.model.entity.cephalopod
 
 import dev.hybridlabs.aquatic.entity.cephalopod.OctopusEntity
 import dev.hybridlabs.hapi.client.model.entity.aquatic.BaseOctopusEntityModel
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 
 class OctopusEntityModel : BaseOctopusEntityModel<OctopusEntity>("hybrid_aquatic","octopus") {
 
     companion object {
         private val OCTOPUS_TEXTURE =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/cephalopod/octopus/octopus.png")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/cephalopod/octopus/octopus.png")
         private val BLUE_RINGED_OCTOPUS_TEXTURE =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/cephalopod/octopus/blue_ringed_octopus.png")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/cephalopod/octopus/blue_ringed_octopus.png")
         private val COCONUT_OCTOPUS_TEXTURE =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/cephalopod/octopus/coconut_octopus.png")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/cephalopod/octopus/coconut_octopus.png")
 
         private val OCTOPUS_MODEL =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "geo/cephalopod/octopus/octopus.geo.json")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "cephalopod/octopus/octopus")
         private val BLUE_RINGED_OCTOPUS_MODEL =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "geo/cephalopod/octopus/blue_ringed_octopus.geo.json")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "cephalopod/octopus/blue_ringed_octopus")
         private val COCONUT_OCTOPUS_MODEL =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "geo/cephalopod/octopus/coconut_octopus.geo.json")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "cephalopod/octopus/coconut_octopus")
 
         private val OCTOPUS_ANIMATION =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "animations/entity/cephalopod/octopus/octopus.animation.json")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "entity/cephalopod/octopus/octopus")
         private val BLUE_RINGED_OCTOPUS_ANIMATION =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "animations/entity/cephalopod/octopus/blue_ringed_octopus.animation.json")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "entity/cephalopod/octopus/blue_ringed_octopus")
         private val COCONUT_OCTOPUS_ANIMATION =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "animations/entity/cephalopod/octopus/coconut_octopus.animation.json")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "entity/cephalopod/octopus/coconut_octopus")
     }
 
-    override fun getTextureResource(animatable: OctopusEntity): ResourceLocation {
+    override fun getTextureResource(animatable: OctopusEntity): Identifier {
         return when (animatable.variant) {
             OctopusEntity.Companion.Type.OCTOPUS -> OCTOPUS_TEXTURE
             OctopusEntity.Companion.Type.BLUE_RINGED -> BLUE_RINGED_OCTOPUS_TEXTURE
@@ -37,7 +37,7 @@ class OctopusEntityModel : BaseOctopusEntityModel<OctopusEntity>("hybrid_aquatic
         }
     }
 
-    override fun getModelResource(animatable: OctopusEntity): ResourceLocation {
+    override fun getModelResource(animatable: OctopusEntity): Identifier {
         return when (animatable.variant) {
             OctopusEntity.Companion.Type.OCTOPUS -> OCTOPUS_MODEL
             OctopusEntity.Companion.Type.BLUE_RINGED -> BLUE_RINGED_OCTOPUS_MODEL
@@ -45,7 +45,7 @@ class OctopusEntityModel : BaseOctopusEntityModel<OctopusEntity>("hybrid_aquatic
         }
     }
 
-    override fun getAnimationResource(animatable: OctopusEntity): ResourceLocation {
+    override fun getAnimationResource(animatable: OctopusEntity): Identifier {
         return when (animatable.variant) {
             OctopusEntity.Companion.Type.OCTOPUS -> OCTOPUS_ANIMATION
             OctopusEntity.Companion.Type.BLUE_RINGED -> BLUE_RINGED_OCTOPUS_ANIMATION

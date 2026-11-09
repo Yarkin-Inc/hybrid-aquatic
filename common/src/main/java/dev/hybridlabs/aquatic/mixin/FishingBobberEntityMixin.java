@@ -15,7 +15,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FishingHook;
@@ -53,19 +53,16 @@ public abstract class FishingBobberEntityMixin extends Entity implements CustomF
     }
 
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
-    private void readCustomDataFromNbt(CompoundTag nbt, CallbackInfo ci) {
+    private void readCustomDataFromNbt(net.minecraft.world.level.storage.ValueInput nbt, CallbackInfo ci) {
         setLureItem(
-                ItemStack.parseOptional(
-                        this.level().registryAccess(), nbt.getCompound("lureItem")));
+                nbt.read("lureItem", ItemStack.CODEC).orElse(ItemStack.EMPTY));
     }
 
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
-    private void writeCustomDataToNbt(CompoundTag nbt, CallbackInfo ci) {
+    private void writeCustomDataToNbt(net.minecraft.world.level.storage.ValueOutput nbt, CallbackInfo ci) {
         if (!lureItemStack.is(HAItemTags.INSTANCE.getLURE_ITEMS())) return;
 
-        CompoundTag itemStack = new CompoundTag();
-        getLureItem().save(this.level().registryAccess(), itemStack);
-        nbt.put("lureItem", itemStack);
+        nbt.store("lureItem", ItemStack.CODEC, getLureItem());
     }
 
     public ItemStack getLureItem() {
@@ -82,9 +79,9 @@ public abstract class FishingBobberEntityMixin extends Entity implements CustomF
             At.Shift.AFTER))
     private void reduceCooldownTime(BlockPos pos, CallbackInfo ci) {
         Item lureItem = this.lureItemStack.getItem();
-        if (lureItem.equals(HAItems.INSTANCE.getBARBED_HOOK().get()) && this.level().isDay()) {
+        if (lureItem.equals(HAItems.INSTANCE.getBARBED_HOOK().get()) && (this.level().environmentAttributes().getValue(net.minecraft.world.attribute.EnvironmentAttributes.SKY_LIGHT_LEVEL, position()) > 11f)) {
             timeUntilLured -= 75;
-        } else if (lureItem.equals(HAItems.INSTANCE.getGLOWING_HOOK().get()) && this.level().isNight()) {
+        } else if (lureItem.equals(HAItems.INSTANCE.getGLOWING_HOOK().get()) && (this.level().environmentAttributes().getValue(net.minecraft.world.attribute.EnvironmentAttributes.SKY_LIGHT_LEVEL, position()) <= 11f)) {
             timeUntilLured -= 75;
         }
     }
@@ -112,7 +109,7 @@ public abstract class FishingBobberEntityMixin extends Entity implements CustomF
                 instance = LootTable.EMPTY;
             } else if (lureItemStack.is(
                     HAItems.INSTANCE.getCREEPERMAGNET_HOOK().get())) {
-                var creeperType = EntityType.CREEPER;
+                var creeperType = net.minecraft.world.entity.EntityTypes.CREEPER;
                 createAndLaunchEntityAtPlayer(creeperType);
 
                 instance = LootTable.EMPTY;
@@ -128,7 +125,7 @@ public abstract class FishingBobberEntityMixin extends Entity implements CustomF
     @Unique
     private void createAndLaunchEntityAtPlayer(EntityType<?> entityType) {
         if (this.level() instanceof ServerLevel serverWorld) {
-            Entity entity = entityType.spawn(serverWorld, this.blockPosition(), MobSpawnType.MOB_SUMMONED);
+            Entity entity = entityType.spawn(serverWorld, this.blockPosition(), EntitySpawnReason.MOB_SUMMONED);
             if (entity == null)
                 return;
 

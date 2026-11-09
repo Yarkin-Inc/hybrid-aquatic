@@ -10,6 +10,6 @@ class CarpEntityRenderer(context: Context) :
     BaseFishEntityRenderer<CarpEntity>(context, CarpEntityModel(), true, false) {
 
     init {
-        addRenderLayer(CarpPatternEntityLayer(this))
+        withRenderLayer(CarpPatternEntityLayer(this))
     }
 }

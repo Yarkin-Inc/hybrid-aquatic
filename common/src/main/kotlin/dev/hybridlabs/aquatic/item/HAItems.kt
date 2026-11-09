@@ -27,37 +27,37 @@ object HAItems {
     //#region Diving Armor
     val DIVING_HELMET = register(
         "diving_helmet"
-    ) {
+    ) { properties ->
         DivingArmorItem(
-            ArmorItem.Type.HELMET,
-            armorProperties(ArmorItem.Type.HELMET, 15)
+            net.minecraft.world.item.equipment.ArmorType.HELMET,
+            armorProperties(properties, net.minecraft.world.item.equipment.ArmorType.HELMET, 15)
         )
     }
 
     val DIVING_SUIT = register(
         "diving_suit"
-    ) {
+    ) { properties ->
         DivingArmorItem(
-            ArmorItem.Type.CHESTPLATE,
-            armorProperties(ArmorItem.Type.CHESTPLATE, 15)
+            net.minecraft.world.item.equipment.ArmorType.CHESTPLATE,
+            armorProperties(properties, net.minecraft.world.item.equipment.ArmorType.CHESTPLATE, 15)
         )
     }
 
     val DIVING_LEGGINGS = register(
         "diving_leggings"
-    ) {
+    ) { properties ->
         DivingArmorItem(
-            ArmorItem.Type.LEGGINGS,
-            armorProperties(ArmorItem.Type.LEGGINGS, 15)
+            net.minecraft.world.item.equipment.ArmorType.LEGGINGS,
+            armorProperties(properties, net.minecraft.world.item.equipment.ArmorType.LEGGINGS, 15)
         )
     }
 
     val DIVING_BOOTS = register(
         "diving_boots"
-    ) {
+    ) { properties ->
         DivingArmorItem(
-            ArmorItem.Type.BOOTS,
-            armorProperties(ArmorItem.Type.BOOTS, 15)
+            net.minecraft.world.item.equipment.ArmorType.BOOTS,
+            armorProperties(properties, net.minecraft.world.item.equipment.ArmorType.BOOTS, 15)
         )
     }
     //#endregion
@@ -65,37 +65,37 @@ object HAItems {
     //#region Reinforced Diving Armor
     val REINFORCED_DIVING_HELMET = register(
         "reinforced_diving_helmet"
-    ) {
+    ) { properties ->
         ReinforcedDivingArmorItem(
-            ArmorItem.Type.HELMET,
-            armorProperties(ArmorItem.Type.HELMET, 25)
+            net.minecraft.world.item.equipment.ArmorType.HELMET,
+            armorProperties(properties, net.minecraft.world.item.equipment.ArmorType.HELMET, 25)
         )
     }
 
     val REINFORCED_DIVING_SUIT = register(
         "reinforced_diving_suit"
-    ) {
+    ) { properties ->
         ReinforcedDivingArmorItem(
-            ArmorItem.Type.CHESTPLATE,
-            armorProperties(ArmorItem.Type.CHESTPLATE, 25)
+            net.minecraft.world.item.equipment.ArmorType.CHESTPLATE,
+            armorProperties(properties, net.minecraft.world.item.equipment.ArmorType.CHESTPLATE, 25)
         )
     }
 
     val REINFORCED_DIVING_LEGGINGS = register(
         "reinforced_diving_leggings"
-    ) {
+    ) { properties ->
         ReinforcedDivingArmorItem(
-            ArmorItem.Type.LEGGINGS,
-            armorProperties(ArmorItem.Type.LEGGINGS, 25)
+            net.minecraft.world.item.equipment.ArmorType.LEGGINGS,
+            armorProperties(properties, net.minecraft.world.item.equipment.ArmorType.LEGGINGS, 25)
         )
     }
 
     val REINFORCED_DIVING_BOOTS = register(
         "reinforced_diving_boots"
-    ) {
+    ) { properties ->
         ReinforcedDivingArmorItem(
-            ArmorItem.Type.BOOTS,
-            armorProperties(ArmorItem.Type.BOOTS, 25)
+            net.minecraft.world.item.equipment.ArmorType.BOOTS,
+            armorProperties(properties, net.minecraft.world.item.equipment.ArmorType.BOOTS, 25)
         )
     }
     //#endregion
@@ -103,37 +103,37 @@ object HAItems {
     //#region Glowing Diving Armor
     val GLOWING_DIVING_HELMET = register(
         "glowing_diving_helmet"
-    ) {
+    ) { properties ->
         GlowingDivingArmorItem(
-            ArmorItem.Type.HELMET,
-            armorProperties(ArmorItem.Type.HELMET, 15)
+            net.minecraft.world.item.equipment.ArmorType.HELMET,
+            armorProperties(properties, net.minecraft.world.item.equipment.ArmorType.HELMET, 15)
         )
     }
 
     val GLOWING_DIVING_SUIT = register(
         "glowing_diving_suit"
-    ) {
+    ) { properties ->
         GlowingDivingArmorItem(
-            ArmorItem.Type.CHESTPLATE,
-            armorProperties(ArmorItem.Type.CHESTPLATE, 15)
+            net.minecraft.world.item.equipment.ArmorType.CHESTPLATE,
+            armorProperties(properties, net.minecraft.world.item.equipment.ArmorType.CHESTPLATE, 15)
         )
     }
 
     val GLOWING_DIVING_LEGGINGS = register(
         "glowing_diving_leggings"
-    ) {
+    ) { properties ->
         GlowingDivingArmorItem(
-            ArmorItem.Type.LEGGINGS,
-            armorProperties(ArmorItem.Type.LEGGINGS, 15)
+            net.minecraft.world.item.equipment.ArmorType.LEGGINGS,
+            armorProperties(properties, net.minecraft.world.item.equipment.ArmorType.LEGGINGS, 15)
         )
     }
 
     val GLOWING_DIVING_BOOTS = register(
         "glowing_diving_boots"
-    ) {
+    ) { properties ->
         GlowingDivingArmorItem(
-            ArmorItem.Type.BOOTS,
-            armorProperties(ArmorItem.Type.BOOTS, 15)
+            net.minecraft.world.item.equipment.ArmorType.BOOTS,
+            armorProperties(properties, net.minecraft.world.item.equipment.ArmorType.BOOTS, 15)
         )
     }
     //#endregion
@@ -141,19 +141,19 @@ object HAItems {
     //#region Nautilus Armor
     val NAUTILUS_HELMET = register(
         "nautilus_helmet"
-    ) {
+    ) { properties ->
         SeashellArmorItem(
-            ArmorItem.Type.HELMET,
-            armorProperties(ArmorItem.Type.HELMET, 15)
+            net.minecraft.world.item.equipment.ArmorType.HELMET,
+            armorProperties(properties, net.minecraft.world.item.equipment.ArmorType.HELMET, 15)
         )
     }
 
     val NAUTILUS_PAULDRONS = register(
         "nautilus_pauldrons"
-    ) {
+    ) { properties ->
         SeashellArmorItem(
-            ArmorItem.Type.CHESTPLATE,
-            armorProperties(ArmorItem.Type.CHESTPLATE, 15)
+            net.minecraft.world.item.equipment.ArmorType.CHESTPLATE,
+            armorProperties(properties, net.minecraft.world.item.equipment.ArmorType.CHESTPLATE, 15)
         )
     }
     //#endregion
@@ -161,10 +161,10 @@ object HAItems {
     //#region Turtle Armor
     val TURTLE_CHESTPLATE = register(
         "turtle_chestplate"
-    ) {
+    ) { properties ->
         TurtleArmorItem(
-            ArmorItem.Type.CHESTPLATE,
-            armorProperties(ArmorItem.Type.CHESTPLATE, 25)
+            net.minecraft.world.item.equipment.ArmorType.CHESTPLATE,
+            armorProperties(properties, net.minecraft.world.item.equipment.ArmorType.CHESTPLATE, 25)
         )
     }
     //#endregion
@@ -172,156 +172,146 @@ object HAItems {
     //#region Cosmetics
     val MANGLERFISH_LURE = register(
         "manglerfish_lure"
-    ) {
+    ) { properties ->
         ManglerfishArmorItem(
-            ArmorItem.Type.HELMET,
-            armorProperties(ArmorItem.Type.HELMET, 15)
+            net.minecraft.world.item.equipment.ArmorType.HELMET,
+            armorProperties(properties, net.minecraft.world.item.equipment.ArmorType.HELMET, 15)
         )
     }
 
     val MANGLERFISH_FIN = register(
         "manglerfish_fin"
-    ) {
+    ) { properties ->
         ManglerfishArmorItem(
-            ArmorItem.Type.CHESTPLATE,
-            armorProperties(ArmorItem.Type.CHESTPLATE, 15)
+            net.minecraft.world.item.equipment.ArmorType.CHESTPLATE,
+            armorProperties(properties, net.minecraft.world.item.equipment.ArmorType.CHESTPLATE, 15)
         )
     }
 
     val EEL_SCARF = register(
         "eel_scarf"
-    ) {
+    ) { properties ->
         EelArmorItem(
-            ArmorItem.Type.CHESTPLATE,
-            armorProperties(ArmorItem.Type.CHESTPLATE, 15)
+            net.minecraft.world.item.equipment.ArmorType.CHESTPLATE,
+            armorProperties(properties, net.minecraft.world.item.equipment.ArmorType.CHESTPLATE, 15)
         )
     }
 
     val STRIPED_EEL_SCARF = register(
         "striped_eel_scarf"
-    ) {
+    ) { properties ->
         StripedEelScarfItem(
-            ArmorItem.Type.CHESTPLATE,
-            armorProperties(ArmorItem.Type.CHESTPLATE, 15)
+            net.minecraft.world.item.equipment.ArmorType.CHESTPLATE,
+            armorProperties(properties, net.minecraft.world.item.equipment.ArmorType.CHESTPLATE, 15)
         )
     }
 
     val PINK_HATXOLOTL = register(
         "pink_hatxolotl"
-    ) {
+    ) { properties ->
         PinkHatxolotlArmorItem(
-            ArmorItem.Type.HELMET,
-            armorProperties(ArmorItem.Type.HELMET, 15)
+            net.minecraft.world.item.equipment.ArmorType.HELMET,
+            armorProperties(properties, net.minecraft.world.item.equipment.ArmorType.HELMET, 15)
         )
     }
 
     val BROWN_HATXOLOTL = register(
         "brown_hatxolotl"
-    ) {
+    ) { properties ->
         BrownHatxolotlArmorItem(
-            ArmorItem.Type.HELMET,
-            armorProperties(ArmorItem.Type.HELMET, 15)
+            net.minecraft.world.item.equipment.ArmorType.HELMET,
+            armorProperties(properties, net.minecraft.world.item.equipment.ArmorType.HELMET, 15)
         )
     }
 
     val GOLD_HATXOLOTL = register(
         "gold_hatxolotl"
-    ) {
+    ) { properties ->
         GoldHatxolotlArmorItem(
-            ArmorItem.Type.HELMET,
-            armorProperties(ArmorItem.Type.HELMET, 15)
+            net.minecraft.world.item.equipment.ArmorType.HELMET,
+            armorProperties(properties, net.minecraft.world.item.equipment.ArmorType.HELMET, 15)
         )
     }
 
     val BLUE_HATXOLOTL = register(
         "blue_hatxolotl"
-    ) {
+    ) { properties ->
         BlueHatxolotlArmorItem(
-            ArmorItem.Type.HELMET,
-            armorProperties(ArmorItem.Type.HELMET, 15)
+            net.minecraft.world.item.equipment.ArmorType.HELMET,
+            armorProperties(properties, net.minecraft.world.item.equipment.ArmorType.HELMET, 15)
         )
     }
 
     val CYAN_HATXOLOTL = register(
         "cyan_hatxolotl"
-    ) {
+    ) { properties ->
         CyanHatxolotlArmorItem(
-            ArmorItem.Type.HELMET,
-            armorProperties(ArmorItem.Type.HELMET, 15)
+            net.minecraft.world.item.equipment.ArmorType.HELMET,
+            armorProperties(properties, net.minecraft.world.item.equipment.ArmorType.HELMET, 15)
         )
     }
 
     val MOON_JELLYFISH_HAT = register(
         "moon_jellyfish_hat"
-    ) {
+    ) { properties ->
         MoonJellyfishArmorItem(
-            ArmorItem.Type.HELMET,
-            armorProperties(ArmorItem.Type.HELMET, 15)
+            net.minecraft.world.item.equipment.ArmorType.HELMET,
+            armorProperties(properties, net.minecraft.world.item.equipment.ArmorType.HELMET, 15)
         )
     }
     //#endregion
     //#endregion
 
     //#region Tools - Weapons - Hooks
-    val DIVING_WEIGHT = register("diving_weight") { DivingWeightItem(Item.Properties()) }
-    val KARKINOS_CLAW = register("karkinos_claw") { KarkinosClawItem(Item.Properties().stacksTo(1)) }
-    val OMINOUS_CONCH = register("ominous_conch") { OminousConchItem(Item.Properties().stacksTo(1), HAInstrumentTags.OMINOUS_CONCH) }
-    val ARGONAUT = register("argonaut") { ArgonautItem(Item.Properties().stacksTo(1)) }
+    val DIVING_WEIGHT = register("diving_weight") { properties -> DivingWeightItem(properties) }
+    val KARKINOS_CLAW = register("karkinos_claw") { properties -> KarkinosClawItem(properties.stacksTo(1)) }
+    val OMINOUS_CONCH = register("ominous_conch") { properties -> OminousConchItem(properties.stacksTo(1), HAInstrumentTags.OMINOUS_CONCH) }
+    val ARGONAUT = register("argonaut") { properties -> ArgonautItem(properties.stacksTo(1)) }
 
-    val BARBED_HOOK = register("barbed_hook") { HookItem(Item.Properties().durability(16)) }
-    val GLOWING_HOOK = register("glowing_hook") { HookItem(Item.Properties().durability(16)) }
-    val MAGNETIC_HOOK = register("magnetic_hook") { HookItem(Item.Properties().durability(8)) }
-    val CREEPERMAGNET_HOOK = register("creepermagnet_hook") { HookItem(Item.Properties().durability(1)) }
-    val OMINOUS_HOOK = register("ominous_hook") { HookItem(Item.Properties().durability(1)) }
+    val BARBED_HOOK = register("barbed_hook") { properties -> HookItem(properties.durability(16)) }
+    val GLOWING_HOOK = register("glowing_hook") { properties -> HookItem(properties.durability(16)) }
+    val MAGNETIC_HOOK = register("magnetic_hook") { properties -> HookItem(properties.durability(8)) }
+    val CREEPERMAGNET_HOOK = register("creepermagnet_hook") { properties -> HookItem(properties.durability(1)) }
+    val OMINOUS_HOOK = register("ominous_hook") { properties -> HookItem(properties.durability(1)) }
 
     //#region Seashell Set
     val SEASHELL_SPEAR = register(
         "seashell_spear"
-    ) {
+    ) { properties ->
         SeashellSpearItem(
-            Item.Properties().attributes(
-                SwordItem.createAttributes(HAPIToolMaterials.SEASHELL, 2, -2.4f)
-            )
+            properties
         )
     }
 
     val SEASHELL_PICKAXE = register(
         "seashell_pickaxe"
-    ) {
+    ) { properties ->
         SeashellPickaxeItem(
-            Item.Properties().attributes(
-                DiggerItem.createAttributes(HAPIToolMaterials.SEASHELL, 1.0f, -2.8f)
-            )
+            properties
         )
     }
 
     val SEASHELL_AXE = register(
         "seashell_axe"
-    ) {
+    ) { properties ->
         SeashellAxeItem(
-            Item.Properties().attributes(
-                DiggerItem.createAttributes(HAPIToolMaterials.SEASHELL, 7.0f, -3.2f)
-            )
+            properties
         )
     }
 
     val SEASHELL_SHOVEL = register(
         "seashell_shovel"
-    ) {
+    ) { properties ->
         SeashellShovelItem(
-            Item.Properties().attributes(
-                DiggerItem.createAttributes(HAPIToolMaterials.SEASHELL, 1.5f, -3.0f)
-            )
+            properties
         )
     }
 
     val SEASHELL_HOE = register(
         "seashell_hoe"
-    ) {
+    ) { properties ->
         SeashellHoeItem(
-            Item.Properties().attributes(
-                DiggerItem.createAttributes(HAPIToolMaterials.SEASHELL, 1.0f, -2.0f)
-            )
+            properties
         )
     }
     //#endregion
@@ -329,51 +319,41 @@ object HAItems {
     //#region Coral Set
     val CORAL_BLADE = register(
         "coral_blade"
-    ) {
+    ) { properties ->
         CoralBladeItem(
-            Item.Properties().attributes(
-                SwordItem.createAttributes(HAPIToolMaterials.CORAL, 3, -2.4f)
-            )
+            properties
         )
     }
 
     val CORAL_PICKAXE = register(
         "coral_pickaxe"
-    ) {
+    ) { properties ->
         CoralPickaxeItem(
-            Item.Properties().attributes(
-                DiggerItem.createAttributes(HAPIToolMaterials.CORAL, 1.0f, -2.8f)
-            )
+            properties
         )
     }
 
     val CORAL_AXE = register(
         "coral_axe"
-    ) {
+    ) { properties ->
         CoralAxeItem(
-            Item.Properties().attributes(
-                DiggerItem.createAttributes(HAPIToolMaterials.CORAL, 1.0f, -3.2f)
-            )
+            properties
         )
     }
 
     val CORAL_SHOVEL = register(
         "coral_shovel"
-    ) {
+    ) { properties ->
         CoralShovelItem(
-            Item.Properties().attributes(
-                DiggerItem.createAttributes(HAPIToolMaterials.CORAL, 1.5f, -3.0f)
-            )
+            properties
         )
     }
 
     val CORAL_HOE = register(
         "coral_hoe"
-    ) {
+    ) { properties ->
         CoralHoeItem(
-            Item.Properties().attributes(
-                DiggerItem.createAttributes(HAPIToolMaterials.CORAL, 1.0f, -2.0f)
-            )
+            properties
         )
     }
     //#endregion
@@ -383,15 +363,15 @@ object HAItems {
 
     //#region Nature Blocks
 
-    val ANEMONE = register("anemone") {
-        PLATFORM.createBlockItem(HABlocks.ANEMONE.get(), Item.Properties())
+    val ANEMONE = register("anemone") { properties ->
+        PLATFORM.createBlockItem(HABlocks.ANEMONE.get(), properties)
     }
 
-    val STRAWBERRY_ANEMONE = register("strawberry_anemone") {
-        PLATFORM.createBlockItem(HABlocks.STRAWBERRY_ANEMONE.get(), Item.Properties())
+    val STRAWBERRY_ANEMONE = register("strawberry_anemone") { properties ->
+        PLATFORM.createBlockItem(HABlocks.STRAWBERRY_ANEMONE.get(), properties)
     }
-    val GIANT_GREEN_ANEMONE = register("giant_green_anemone") {
-        PLATFORM.createBlockItem(HABlocks.GIANT_GREEN_ANEMONE.get(), Item.Properties())
+    val GIANT_GREEN_ANEMONE = register("giant_green_anemone") { properties ->
+        PLATFORM.createBlockItem(HABlocks.GIANT_GREEN_ANEMONE.get(), properties)
     }
 
     val GIANT_CLAM = registerBlockItem("giant_clam") { HABlocks.GIANT_CLAM.get() }
@@ -691,7 +671,7 @@ object HAItems {
     val CHERRY_RAFT = registerPlaceableInWaterBlockItem("cherry_raft") { HABlocks.CHERRY_RAFT.get() }
     val DRIFTWOOD_RAFT = registerPlaceableInWaterBlockItem("driftwood_raft") { HABlocks.DRIFTWOOD_RAFT.get() }
     val GLOWSTICK = registerVerticallyAttachable("glowstick", HABlocks.GLOWSTICK, HABlocks.WALL_GLOWSTICK)
-    val MESSAGE_IN_A_BOTTLE = register("message_in_a_bottle") { MessageInABottleItem(Item.Properties()) }
+    val MESSAGE_IN_A_BOTTLE = register("message_in_a_bottle") { properties -> MessageInABottleItem(properties) }
     //#endregion
 
     //#region Nature Blocks
@@ -702,19 +682,19 @@ object HAItems {
     val WHITE_SAND = registerBlockItem("white_sand") { HABlocks.WHITE_SAND.get() }
     val CHISELED_WHITE_SANDSTONE = registerBlockItem("chiseled_white_sandstone") { HABlocks.CHISELED_WHITE_SANDSTONE.get() }
     val WHITE_SANDSTONE = registerBlockItem("white_sandstone") { HABlocks.WHITE_SANDSTONE.get() }
-    val WHITE_SANDSTONE_STAIRS = register("white_sandstone_stairs") { BlockItem(HABlocks.WHITE_SANDSTONE_STAIRS.get(), Item.Properties()) }
-    val WHITE_SANDSTONE_SLAB = register("white_sandstone_slab") { BlockItem(HABlocks.WHITE_SANDSTONE_SLAB.get(), Item.Properties()) }
-    val WHITE_SANDSTONE_WALL = register("white_sandstone_wall") { BlockItem(HABlocks.WHITE_SANDSTONE_WALL.get(), Item.Properties()) }
+    val WHITE_SANDSTONE_STAIRS = registerBlockItem("white_sandstone_stairs") { HABlocks.WHITE_SANDSTONE_STAIRS.get() }
+    val WHITE_SANDSTONE_SLAB = registerBlockItem("white_sandstone_slab") { HABlocks.WHITE_SANDSTONE_SLAB.get() }
+    val WHITE_SANDSTONE_WALL = registerBlockItem("white_sandstone_wall") { HABlocks.WHITE_SANDSTONE_WALL.get() }
     val SMOOTH_WHITE_SANDSTONE = registerBlockItem("smooth_white_sandstone") { HABlocks.SMOOTH_WHITE_SANDSTONE.get() }
-    val SMOOTH_WHITE_SANDSTONE_STAIRS = register("smooth_white_sandstone_stairs") { BlockItem(HABlocks.SMOOTH_WHITE_SANDSTONE_STAIRS.get(), Item.Properties()) }
-    val SMOOTH_WHITE_SANDSTONE_SLAB = register("smooth_white_sandstone_slab") { BlockItem(HABlocks.SMOOTH_WHITE_SANDSTONE_SLAB.get(), Item.Properties()) }
+    val SMOOTH_WHITE_SANDSTONE_STAIRS = registerBlockItem("smooth_white_sandstone_stairs") { HABlocks.SMOOTH_WHITE_SANDSTONE_STAIRS.get() }
+    val SMOOTH_WHITE_SANDSTONE_SLAB = registerBlockItem("smooth_white_sandstone_slab") { HABlocks.SMOOTH_WHITE_SANDSTONE_SLAB.get() }
     val CUT_WHITE_SANDSTONE = registerBlockItem("cut_white_sandstone") { HABlocks.CUT_WHITE_SANDSTONE.get() }
-    val CUT_WHITE_SANDSTONE_SLAB = register("cut_white_sandstone_slab") { BlockItem(HABlocks.CUT_WHITE_SANDSTONE_SLAB.get(), Item.Properties()) }
+    val CUT_WHITE_SANDSTONE_SLAB = registerBlockItem("cut_white_sandstone_slab") { HABlocks.CUT_WHITE_SANDSTONE_SLAB.get() }
 
-    val BONE_STAIRS = register("bone_stairs") { BlockItem(HABlocks.BONE_STAIRS.get(), Item.Properties()) }
-    val BONE_SLAB = register("bone_slab") { BlockItem(HABlocks.BONE_SLAB.get(), Item.Properties()) }
-    val BONE_WALL = register("bone_wall") { BlockItem(HABlocks.BONE_WALL.get(), Item.Properties()) }
-    val BONE_FENCE = register("bone_fence") { BlockItem(HABlocks.BONE_FENCE.get(), Item.Properties()) }
+    val BONE_STAIRS = registerBlockItem("bone_stairs") { HABlocks.BONE_STAIRS.get() }
+    val BONE_SLAB = registerBlockItem("bone_slab") { HABlocks.BONE_SLAB.get() }
+    val BONE_WALL = registerBlockItem("bone_wall") { HABlocks.BONE_WALL.get() }
+    val BONE_FENCE = registerBlockItem("bone_fence") { HABlocks.BONE_FENCE.get() }
 
     val SUSPICIOUS_RED_SAND = registerBlockItem("suspicious_red_sand") { HABlocks.SUSPICIOUS_RED_SAND.get() }
     val CORALSTONE = registerBlockItem("coralstone") { HABlocks.CORALSTONE.get() }
@@ -834,40 +814,40 @@ object HAItems {
     //#endregion
 
     //#region Crafting Ingredients
-    val GLOWSLIME = register("glowslime") { Item(Item.Properties()) }
-    val HAGSLIME = register("hagslime") { Item(Item.Properties()) }
-    val SEA_URCHIN_SPINE = register("sea_urchin_spine") { Item(Item.Properties()) }
-    val SHARK_TOOTH = register("shark_tooth") { Item(Item.Properties()) }
-    val SULFUR = register("sulfur") { Item(Item.Properties()) }
-    val CORAL_CHUNK = register("coral_chunk") { Item(Item.Properties()) }
-    val PRISMARINE_ROD = register("prismarine_rod") { Item(Item.Properties()) }
-    val DIVING_ARMOR_UPGRADE_TEMPLATE = register("diving_armor_upgrade_template") { Item(Item.Properties()) }
-    val STARFISH = register("starfish") { StarfishItem(Item.Properties().stacksTo(16)) }
-    val PEARL = register("pearl") { Item(Item.Properties()) }
-    val BLACK_PEARL = register("black_pearl") { Item(Item.Properties()) }
-    val COMICALLY_LARGE_NAUTILUS_SHELL = register("comically_large_nautilus_shell") { Item(Item.Properties()) }
-    val CUTTLEBONE = register("cuttlebone") { Item(Item.Properties()) }
-    val FISH_FOOD = register("fish_food") { Item(Item.Properties()) }
+    val GLOWSLIME = register("glowslime") { properties -> Item(properties) }
+    val HAGSLIME = register("hagslime") { properties -> Item(properties) }
+    val SEA_URCHIN_SPINE = register("sea_urchin_spine") { properties -> Item(properties) }
+    val SHARK_TOOTH = register("shark_tooth") { properties -> Item(properties) }
+    val SULFUR = register("sulfur") { properties -> Item(properties) }
+    val CORAL_CHUNK = register("coral_chunk") { properties -> Item(properties) }
+    val PRISMARINE_ROD = register("prismarine_rod") { properties -> Item(properties) }
+    val DIVING_ARMOR_UPGRADE_TEMPLATE = register("diving_armor_upgrade_template") { properties -> Item(properties) }
+    val STARFISH = register("starfish") { properties -> StarfishItem(properties.stacksTo(16)) }
+    val PEARL = register("pearl") { properties -> Item(properties) }
+    val BLACK_PEARL = register("black_pearl") { properties -> Item(properties) }
+    val COMICALLY_LARGE_NAUTILUS_SHELL = register("comically_large_nautilus_shell") { properties -> Item(properties) }
+    val CUTTLEBONE = register("cuttlebone") { properties -> Item(properties) }
+    val FISH_FOOD = register("fish_food") { properties -> Item(properties) }
 
     //#region Claws
-    val LOBSTER_CLAW = register("lobster_claw") { Item(Item.Properties()) }
-    val DUNGENESS_CRAB_CLAW = register("dungeness_crab_claw") { Item(Item.Properties()) }
-    val FIDDLER_CRAB_CLAW = register("fiddler_crab_claw") { Item(Item.Properties()) }
-    val VAMPIRE_CRAB_CLAW = register("vampire_crab_claw") { Item(Item.Properties()) }
-    val FLOWER_CRAB_CLAW = register("flower_crab_claw") { Item(Item.Properties()) }
-    val GHOST_CRAB_CLAW = register("ghost_crab_claw") { Item(Item.Properties()) }
-    val SPIDER_CRAB_CLAW = register("spider_crab_claw") { Item(Item.Properties()) }
-    val COCONUT_CRAB_CLAW = register("coconut_crab_claw") { Item(Item.Properties()) }
-    val YETI_CRAB_CLAW = register("yeti_crab_claw") { Item(Item.Properties()) }
-    val LIGHTFOOT_CRAB_CLAW = register("lightfoot_crab_claw") { Item(Item.Properties()) }
+    val LOBSTER_CLAW = register("lobster_claw") { properties -> Item(properties) }
+    val DUNGENESS_CRAB_CLAW = register("dungeness_crab_claw") { properties -> Item(properties) }
+    val FIDDLER_CRAB_CLAW = register("fiddler_crab_claw") { properties -> Item(properties) }
+    val VAMPIRE_CRAB_CLAW = register("vampire_crab_claw") { properties -> Item(properties) }
+    val FLOWER_CRAB_CLAW = register("flower_crab_claw") { properties -> Item(properties) }
+    val GHOST_CRAB_CLAW = register("ghost_crab_claw") { properties -> Item(properties) }
+    val SPIDER_CRAB_CLAW = register("spider_crab_claw") { properties -> Item(properties) }
+    val COCONUT_CRAB_CLAW = register("coconut_crab_claw") { properties -> Item(properties) }
+    val YETI_CRAB_CLAW = register("yeti_crab_claw") { properties -> Item(properties) }
+    val LIGHTFOOT_CRAB_CLAW = register("lightfoot_crab_claw") { properties -> Item(properties) }
     //#endregion
 
     //#endregion
 
     //#region Food
-    val UNI = register("uni") {
+    val UNI = register("uni") { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(2)
@@ -879,9 +859,9 @@ object HAItems {
 
     val RAW_SHRIMP = register(
         "raw_shrimp"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(2)
@@ -893,9 +873,9 @@ object HAItems {
 
     val COOKED_SHRIMP = register(
         "cooked_shrimp"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(4)
@@ -907,9 +887,9 @@ object HAItems {
 
     val COOKED_CLAM = register(
         "cooked_clam"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(4)
@@ -921,10 +901,11 @@ object HAItems {
 
     val CLAM = register(
         "clam"
-    ) {
+    ) { properties ->
         BlockItem(
             HABlocks.CLAMS.get(),
-            Item.Properties()
+            properties
+                .overrideDescription(HABlocks.CLAMS.get().descriptionId)
                 .food(
                     FoodProperties.Builder()
                         .nutrition(4)
@@ -936,9 +917,9 @@ object HAItems {
 
     val COOKED_MUSSEL = register(
         "cooked_mussel"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(4)
@@ -950,10 +931,11 @@ object HAItems {
 
     val MUSSEL = register(
         "mussel"
-    ) {
+    ) { properties ->
         BlockItem(
             HABlocks.MUSSELS.get(),
-            Item.Properties()
+            properties
+                .overrideDescription(HABlocks.MUSSELS.get().descriptionId)
                 .food(
                     FoodProperties.Builder()
                         .nutrition(4)
@@ -965,9 +947,9 @@ object HAItems {
 
     val RAW_CRAYFISH = register(
         "raw_crayfish"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(2)
@@ -979,9 +961,9 @@ object HAItems {
 
     val COOKED_CRAYFISH = register(
         "cooked_crayfish"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(4)
@@ -993,9 +975,9 @@ object HAItems {
 
     val RAW_CRAB = register(
         "raw_crab"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(2)
@@ -1007,9 +989,9 @@ object HAItems {
 
     val COOKED_CRAB = register(
         "cooked_crab"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(4)
@@ -1021,9 +1003,9 @@ object HAItems {
 
     val RAW_LOBSTER = register(
         "raw_lobster"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(2)
@@ -1035,9 +1017,9 @@ object HAItems {
 
     val COOKED_LOBSTER = register(
         "cooked_lobster"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(5)
@@ -1049,9 +1031,9 @@ object HAItems {
 
     val RAW_LOBSTER_TAIL = register(
         "raw_lobster_tail"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(2)
@@ -1063,9 +1045,9 @@ object HAItems {
 
     val COOKED_LOBSTER_TAIL = register(
         "cooked_lobster_tail"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(5)
@@ -1077,9 +1059,9 @@ object HAItems {
 
     val COOKED_FISH_STEAK = register(
         "cooked_fish_steak"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(8)
@@ -1091,9 +1073,9 @@ object HAItems {
 
     val RAW_FISH_STEAK = register(
         "raw_fish_steak"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(3)
@@ -1105,9 +1087,9 @@ object HAItems {
 
     val COOKED_FISH_MEAT = register(
         "cooked_fish_meat"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(4)
@@ -1119,9 +1101,9 @@ object HAItems {
 
     val RAW_FISH_MEAT = register(
         "raw_fish_meat"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(2)
@@ -1133,9 +1115,9 @@ object HAItems {
 
     val RAW_TENTACLE = register(
         "raw_tentacle"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(2)
@@ -1147,9 +1129,9 @@ object HAItems {
 
     val COOKED_TENTACLE = register(
         "cooked_tentacle"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(4)
@@ -1161,9 +1143,9 @@ object HAItems {
 
     val SIRENIAN_STEAK = register(
         "sirenian_steak"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(8)
@@ -1175,9 +1157,9 @@ object HAItems {
 
     val SIRENIAN_BEEF = register(
         "sirenian_beef"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(3)
@@ -1189,9 +1171,9 @@ object HAItems {
 
     val MACKEREL = register(
         "mackerel"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1203,9 +1185,9 @@ object HAItems {
 
     val HERRING = register(
         "herring"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1217,9 +1199,9 @@ object HAItems {
 
     val FLYING_FISH = register(
         "flying_fish"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1231,9 +1213,9 @@ object HAItems {
 
     val PIRANHA = register(
         "piranha"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1245,9 +1227,9 @@ object HAItems {
 
     val ANGLERFISH = register(
         "anglerfish"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1259,9 +1241,9 @@ object HAItems {
 
     val BARRELEYE = register(
         "barreleye"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1273,9 +1255,9 @@ object HAItems {
 
     val DRAGONFISH = register(
         "dragonfish"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1287,9 +1269,9 @@ object HAItems {
 
     val BLOBFISH = register(
         "blobfish"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1301,14 +1283,16 @@ object HAItems {
 
     val HAGFISH = register(
         "hagfish"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
                         .saturationModifier(0.2F)
-                        .effect(MobEffectInstance(MobEffects.POISON, 600, 0), 1.0f)
+                        .build(),
+                    net.minecraft.world.item.component.Consumables.defaultFood()
+                        .onConsume(net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect(MobEffectInstance(MobEffects.POISON, 600, 0), 1.0f))
                         .build()
                 )
         )
@@ -1316,9 +1300,9 @@ object HAItems {
 
     val SURGEONFISH = register(
         "surgeonfish"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1330,9 +1314,9 @@ object HAItems {
 
     val CLOWNFISH = register(
         "clownfish"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1344,9 +1328,9 @@ object HAItems {
 
     val JOHN_DORY = register(
         "john_dory"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1358,9 +1342,9 @@ object HAItems {
 
     val DAMSELFISH = register(
         "damselfish"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1372,9 +1356,9 @@ object HAItems {
 
     val FLASHLIGHT_FISH = register(
         "flashlight_fish"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1386,9 +1370,9 @@ object HAItems {
 
     val SQUIRRELFISH = register(
         "squirrelfish"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1400,9 +1384,9 @@ object HAItems {
 
     val GOURAMI = register(
         "gourami"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1414,9 +1398,9 @@ object HAItems {
 
     val BETTA = register(
         "betta"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1428,9 +1412,9 @@ object HAItems {
 
     val PEARLFISH = register(
         "pearlfish"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1442,9 +1426,9 @@ object HAItems {
 
     val SNAILFISH = register(
         "snailfish"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1456,9 +1440,9 @@ object HAItems {
 
     val DISCUS = register(
         "discus"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1470,9 +1454,9 @@ object HAItems {
 
     val DANIO = register(
         "danio"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1484,9 +1468,9 @@ object HAItems {
 
     val TETRA = register(
         "tetra"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1498,9 +1482,9 @@ object HAItems {
 
     val AFRICAN_BUTTERFLYFISH = register(
         "african_butterflyfish"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1512,9 +1496,9 @@ object HAItems {
 
     val TIGER_BARB = register(
         "tiger_barb"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1526,9 +1510,9 @@ object HAItems {
 
     val CICHLID = register(
         "cichlid"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1540,14 +1524,16 @@ object HAItems {
 
     val BOXFISH = register(
         "boxfish"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
                         .saturationModifier(0.2F)
-                        .effect(MobEffectInstance(MobEffects.POISON, 600, 1), 1.0f)
+                        .build(),
+                    net.minecraft.world.item.component.Consumables.defaultFood()
+                        .onConsume(net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect(MobEffectInstance(MobEffects.POISON, 600, 1), 1.0f))
                         .build()
                 )
         )
@@ -1555,9 +1541,9 @@ object HAItems {
 
     val CARP = register(
         "carp"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1569,9 +1555,9 @@ object HAItems {
 
     val GOLDFISH = register(
         "goldfish"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1583,9 +1569,9 @@ object HAItems {
 
     val SUNFISH = register(
         "sunfish"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1597,9 +1583,9 @@ object HAItems {
 
     val TROUT = register(
         "trout"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1611,9 +1597,9 @@ object HAItems {
 
     val PLECO = register(
         "pleco"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1625,9 +1611,9 @@ object HAItems {
 
     val SEAHORSE = register(
         "seahorse"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
@@ -1639,14 +1625,16 @@ object HAItems {
 
     val BLOWFISH = register(
         "blowfish"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
                         .saturationModifier(0.4F)
-                        .effect(MobEffectInstance(MobEffects.POISON, 600, 1), 1.0f)
+                        .build(),
+                    net.minecraft.world.item.component.Consumables.defaultFood()
+                        .onConsume(net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect(MobEffectInstance(MobEffects.POISON, 600, 1), 1.0f))
                         .build()
                 )
         )
@@ -1654,14 +1642,16 @@ object HAItems {
 
     val STONEFISH = register(
         "stonefish"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(1)
                         .saturationModifier(0.4F)
-                        .effect(MobEffectInstance(MobEffects.POISON, 600, 1), 1.0f)
+                        .build(),
+                    net.minecraft.world.item.component.Consumables.defaultFood()
+                        .onConsume(net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect(MobEffectInstance(MobEffects.POISON, 600, 1), 1.0f))
                         .build()
                 )
         )
@@ -1669,14 +1659,16 @@ object HAItems {
 
     val LIONFISH = register(
         "lionfish"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(2)
                         .saturationModifier(0.4F)
-                        .effect(MobEffectInstance(MobEffects.POISON, 1200, 0), 1.0f)
+                        .build(),
+                    net.minecraft.world.item.component.Consumables.defaultFood()
+                        .onConsume(net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect(MobEffectInstance(MobEffects.POISON, 1200, 0), 1.0f))
                         .build()
                 )
         )
@@ -1684,9 +1676,9 @@ object HAItems {
 
     val ROCKFISH = register(
         "rockfish"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(2)
@@ -1698,9 +1690,9 @@ object HAItems {
 
     val SEA_BASS = register(
         "sea_bass"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(2)
@@ -1712,14 +1704,16 @@ object HAItems {
 
     val STINGRAY = register(
         "stingray"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(2)
                         .saturationModifier(0.4F)
-                        .effect(MobEffectInstance(MobEffects.POISON, 600, 0), 1.0f)
+                        .build(),
+                    net.minecraft.world.item.component.Consumables.defaultFood()
+                        .onConsume(net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect(MobEffectInstance(MobEffects.POISON, 600, 0), 1.0f))
                         .build()
                 )
         )
@@ -1727,9 +1721,9 @@ object HAItems {
 
     val MORAY_EEL = register(
         "moray_eel"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(2)
@@ -1741,9 +1735,9 @@ object HAItems {
 
     val NEEDLEFISH = register(
         "needlefish"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(2)
@@ -1755,9 +1749,9 @@ object HAItems {
 
     val RATFISH = register(
         "ratfish"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(2)
@@ -1769,9 +1763,9 @@ object HAItems {
 
     val TRIGGERFISH = register(
         "triggerfish"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(2)
@@ -1783,9 +1777,9 @@ object HAItems {
 
     val TREVALLY = register(
         "trevally"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(2)
@@ -1797,9 +1791,9 @@ object HAItems {
 
     val PARROTFISH = register(
         "parrotfish"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(2)
@@ -1811,9 +1805,9 @@ object HAItems {
 
     val SHEEPSHEAD_WRASSE = register(
         "sheepshead_wrasse"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(2)
@@ -1825,9 +1819,9 @@ object HAItems {
 
     val COELACANTH = register(
         "coelacanth"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(2)
@@ -1839,9 +1833,9 @@ object HAItems {
 
     val GOLDEN_DORADO = register(
         "golden_dorado"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(2)
@@ -1853,9 +1847,9 @@ object HAItems {
 
     val MAHI = register(
         "mahi"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(3)
@@ -1867,9 +1861,9 @@ object HAItems {
 
     val TUNA = register(
         "tuna"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(3)
@@ -1881,9 +1875,9 @@ object HAItems {
 
     val OPAH = register(
         "opah"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(3)
@@ -1895,9 +1889,9 @@ object HAItems {
 
     val OARFISH = register(
         "oarfish"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(3)
@@ -1909,9 +1903,9 @@ object HAItems {
 
     val OCEAN_SUNFISH = register(
         "ocean_sunfish"
-    ) {
+    ) { properties ->
         Item(
-            Item.Properties()
+            properties
                 .food(
                     FoodProperties.Builder()
                         .nutrition(3)
@@ -2217,8 +2211,9 @@ object HAItems {
     //#endregion
     //#endregion
 
-    fun register(id: String, item: Supplier<Item>): Supplier<Item> {
-        return CommonClass.ITEMS.register(id, item)
+    fun register(id: String, item: (Item.Properties) -> Item): Supplier<Item> {
+        return CommonClass.ITEMS.register(id) { item(Item.Properties().setId(
+            net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, CommonClass.locate(id)))) }
     }
 
     private fun <T : Mob> registerSpawnEgg(
@@ -2232,23 +2227,23 @@ object HAItems {
     }
 
     fun registerBlockItem(id: String, block: Supplier<Block>): Supplier<Item> {
-        return register(id) { BlockItem(block.get(), Item.Properties()) }
+        return register(id) { properties -> DescriptionBlockItem(block.get(), properties) }
     }
 
     /**
      * Armor durability is no longer carried by the armor material, so each piece has to declare it
      * here. [durabilityFactor] is the per-material multiplier the armor set used before the port.
      */
-    private fun armorProperties(type: ArmorItem.Type, durabilityFactor: Int): Item.Properties {
-        return Item.Properties().stacksTo(1).durability(type.getDurability(durabilityFactor))
+    private fun armorProperties(properties: Item.Properties, type: net.minecraft.world.item.equipment.ArmorType, durabilityFactor: Int): Item.Properties {
+        return properties.stacksTo(1).durability(type.getDurability(durabilityFactor))
     }
 
     private fun registerPlaceableInWaterBlockItem(id: String, block: Supplier<Block>): Supplier<Item> {
-        return register(id) { PlaceableInWaterItem(block.get(), Item.Properties()) }
+        return register(id) { properties -> PlaceableInWaterItem(block.get(), properties) }
     }
 
     private fun registerPlaceableInWaterOrLandBlockItem(id: String, block: Supplier<Block>): Supplier<Item> {
-        return register(id) { PlaceableInWaterOrLandItem(block.get(), Item.Properties()) }
+        return register(id) { properties -> PlaceableInWaterOrLandItem(block.get(), properties) }
     }
 
     private fun registerVerticallyAttachable(
@@ -2257,12 +2252,12 @@ object HAItems {
         wallBlock: Supplier<Block>,
         direction: Direction = Direction.DOWN,
     ): Supplier<Item> {
-        return register(id) {
+        return register(id) { properties ->
             StandingAndWallBlockItem(
                 standingBlock.get(),
                 wallBlock.get(),
-                Item.Properties(),
-                direction
+                direction,
+                properties.overrideDescription(standingBlock.get().descriptionId)
             )
         }
     }

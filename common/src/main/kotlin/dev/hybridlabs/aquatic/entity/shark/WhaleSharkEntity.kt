@@ -14,18 +14,18 @@ import net.minecraft.util.ByIdMap
 import net.minecraft.util.StringRepresentable
 import net.minecraft.world.DifficultyInstance
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.MobSpawnType
+import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.SpawnGroupData
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.ServerLevelAccessor
-import software.bernie.geckolib.animation.AnimatableManager
-import software.bernie.geckolib.animation.AnimationController
-import software.bernie.geckolib.animation.AnimationController.AnimationStateHandler
-import software.bernie.geckolib.animation.AnimationState
-import software.bernie.geckolib.animation.PlayState
+import com.geckolib.animatable.manager.AnimatableManager
+import com.geckolib.animation.AnimationController
+import com.geckolib.animation.AnimationController.AnimationStateHandler
+import com.geckolib.animation.state.AnimationTest
+import com.geckolib.animation.`object`.PlayState
 import java.util.function.IntFunction
 
 class WhaleSharkEntity(type: EntityType<out WhaleSharkEntity>, world: Level) :
@@ -46,14 +46,14 @@ class WhaleSharkEntity(type: EntityType<out WhaleSharkEntity>, world: Level) :
         super.defineSynchedData(builder)
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
+    override fun addAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueOutput) {
         compound.putInt("texture_overlay", this.overlayTexture.id)
         super.addAdditionalSaveData(compound)
     }
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
+    override fun readAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueInput) {
         if (compound.contains("texture_overlay")) this.overlayTexture =
-            OverlayTextures.byId(compound.getInt("texture_overlay"))
+            OverlayTextures.byId(compound.getIntOr("texture_overlay", 0))
         super.readAdditionalSaveData(compound)
     }
 
@@ -61,9 +61,9 @@ class WhaleSharkEntity(type: EntityType<out WhaleSharkEntity>, world: Level) :
     override fun registerControllers(controllers: AnimatableManager.ControllerRegistrar) {
         super.registerControllers(controllers)
         controllers.add(
-            AnimationController(
-                this, "Feeding",
-                AnimationStateHandler { state: AnimationState<BaseSharkEntity> ->
+            AnimationController<BaseSharkEntity>(
+                 "Feeding",
+                AnimationStateHandler { state: AnimationTest<BaseSharkEntity> ->
                     if (this.isFeeding())
                         return@AnimationStateHandler state.setAndContinue(FEED_ANIMATION)
                     PlayState.STOP
@@ -112,7 +112,7 @@ class WhaleSharkEntity(type: EntityType<out WhaleSharkEntity>, world: Level) :
     override fun finalizeSpawn(
         world: ServerLevelAccessor,
         difficulty: DifficultyInstance,
-        spawnReason: MobSpawnType,
+        spawnReason: EntitySpawnReason,
         entityData: SpawnGroupData?
     ): SpawnGroupData? {
         val overlayID = world.random.nextIntBetweenInclusive(0, OverlayTextures.entries.size - 1)

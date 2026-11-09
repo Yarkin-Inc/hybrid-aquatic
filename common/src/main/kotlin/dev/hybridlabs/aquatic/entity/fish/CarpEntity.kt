@@ -1,5 +1,6 @@
 package dev.hybridlabs.aquatic.entity.fish
 
+import dev.hybridlabs.hapi.entity.VariantHolder
 import com.mojang.serialization.Codec
 import dev.hybridlabs.aquatic.entity.HAEntityTypes
 import dev.hybridlabs.aquatic.entity.ai.goal.CarpBreedGoal
@@ -65,13 +66,13 @@ class CarpEntity(type: EntityType<out CarpEntity>, world: Level) : BaseFishEntit
             partner.variant == Type.KOI
         ) {
             return if (level.random.nextBoolean()) {
-                HAEntityTypes.GOLDFISH.get().create(level)
+                HAEntityTypes.GOLDFISH.get().create(level, net.minecraft.world.entity.EntitySpawnReason.BREEDING)
             } else {
-                HAEntityTypes.CARP.get().create(level)
+                HAEntityTypes.CARP.get().create(level, net.minecraft.world.entity.EntitySpawnReason.BREEDING)
             }
         }
 
-        return HAEntityTypes.CARP.get().create(level)
+        return HAEntityTypes.CARP.get().create(level, net.minecraft.world.entity.EntitySpawnReason.BREEDING)
     }
 
     override fun getMaxSpawnClusterSize(): Int {
@@ -89,7 +90,7 @@ class CarpEntity(type: EntityType<out CarpEntity>, world: Level) : BaseFishEntit
     override fun finalizeSpawn(
         world: ServerLevelAccessor,
         difficulty: DifficultyInstance,
-        spawnReason: MobSpawnType,
+        spawnReason: EntitySpawnReason,
         entityData: SpawnGroupData?
     ): SpawnGroupData? {
         val biome = world.getBiome(this.blockPosition())
@@ -115,7 +116,7 @@ class CarpEntity(type: EntityType<out CarpEntity>, world: Level) : BaseFishEntit
         val baby = this.getBreedOffspring(level, mate) ?: return
 
         baby.isBaby = true
-        baby.moveTo(this.x, this.y, this.z, 0.0f, 0.0f)
+        baby.snapTo(this.x, this.y, this.z, 0.0f, 0.0f)
 
         this.finalizeSpawnChildFromBreeding(level, mate)
 
@@ -168,7 +169,7 @@ class CarpEntity(type: EntityType<out CarpEntity>, world: Level) : BaseFishEntit
         fun canSpawn(
             type: EntityType<out CarpEntity>,
             world: ServerLevelAccessor,
-            reason: MobSpawnType,
+            reason: EntitySpawnReason,
             pos: BlockPos,
             random: RandomSource,
         ): Boolean {
@@ -196,7 +197,7 @@ class CarpEntity(type: EntityType<out CarpEntity>, world: Level) : BaseFishEntit
                 )
 
                 fun byName(name: String?): Type {
-                    return CODEC.byName(name, COMMON) as Type
+                    return CODEC.byName(name ?: "", COMMON) as Type
                 }
 
                 fun fromId(id: Int): Type {
@@ -290,16 +291,16 @@ class CarpEntity(type: EntityType<out CarpEntity>, world: Level) : BaseFishEntit
         super.defineSynchedData(builder)
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
+    override fun addAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueOutput) {
         compound.putString("Type", this.variant.serializedName)
         compound.putInt("pattern_texture", this.patternTexture.id)
         super.addAdditionalSaveData(compound)
     }
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
-        this.variant = Type.byName(compound.getString("Type"))
+    override fun readAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueInput) {
+        this.variant = Type.byName(compound.getStringOr("Type", ""))
         if (compound.contains("pattern_texture")) this.patternTexture =
-            PatternTextures.byId(compound.getInt("pattern_texture"))
+            PatternTextures.byId(compound.getIntOr("pattern_texture", 0))
         super.readAdditionalSaveData(compound)
     }
 

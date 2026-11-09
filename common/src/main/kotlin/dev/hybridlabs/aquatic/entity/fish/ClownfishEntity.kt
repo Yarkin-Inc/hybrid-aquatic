@@ -14,9 +14,9 @@ import net.minecraft.util.RandomSource
 import net.minecraft.util.StringRepresentable
 import net.minecraft.world.DifficultyInstance
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.MobSpawnType
+import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.SpawnGroupData
-import net.minecraft.world.entity.VariantHolder
+import dev.hybridlabs.hapi.entity.VariantHolder
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.level.Level
@@ -42,7 +42,7 @@ class ClownfishEntity(type: EntityType<out ClownfishEntity>, world: Level) :
     override fun finalizeSpawn(
         world: ServerLevelAccessor,
         difficulty: DifficultyInstance,
-        spawnReason: MobSpawnType,
+        spawnReason: EntitySpawnReason,
         entityData: SpawnGroupData?,
     ): SpawnGroupData? {
         val spawnData = super.finalizeSpawn(world, difficulty, spawnReason, entityData)
@@ -50,14 +50,14 @@ class ClownfishEntity(type: EntityType<out ClownfishEntity>, world: Level) :
         val variant = Type.entries.random(Random).id
         this.variant = Type.fromId(variant)
 
-        if (spawnReason == MobSpawnType.CHUNK_GENERATION || spawnReason == MobSpawnType.NATURAL) {
+        if (spawnReason == EntitySpawnReason.CHUNK_GENERATION || spawnReason == EntitySpawnReason.NATURAL) {
             val fishCount = (this.maxSpawnClusterSize * this.random.nextFloat()).toInt()
             if (fishCount > 0 && !level().isClientSide()) {
                 for (i in 0 until fishCount) {
                     val distance = 1.5f
                     val entity = ClownfishEntity(HAEntityTypes.CLOWNFISH.get(), this.level())
                     entity.variant = this.variant
-                    entity.moveTo(
+                    entity.snapTo(
                         this.x + this.random.nextFloat() * distance,
                         this.y + this.random.nextFloat() * distance,
                         this.z + this.random.nextFloat() * distance
@@ -82,7 +82,7 @@ class ClownfishEntity(type: EntityType<out ClownfishEntity>, world: Level) :
         fun canSpawn(
             type: EntityType<out ClownfishEntity>,
             world: ServerLevelAccessor,
-            reason: MobSpawnType,
+            reason: EntitySpawnReason,
             pos: BlockPos,
             random: RandomSource,
         ): Boolean {
@@ -115,7 +115,7 @@ class ClownfishEntity(type: EntityType<out ClownfishEntity>, world: Level) :
                 )
 
                 fun byName(name: String?): Type {
-                    return CODEC.byName(name, OCELLARIS) as Type
+                    return CODEC.byName(name ?: "", OCELLARIS) as Type
                 }
 
                 fun fromId(id: Int): Type {
@@ -130,13 +130,13 @@ class ClownfishEntity(type: EntityType<out ClownfishEntity>, world: Level) :
         builder.define(TYPE, 0)
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
+    override fun addAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueOutput) {
         compound.putString("Type", this.variant.serializedName)
         super.addAdditionalSaveData(compound)
     }
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
-        this.variant = Type.byName(compound.getString("Type"))
+    override fun readAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueInput) {
+        this.variant = Type.byName(compound.getStringOr("Type", ""))
         super.readAdditionalSaveData(compound)
     }
 

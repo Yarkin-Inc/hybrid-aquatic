@@ -52,12 +52,9 @@ open class CarpBreedGoal @JvmOverloads constructor(
 
     private val freePartner: CarpEntity?
         get() {
-            val list: MutableList<out CarpEntity> = this.level.getNearbyEntities(
-                this.partnerClass,
-                PARTNER_TARGETING,
-                this.carp,
-                this.carp.boundingBox.inflate(8.0)
-            )
+            val list: MutableList<out CarpEntity> = this.level.getEntitiesOfClass(this.partnerClass, this.carp.boundingBox.inflate(8.0)) {
+                PARTNER_TARGETING.test(level as ServerLevel, carp, it)
+            }
             var d0 = Double.MAX_VALUE
             var waterAnimal: CarpEntity? = null
 

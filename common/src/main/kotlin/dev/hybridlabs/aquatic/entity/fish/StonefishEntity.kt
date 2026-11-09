@@ -49,8 +49,8 @@ class StonefishEntity(type: EntityType<out StonefishEntity>, world: Level) :
         }
     }
 
-    override fun hurt(source: DamageSource, amount: Float): Boolean {
-        if (super.hurt(source, amount)) {
+    override fun hurtServer(level: net.minecraft.server.level.ServerLevel, source: DamageSource, amount: Float): Boolean {
+        if (super.hurtServer(level, source, amount)) {
 
             val attacker = source.directEntity
             if (attacker is LivingEntity && attacker.mainHandItem.isEmpty) {

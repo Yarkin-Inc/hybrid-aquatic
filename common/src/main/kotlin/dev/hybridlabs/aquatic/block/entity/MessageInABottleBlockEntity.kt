@@ -8,11 +8,14 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED
-import software.bernie.geckolib.animatable.GeoAnimatable
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
-import software.bernie.geckolib.animation.*
-import software.bernie.geckolib.util.GeckoLibUtil
-import software.bernie.geckolib.util.RenderUtil
+import com.geckolib.animatable.GeoAnimatable
+import com.geckolib.animatable.instance.AnimatableInstanceCache
+import com.geckolib.animation.*
+import com.geckolib.animation.state.AnimationTest
+import com.geckolib.animatable.manager.AnimatableManager
+import com.geckolib.animation.`object`.PlayState
+import com.geckolib.util.GeckoLibUtil
+import com.geckolib.util.RenderUtil
 
 /**
  * Represents the block entity for Message in a Bottle blocks.
@@ -28,20 +31,27 @@ class MessageInABottleBlockEntity(pos: BlockPos, state: BlockState) :
      */
     var variant: MessageInABottleBlock.Variant = MessageInABottleBlock.Variant.BOTTLE
 
-    override fun saveAdditional(tag: CompoundTag, registries: HolderLookup.Provider) {
-        super.saveAdditional(tag, registries)
+    override fun saveAdditional(tag: net.minecraft.world.level.storage.ValueOutput) {
+        super.saveAdditional(tag)
         tag.putString(VARIANT_KEY, variant.id)
     }
 
-    override fun loadAdditional(tag: CompoundTag, registries: HolderLookup.Provider) {
-        super.loadAdditional(tag, registries)
-        variant = MessageInABottleBlock.Variant.byId(tag.getString(VARIANT_KEY))
+    override fun loadAdditional(tag: net.minecraft.world.level.storage.ValueInput) {
+        super.loadAdditional(tag)
+        variant = MessageInABottleBlock.Variant.byId(tag.getStringOr(VARIANT_KEY, "bottle"))
+    }
+
+    override fun collectImplicitComponents(builder: net.minecraft.core.component.DataComponentMap.Builder) {
+        super.collectImplicitComponents(builder)
+        val data = CompoundTag().apply { putString(VARIANT_KEY, variant.id) }
+        builder.set(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA,
+            net.minecraft.world.item.component.TypedEntityData.of(type, data))
     }
 
     private fun <E> predicate(
-        event: AnimationState<E>
-    ): PlayState where E : BlockEntity?, E : GeoAnimatable {
-        return if (blockState.hasProperty(WATERLOGGED)) {
+        event: AnimationTest<E>
+    ): PlayState where E : BlockEntity, E : GeoAnimatable {
+        return if (blockState.hasProperty(WATERLOGGED) && blockState.getValue(WATERLOGGED)) {
             event.controller.setAnimation(WATER_BOB_ANIMATION)
             PlayState.CONTINUE
         } else {
@@ -50,19 +60,16 @@ class MessageInABottleBlockEntity(pos: BlockPos, state: BlockState) :
     }
 
     override fun registerControllers(controllerRegistrar: AnimatableManager.ControllerRegistrar) {
-        controllerRegistrar.add(AnimationController(this, "controller", 0, ::predicate))
+        controllerRegistrar.add(AnimationController<MessageInABottleBlockEntity>( "controller", 0, ::predicate))
     }
 
     override fun getAnimatableInstanceCache(): AnimatableInstanceCache {
         return instanceCache
     }
 
-    override fun getTick(animatable: Any): Double {
-        return RenderUtil.getCurrentTick()
-    }
 
     override fun getUpdateTag(registries: HolderLookup.Provider): CompoundTag {
-        return saveWithId(registries)
+        return saveWithoutMetadata(registries)
     }
 
     override fun getUpdatePacket(): ClientboundBlockEntityDataPacket {
@@ -75,6 +82,6 @@ class MessageInABottleBlockEntity(pos: BlockPos, state: BlockState) :
          */
         const val VARIANT_KEY = "variant"
 
-        val WATER_BOB_ANIMATION: RawAnimation = RawAnimation.begin().then("water_bob", Animation.LoopType.LOOP)
+        val WATER_BOB_ANIMATION: RawAnimation = RawAnimation.begin().then("water_bob", com.geckolib.animation.`object`.LoopType.LOOP)
     }
 }

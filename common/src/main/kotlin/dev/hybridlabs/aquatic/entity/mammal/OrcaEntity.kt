@@ -1,5 +1,6 @@
 package dev.hybridlabs.aquatic.entity.mammal
 
+import dev.hybridlabs.hapi.entity.VariantHolder
 import com.mojang.serialization.Codec
 import dev.hybridlabs.aquatic.entity.HAEntityTypes
 import dev.hybridlabs.aquatic.entity.feature.OrcaEyeTextureFeature
@@ -59,7 +60,7 @@ class OrcaEntity(type: EntityType<out OrcaEntity>, world: Level) : BaseDolphinEn
     }
 
     override fun getBreedOffspring(p0: ServerLevel, p1: AgeableMob): OrcaEntity? {
-        return HAEntityTypes.ORCA.get().create(p0)
+        return HAEntityTypes.ORCA.get().create(p0, net.minecraft.world.entity.EntitySpawnReason.BREEDING)
     }
 
     //#region SFX
@@ -87,7 +88,7 @@ class OrcaEntity(type: EntityType<out OrcaEntity>, world: Level) : BaseDolphinEn
     override fun finalizeSpawn(
         world: ServerLevelAccessor,
         difficulty: DifficultyInstance,
-        spawnReason: MobSpawnType,
+        spawnReason: EntitySpawnReason,
         entityData: SpawnGroupData?,
     ): SpawnGroupData? {
         this.airSupply = this.maxAirSupply
@@ -146,7 +147,7 @@ class OrcaEntity(type: EntityType<out OrcaEntity>, world: Level) : BaseDolphinEn
                 )
 
                 fun byName(name: String?): Type {
-                    return CODEC.byName(name, BLACK) as Type
+                    return CODEC.byName(name ?: "", BLACK) as Type
                 }
 
                 fun fromId(id: Int): Type {
@@ -271,18 +272,18 @@ class OrcaEntity(type: EntityType<out OrcaEntity>, world: Level) : BaseDolphinEn
         super.defineSynchedData(builder)
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
+    override fun addAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueOutput) {
         compound.putString("Type", this.variant.serializedName)
         compound.putInt("eye_spot_texture", this.eyeSpotTexture.id)
         compound.putInt("saddle_texture", this.saddleTexture.id)
         super.addAdditionalSaveData(compound)
     }
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
-        this.variant = Type.byName(compound.getString("Type"))
-        this.eyeSpotTexture = EyeSpotTextures.byId(compound.getInt("eye_spot_texture"))
+    override fun readAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueInput) {
+        this.variant = Type.byName(compound.getStringOr("Type", ""))
+        this.eyeSpotTexture = EyeSpotTextures.byId(compound.getIntOr("eye_spot_texture", 0))
         if (compound.contains("saddle_texture")) this.saddleTexture =
-            SaddleTextures.byId(compound.getInt("saddle_texture"))
+            SaddleTextures.byId(compound.getIntOr("saddle_texture", 0))
         super.readAdditionalSaveData(compound)
     }
     //#endregion

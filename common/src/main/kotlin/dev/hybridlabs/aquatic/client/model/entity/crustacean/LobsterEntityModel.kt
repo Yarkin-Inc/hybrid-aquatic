@@ -2,31 +2,31 @@ package dev.hybridlabs.aquatic.client.model.entity.crustacean
 
 import dev.hybridlabs.aquatic.entity.crustacean.LobsterEntity
 import dev.hybridlabs.hapi.client.model.entity.aquatic.BaseCrustaceanEntityModel
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import kotlin.random.Random
 
 class LobsterEntityModel : BaseCrustaceanEntityModel<LobsterEntity>("hybrid_aquatic", "lobster") {
 
     companion object {
         private val clawlessTextures = listOf(
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/crustacean/lobster/lobster_ornate_spiny.png"),
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/crustacean/lobster/lobster_california_spiny.png")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/crustacean/lobster/lobster_ornate_spiny.png"),
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/crustacean/lobster/lobster_california_spiny.png")
         )
 
         private val clawedTextures = listOf(
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/crustacean/lobster/lobster_american.png")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/crustacean/lobster/lobster_american.png")
         )
 
         private val REGAL_SLIPPER_TEXTURE =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/crustacean/lobster/lobster_regal_slipper.png")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/crustacean/lobster/lobster_regal_slipper.png")
 
         private val LOBSTER_MODEL =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "geo/crustacean/lobster/lobster.geo.json")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "crustacean/lobster/lobster")
         private val SLIPPER_LOBSTER_MODEL =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "geo/crustacean/lobster/lobster_slipper.geo.json")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "crustacean/lobster/lobster_slipper")
     }
 
-    override fun getTextureResource(animatable: LobsterEntity): ResourceLocation {
+    override fun getTextureResource(animatable: LobsterEntity): Identifier {
         val seed = animatable.uuid.leastSignificantBits
         val random = Random(seed)
         return when (animatable.variant) {
@@ -36,7 +36,7 @@ class LobsterEntityModel : BaseCrustaceanEntityModel<LobsterEntity>("hybrid_aqua
         }
     }
 
-    override fun getModelResource(animatable: LobsterEntity): ResourceLocation {
+    override fun getModelResource(animatable: LobsterEntity): Identifier {
         return when (animatable.variant) {
             LobsterEntity.Companion.Type.REGAL_SLIPPER -> SLIPPER_LOBSTER_MODEL
             else -> LOBSTER_MODEL

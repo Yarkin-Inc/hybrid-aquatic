@@ -6,7 +6,7 @@ import dev.hybridlabs.hapi.entity.base.aquatic.BaseOctopusEntity
 import net.minecraft.core.BlockPos
 import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.MobSpawnType
+import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.level.Level
@@ -29,7 +29,7 @@ class UmbrellaOctopusEntity(type: EntityType<out UmbrellaOctopusEntity>, world: 
         fun canSpawn(
             type: EntityType<out UmbrellaOctopusEntity>,
             world: ServerLevelAccessor,
-            reason: MobSpawnType,
+            reason: EntitySpawnReason,
             pos: BlockPos,
             random: RandomSource,
         ): Boolean {

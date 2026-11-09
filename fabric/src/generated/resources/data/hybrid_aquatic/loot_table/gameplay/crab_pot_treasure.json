@@ -5,7 +5,8 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "functions": [
+          "name": "hybrid_aquatic:coconut_crab_claw",
+          "modifier": [
             {
               "add": false,
               "count": {
@@ -13,14 +14,14 @@
                 "max": 3.0,
                 "min": 1.0
               },
-              "function": "minecraft:set_count"
+              "type": "minecraft:set_count"
             }
-          ],
-          "name": "hybrid_aquatic:coconut_crab_claw"
+          ]
         },
         {
           "type": "minecraft:item",
-          "functions": [
+          "name": "hybrid_aquatic:ghost_crab_claw",
+          "modifier": [
             {
               "add": false,
               "count": {
@@ -28,14 +29,14 @@
                 "max": 3.0,
                 "min": 1.0
               },
-              "function": "minecraft:set_count"
+              "type": "minecraft:set_count"
             }
-          ],
-          "name": "hybrid_aquatic:ghost_crab_claw"
+          ]
         },
         {
           "type": "minecraft:item",
-          "functions": [
+          "name": "hybrid_aquatic:yeti_crab_claw",
+          "modifier": [
             {
               "add": false,
               "count": {
@@ -43,14 +44,14 @@
                 "max": 3.0,
                 "min": 1.0
               },
-              "function": "minecraft:set_count"
+              "type": "minecraft:set_count"
             }
-          ],
-          "name": "hybrid_aquatic:yeti_crab_claw"
+          ]
         },
         {
           "type": "minecraft:item",
-          "functions": [
+          "name": "hybrid_aquatic:spider_crab_claw",
+          "modifier": [
             {
               "add": false,
               "count": {
@@ -58,14 +59,14 @@
                 "max": 3.0,
                 "min": 1.0
               },
-              "function": "minecraft:set_count"
+              "type": "minecraft:set_count"
             }
-          ],
-          "name": "hybrid_aquatic:spider_crab_claw"
+          ]
         },
         {
           "type": "minecraft:item",
-          "functions": [
+          "name": "hybrid_aquatic:vampire_crab_claw",
+          "modifier": [
             {
               "add": false,
               "count": {
@@ -73,14 +74,14 @@
                 "max": 3.0,
                 "min": 1.0
               },
-              "function": "minecraft:set_count"
+              "type": "minecraft:set_count"
             }
-          ],
-          "name": "hybrid_aquatic:vampire_crab_claw"
+          ]
         },
         {
           "type": "minecraft:item",
-          "functions": [
+          "name": "hybrid_aquatic:dungeness_crab_claw",
+          "modifier": [
             {
               "add": false,
               "count": {
@@ -88,14 +89,14 @@
                 "max": 3.0,
                 "min": 1.0
               },
-              "function": "minecraft:set_count"
+              "type": "minecraft:set_count"
             }
-          ],
-          "name": "hybrid_aquatic:dungeness_crab_claw"
+          ]
         },
         {
           "type": "minecraft:item",
-          "functions": [
+          "name": "hybrid_aquatic:lightfoot_crab_claw",
+          "modifier": [
             {
               "add": false,
               "count": {
@@ -103,14 +104,14 @@
                 "max": 3.0,
                 "min": 1.0
               },
-              "function": "minecraft:set_count"
+              "type": "minecraft:set_count"
             }
-          ],
-          "name": "hybrid_aquatic:lightfoot_crab_claw"
+          ]
         },
         {
           "type": "minecraft:item",
-          "functions": [
+          "name": "hybrid_aquatic:fiddler_crab_claw",
+          "modifier": [
             {
               "add": false,
               "count": {
@@ -118,14 +119,14 @@
                 "max": 3.0,
                 "min": 1.0
               },
-              "function": "minecraft:set_count"
+              "type": "minecraft:set_count"
             }
-          ],
-          "name": "hybrid_aquatic:fiddler_crab_claw"
+          ]
         },
         {
           "type": "minecraft:item",
-          "functions": [
+          "name": "hybrid_aquatic:flower_crab_claw",
+          "modifier": [
             {
               "add": false,
               "count": {
@@ -133,14 +134,14 @@
                 "max": 3.0,
                 "min": 1.0
               },
-              "function": "minecraft:set_count"
+              "type": "minecraft:set_count"
             }
-          ],
-          "name": "hybrid_aquatic:flower_crab_claw"
+          ]
         },
         {
           "type": "minecraft:item",
-          "functions": [
+          "name": "hybrid_aquatic:raw_shrimp",
+          "modifier": [
             {
               "add": false,
               "count": {
@@ -148,14 +149,14 @@
                 "max": 3.0,
                 "min": 1.0
               },
-              "function": "minecraft:set_count"
+              "type": "minecraft:set_count"
             }
-          ],
-          "name": "hybrid_aquatic:raw_shrimp"
+          ]
         },
         {
           "type": "minecraft:item",
-          "functions": [
+          "name": "hybrid_aquatic:lobster_claw",
+          "modifier": [
             {
               "add": false,
               "count": {
@@ -163,14 +164,14 @@
                 "max": 3.0,
                 "min": 1.0
               },
-              "function": "minecraft:set_count"
+              "type": "minecraft:set_count"
             }
-          ],
-          "name": "hybrid_aquatic:lobster_claw"
+          ]
         },
         {
           "type": "minecraft:item",
-          "functions": [
+          "name": "hybrid_aquatic:raw_lobster_tail",
+          "modifier": [
             {
               "add": false,
               "count": {
@@ -178,10 +179,9 @@
                 "max": 3.0,
                 "min": 1.0
               },
-              "function": "minecraft:set_count"
+              "type": "minecraft:set_count"
             }
-          ],
-          "name": "hybrid_aquatic:raw_lobster_tail"
+          ]
         }
       ],
       "rolls": 1.0

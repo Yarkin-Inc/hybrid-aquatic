@@ -17,7 +17,7 @@ import java.util.Arrays;
 @SuppressWarnings("unused")
 @Mixin(MobCategory.class)
 public class SpawnGroupMixin {
-    SpawnGroupMixin(String enumname, int ordinal, String name, int spawnCap, boolean peaceful, boolean rare, int immediateDespawnRange) {
+    SpawnGroupMixin(String enumname, int ordinal, String name, String debugAbbreviation, int spawnCap, boolean peaceful, boolean rare, int immediateDespawnRange) {
         throw new AssertionError();
     }
 
@@ -30,7 +30,7 @@ public class SpawnGroupMixin {
     @Unique
     private static MobCategory createHybridAquaticSpawnGroups(String enumname, int ordinal, HASpawnGroup spawnGroup) {
         SpawnGroupMixin groups = new SpawnGroupMixin(
-                spawnGroup.name(), ordinal, spawnGroup.location.toString(),
+                spawnGroup.name(), ordinal, spawnGroup.location.toString(), spawnGroup.name(),
                 spawnGroup.spawnCap, spawnGroup.peaceful, spawnGroup.rare, spawnGroup.immediateDespawnRange
         );
 

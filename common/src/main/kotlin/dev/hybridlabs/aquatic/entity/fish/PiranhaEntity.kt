@@ -24,7 +24,7 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
-import java.util.*
+import net.minecraft.world.entity.EntityReference
 
 class PiranhaEntity(type: EntityType<out PiranhaEntity>, world: Level) :
     BaseSchoolingFishEntity(type, world),
@@ -32,8 +32,8 @@ class PiranhaEntity(type: EntityType<out PiranhaEntity>, world: Level) :
 
     override fun getTargetConfig() = TARGET_CONFIG
 
-    private var angerTime = 0
-    private var persistentAngerTarget: UUID? = null
+    private var angerTime = NeutralMob.NO_ANGER_END_TIME
+    private var persistentAngerTarget: EntityReference<LivingEntity>? = null
     private var ticksUntilNextAlert = 0
 
     override fun registerGoals() {
@@ -41,9 +41,9 @@ class PiranhaEntity(type: EntityType<out PiranhaEntity>, world: Level) :
         goalSelector.addGoal(5, BoidGoal(this, 0.25f, 0.5f, 8 / 20f, 1 / 20f))
         goalSelector.addGoal(3, StayInWaterGoal(this))
         goalSelector.addGoal(2, WaterAnimalEatItemGoal(this))
-        targetSelector.addGoal(1, (HurtByTargetGoal(this, *arrayOfNulls<Class<*>>(0))).setAlertOthers(*arrayOfNulls<Class<*>>(0)))
-        targetSelector.addGoal(2, NearestAttackableTargetGoal(this, Player::class.java, 10, true, false) { this.isAngryAt(it) })
-        targetSelector.addGoal(2, NearestAttackableTargetGoal(this, LivingEntity::class.java, 10, true, true) { it.hasEffect(HAMobEffects.BLEEDING.asHolder()) && it !is PiranhaEntity })
+        targetSelector.addGoal(1, HurtByTargetGoal(this).setAlertOthers())
+        targetSelector.addGoal(2, NearestAttackableTargetGoal(this, Player::class.java, 10, true, false) { candidate, server -> this.isAngryAt(candidate, server) })
+        targetSelector.addGoal(2, NearestAttackableTargetGoal(this, LivingEntity::class.java, 10, true, true) { candidate, _ -> candidate.hasEffect(HAMobEffects.BLEEDING.asHolder()) && candidate !is PiranhaEntity })
         targetSelector.addGoal(3, ResetUniversalAngerTargetGoal(this, true))
     }
 
@@ -55,27 +55,27 @@ class PiranhaEntity(type: EntityType<out PiranhaEntity>, world: Level) :
         return stack.`is`(HAItemTags.SMALL_FISH)
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
+    override fun addAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueOutput) {
         super.addAdditionalSaveData(compound)
         this.addPersistentAngerSaveData(compound)
     }
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
+    override fun readAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueInput) {
         super.readAdditionalSaveData(compound)
         this.readPersistentAngerSaveData(this.level(), compound)
     }
 
-    override fun customServerAiStep() {
+    override fun customServerAiStep(level: net.minecraft.server.level.ServerLevel) {
         this.updatePersistentAnger(this.level() as ServerLevel, true)
         if (this.target != null) {
             this.maybeAlertOthers()
         }
 
         if (this.isAngry) {
-            this.lastHurtByPlayerTime = this.tickCount
+            this.lastHurtByPlayerMemoryTime = 100
         }
 
-        super.customServerAiStep()
+        super.customServerAiStep(level)
     }
 
     override fun canCollideWith(entity: Entity): Boolean {
@@ -92,8 +92,8 @@ class PiranhaEntity(type: EntityType<out PiranhaEntity>, world: Level) :
         super.doPush(entity)
     }
 
-    override fun doHurtTarget(target: Entity): Boolean {
-        if (super.doHurtTarget(target)) {
+    override fun doHurtTarget(level: net.minecraft.server.level.ServerLevel, target: Entity): Boolean {
+        if (super.doHurtTarget(level, target)) {
             if (target is LivingEntity) {
                 var i = 0
                 if (level().difficulty == Difficulty.NORMAL) {
@@ -114,24 +114,24 @@ class PiranhaEntity(type: EntityType<out PiranhaEntity>, world: Level) :
     }
 
     //#region Angerable Implementation Details
-    override fun setRemainingPersistentAngerTime(time: Int) {
+    override fun setPersistentAngerEndTime(time: Long) {
         this.angerTime = time
     }
 
-    override fun getRemainingPersistentAngerTime(): Int {
+    override fun getPersistentAngerEndTime(): Long {
         return this.angerTime
     }
 
-    override fun getPersistentAngerTarget(): UUID? {
+    override fun getPersistentAngerTarget(): EntityReference<LivingEntity>? {
         return this.persistentAngerTarget
     }
 
-    override fun setPersistentAngerTarget(target: UUID?) {
+    override fun setPersistentAngerTarget(target: EntityReference<LivingEntity>?) {
         this.persistentAngerTarget = target
     }
 
     override fun startPersistentAngerTimer() {
-        this.remainingPersistentAngerTime = PERSISTENT_ANGER_TIME.sample(this.random)
+        this.setTimeToRemainAngry(PERSISTENT_ANGER_TIME.sample(this.random).toLong())
     }
 
     @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
@@ -139,7 +139,7 @@ class PiranhaEntity(type: EntityType<out PiranhaEntity>, world: Level) :
         if (this.ticksUntilNextAlert > 0) {
             --this.ticksUntilNextAlert
         } else {
-            if (this.sensing.hasLineOfSight(this.target)) {
+            if (this.target?.let { this.sensing.hasLineOfSight(it) } == true) {
                 this.alertOthers()
             }
 
@@ -165,7 +165,7 @@ class PiranhaEntity(type: EntityType<out PiranhaEntity>, world: Level) :
         }
 
         if (livingEntity is Player) {
-            this.setLastHurtByPlayer(livingEntity)
+            this.setLastHurtByPlayer(livingEntity, 100)
         }
 
         super.setTarget(livingEntity)

@@ -11,7 +11,8 @@ open class HookItem(settings: Properties) : Item(settings) {
     override fun appendHoverText(
         stack: ItemStack,
         context: TooltipContext,
-        tooltip: MutableList<Component>,
+        display: net.minecraft.world.item.component.TooltipDisplay,
+        tooltip: java.util.function.Consumer<Component>,
         tooltipFlag: TooltipFlag
     ) {
         val isTideLoaded = Services.PLATFORM.isModLoaded("tide")
@@ -19,17 +20,10 @@ open class HookItem(settings: Properties) : Item(settings) {
         val hookDescription = Component.translatable(this.descriptionId.plus(".description")).withStyle(ChatFormatting.GRAY)
         val globalHookDescription = Component.translatable("item.hybrid_aquatic.hook.description${ if (isTideLoaded) "_tide" else "" }").withStyle(ChatFormatting.GRAY)
 
-        tooltip.add(hookDescription)
-        tooltip.add(globalHookDescription)
+        tooltip.accept(hookDescription)
+        tooltip.accept(globalHookDescription)
 
-        super.appendHoverText(stack, context, tooltip, tooltipFlag)
+        super.appendHoverText(stack, context, display, tooltip, tooltipFlag)
     }
 
-    override fun isEnchantable(stack: ItemStack): Boolean {
-        return false
-    }
-
-    override fun getEnchantmentValue(): Int {
-        return 0
-    }
 }

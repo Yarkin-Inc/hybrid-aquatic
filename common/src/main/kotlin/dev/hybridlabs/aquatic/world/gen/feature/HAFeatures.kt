@@ -6,11 +6,11 @@ import dev.hybridlabs.aquatic.world.gen.feature.algae.RedAlgaePatchFeature
 import dev.hybridlabs.aquatic.world.gen.feature.algae.SeaLettuceFeature
 import dev.hybridlabs.aquatic.world.gen.feature.corals.*
 import dev.hybridlabs.aquatic.world.gen.feature.kelp.*
-import net.minecraft.world.level.levelgen.feature.Feature
-import net.minecraft.world.level.levelgen.feature.configurations.DiskConfiguration
-import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration
-import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration
-import net.minecraft.world.level.levelgen.feature.configurations.ProbabilityFeatureConfiguration
+import dev.hybridlabs.aquatic.world.gen.feature.FeatureAlgorithm as Feature
+import net.minecraft.world.level.levelgen.feature.DiskFeature as DiskConfiguration
+import dev.hybridlabs.aquatic.world.gen.feature.config.FeatureConfiguration
+import dev.hybridlabs.aquatic.world.gen.feature.config.NoneFeatureConfiguration
+import dev.hybridlabs.aquatic.world.gen.feature.config.ProbabilityFeatureConfiguration
 
 /**
  * A registry of world generation features for Hybrid Aquatic.
@@ -25,7 +25,7 @@ object HAFeatures {
     val SARGASSUM = register("sargassum", SargassumFeature(SargassumFeatureConfig.CODEC))
     val SEA_LETTUCE_PATCH = register("sea_lettuce_patch", SeaLettuceFeature(ProbabilityFeatureConfiguration.CODEC))
     val RED_ALGAE_PATCH = register("red_algae_patch", RedAlgaePatchFeature(ProbabilityFeatureConfiguration.CODEC))
-    val SUSPICIOUS_SAND_DISK = register("suspicious_sand_disk", SuspiciousSandDiskFeature(DiskConfiguration.CODEC))
+    val SUSPICIOUS_SAND_DISK = register("suspicious_sand_disk", SuspiciousSandDiskFeature(DiskConfiguration.CODEC.codec()))
 
     val DEEP_CORAL_CLAW = register("deep_coral_claw", DeepCoralClawFeature(NoneFeatureConfiguration.CODEC))
     val DEEP_CORAL_TREE = register("deep_coral_tree", DeepCoralTreeFeature(NoneFeatureConfiguration.CODEC))
@@ -49,8 +49,7 @@ object HAFeatures {
     fun <F : Feature<*>> register(
         id: String,
         feature: F,
-    ): RegistryObject<Feature<FeatureConfiguration>> {
-        @Suppress("UNCHECKED_CAST")
-        return CommonClass.FEATURE.register(id) { feature as Feature<FeatureConfiguration> }
+    ): RegistryObject<com.mojang.serialization.MapCodec<out net.minecraft.world.level.levelgen.feature.Feature>> {
+        return CommonClass.FEATURE.register(id) { feature.codec() }
     }
 }

@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:disk",
+  "half_height": 1,
+  "radius": {
+    "type": "minecraft:uniform",
+    "max_inclusive": 8,
+    "min_inclusive": 3
+  },
+  "state_provider": {
+    "fallback": {
+      "type": "minecraft:simple",
+      "state": {
+        "id": "minecraft:sand"
+      }
+    },
+    "rules": [],
+    "type": "minecraft:rule_based"
+  },
+  "target": {
+    "type": "minecraft:matching_blocks",
+    "blocks": "hybrid_aquatic:grassy_sand"
+  }
+}

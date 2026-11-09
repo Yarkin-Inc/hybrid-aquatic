@@ -5,7 +5,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.vehicle.Boat
+import net.minecraft.world.entity.vehicle.boat.Boat
 import net.minecraft.world.item.context.BlockPlaceContext
 import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.Level
@@ -58,21 +58,23 @@ class JungleLilyPadBlock(settings: Properties) : BushBlock(settings) {
 
     override fun updateShape(
         state: BlockState,
-        direction: Direction,
-        neighborState: BlockState,
-        world: LevelAccessor,
+        world: net.minecraft.world.level.LevelReader,
+        tickAccess: net.minecraft.world.level.ScheduledTickAccess,
         pos: BlockPos,
+        direction: Direction,
         neighborPos: BlockPos,
+        neighborState: BlockState,
+        random: net.minecraft.util.RandomSource,
     ): BlockState {
         if (state.getValue(WATERLOGGED)) {
-            world.scheduleTick(pos, WATER, WATER.getTickDelay(world))
+            tickAccess.scheduleTick(pos, WATER, WATER.getTickDelay(world))
         }
 
         if (!canSurvive(state, world, pos)) {
             return Blocks.AIR.defaultBlockState()
         }
 
-        return super.updateShape(state, direction, neighborState, world, pos, neighborPos)
+        return super.updateShape(state, world, tickAccess, pos, direction, neighborPos, neighborState, random)
     }
 
     override fun getShape(
@@ -88,24 +90,21 @@ class JungleLilyPadBlock(settings: Properties) : BushBlock(settings) {
         return if (state.getValue(WATERLOGGED)) WATER.getSource(false) else super.getFluidState(state)
     }
 
-    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block?, BlockState?>) {
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
         builder.add(WATERLOGGED)
     }
 
-    override fun entityInside(state: BlockState, world: Level, pos: BlockPos, entity: Entity) {
-        super.entityInside(state, world, pos, entity)
+    override fun entityInside(state: BlockState, world: Level, pos: BlockPos, entity: Entity, effectApplier: net.minecraft.world.entity.InsideBlockEffectApplier, isPrecise: Boolean) {
+        super.entityInside(state, world, pos, entity, effectApplier, isPrecise)
         if (world is ServerLevel && entity is Boat) {
             entity.makeStuckInBlock(state, Vec3(0.66, 0.66, 0.66))
-            world.destroyBlock(BlockPos(pos), false, entity)
+            world.destroyBlock(pos, false, entity)
         }
     }
 
-    override fun codec(): MapCodec<out BushBlock> {
-        return CODEC
-    }
 
     companion object {
-        val CODEC: MapCodec<JungleLilyPadBlock> = simpleCodec(::JungleLilyPadBlock)
+
         private val SHAPE: VoxelShape = box(1.0, 15.0, 1.0, 15.0, 16.0, 15.0)
     }
 }

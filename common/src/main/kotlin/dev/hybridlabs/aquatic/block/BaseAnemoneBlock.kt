@@ -49,7 +49,7 @@ open class BaseAnemoneBlock(settings: Properties) : DirectionalBlock(settings),
     }
 
     override fun getRenderShape(state: BlockState): RenderShape {
-        return RenderShape.ENTITYBLOCK_ANIMATED
+        return RenderShape.INVISIBLE
     }
 
     override fun isPathfindable(state: BlockState, type: PathComputationType): Boolean {
@@ -58,17 +58,19 @@ open class BaseAnemoneBlock(settings: Properties) : DirectionalBlock(settings),
 
     override fun updateShape(
         state: BlockState,
-        direction: Direction,
-        neighborState: BlockState,
-        level: LevelAccessor,
+        level: net.minecraft.world.level.LevelReader,
+        tickAccess: net.minecraft.world.level.ScheduledTickAccess,
         pos: BlockPos,
-        neighborPos: BlockPos
+        direction: Direction,
+        neighborPos: BlockPos,
+        neighborState: BlockState,
+        random: net.minecraft.util.RandomSource,
     ): BlockState {
-        if (state.getValue(WATERLOGGED)) level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level))
+        if (state.getValue(WATERLOGGED)) tickAccess.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level))
 
         return if (!canSurvive(state, level, pos)) {
             Blocks.AIR.defaultBlockState()
-        } else super.updateShape(state, direction, neighborState, level, pos, neighborPos)
+        } else super.updateShape(state, level, tickAccess, pos, direction, neighborPos, neighborState, random)
     }
 
     override fun getCollisionShape(
@@ -105,12 +107,9 @@ open class BaseAnemoneBlock(settings: Properties) : DirectionalBlock(settings),
         TODO("Not yet implemented")
     }
 
-    override fun codec(): MapCodec<out DirectionalBlock?> {
-        return CODEC
-    }
 
     companion object {
-        val CODEC: MapCodec<BaseAnemoneBlock> = simpleCodec(::BaseAnemoneBlock)
+
         private val CEILING_SHAPE: VoxelShape = box(1.0, 0.0, 1.0, 15.0, 16.0, 15.0)
         private val FLOOR_SHAPE: VoxelShape = box(1.0, 0.0, 1.0, 15.0, 16.0, 15.0)
         private val NORTH_SHAPE: VoxelShape = box(1.0, 1.0, 0.0, 15.0, 15.0, 16.0)

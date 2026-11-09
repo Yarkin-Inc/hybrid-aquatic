@@ -1,11 +1,12 @@
 package dev.hybridlabs.aquatic.entity.misc
 
+import dev.hybridlabs.aquatic.entity.spawnDrop
 import com.google.common.collect.Maps
 import com.mojang.serialization.Codec
 import dev.hybridlabs.aquatic.item.HAItems
 import dev.hybridlabs.aquatic.world.inventory.ArgonautMenu
 import net.minecraft.SharedConstants
-import net.minecraft.Util
+import net.minecraft.util.Util
 import net.minecraft.core.Direction
 import net.minecraft.core.NonNullList
 import net.minecraft.core.component.DataComponents
@@ -33,7 +34,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.ContainerData
 import net.minecraft.world.item.*
 import net.minecraft.world.item.component.CustomData
-import net.minecraft.world.level.GameRules
+import net.minecraft.world.level.gamerules.GameRules
 import net.minecraft.world.level.ItemLike
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Blocks
@@ -42,12 +43,12 @@ import net.minecraft.world.level.storage.loot.LootTable
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
 import org.joml.Vector3f
-import software.bernie.geckolib.animatable.GeoEntity
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
-import software.bernie.geckolib.animation.AnimatableManager
-import software.bernie.geckolib.animation.AnimationController
-import software.bernie.geckolib.constant.DefaultAnimations
-import software.bernie.geckolib.util.GeckoLibUtil
+import com.geckolib.animatable.GeoEntity
+import com.geckolib.animatable.instance.AnimatableInstanceCache
+import com.geckolib.animatable.manager.AnimatableManager
+import com.geckolib.animation.AnimationController
+import com.geckolib.constant.DefaultAnimations
+import com.geckolib.util.GeckoLibUtil
 import java.util.function.IntFunction
 
 open class ArgonautEntity(
@@ -67,13 +68,6 @@ open class ArgonautEntity(
     private var inputJumping = false
     private var inputSprint = false
     private var deltaRotation = 0f
-    private var lerpSteps = 0
-    private var lerpX = 0.0
-    private var lerpY = 0.0
-    private var lerpZ = 0.0
-    private var lerpYRot = 0.0
-    private var lerpXRot = 0.0
-
     private var litTime = 0
     private var litDuration = 0
     private val dataAccess = object : ContainerData {
@@ -110,37 +104,37 @@ open class ArgonautEntity(
         builder.define(IS_BURNING, false)
     }
 
-    override fun addAdditionalSaveData(tag: CompoundTag) {
+    override fun addAdditionalSaveData(tag: net.minecraft.world.level.storage.ValueOutput) {
         tag.putFloat("Damage", getDamage())
         tag.putBoolean("IsGlowing", isGlowing())
         tag.putString("ShellColor", this.getShellColor().serializedName)
         tag.putString("SailColor", this.getSailColor().serializedName)
         tag.putInt("BurnTime", this.litTime)
         tag.putInt("BurnDuration", this.litDuration)
-        this.addChestVehicleSaveData(tag, this.registryAccess())
+        this.addChestVehicleSaveData(tag)
     }
 
-    override fun readAdditionalSaveData(tag: CompoundTag) {
-        setDamage(tag.getFloat("Damage"))
-        setGlowing(tag.getBoolean("IsGlowing"))
+    override fun readAdditionalSaveData(tag: net.minecraft.world.level.storage.ValueInput) {
+        setDamage(tag.getFloatOr("Damage", 0f))
+        setGlowing(tag.getBooleanOr("IsGlowing", false))
 
-        if (tag.contains("ShellColor", 8)) {
-            val colorName = tag.getString("ShellColor")
+        if (tag.contains("ShellColor")) {
+            val colorName = tag.getStringOr("ShellColor", "")
             val color = ShellColor.entries.firstOrNull { it.serializedName == colorName } ?: ShellColor.NONE
             setShellColor(color)
         }
 
-        if (tag.contains("SailColor", 8)) {
-            val colorName = tag.getString("SailColor")
+        if (tag.contains("SailColor")) {
+            val colorName = tag.getStringOr("SailColor", "")
             val color = SailColor.entries.firstOrNull { it.serializedName == colorName } ?: SailColor.NONE
             setSailColor(color)
         }
 
-        this.litTime = tag.getInt("BurnTime")
+        this.litTime = tag.getIntOr("BurnTime", 0)
         // Without this the fuel gauge falls back to a 200 tick scale after a reload and jumps.
-        this.litDuration = tag.getInt("BurnDuration")
+        this.litDuration = tag.getIntOr("BurnDuration", 0)
         setLit(litTime > 0)
-        this.readChestVehicleSaveData(tag, this.registryAccess())
+        this.readChestVehicleSaveData(tag)
     }
     //#endregion
 
@@ -160,14 +154,8 @@ open class ArgonautEntity(
         entityData.set(SAIL_COLOR, sailColor.id)
     }
 
-    override fun lerpTo(x: Double, y: Double, z: Double, pitch: Float, xRot: Float, posRotationIncrements: Int) {
-        this.lerpX = x
-        this.lerpY = y
-        this.lerpZ = z
-        this.lerpYRot = pitch.toDouble()
-        this.lerpXRot = xRot.toDouble()
-        this.lerpSteps = 10
-    }
+    override fun createInterpolationHandler(): InterpolationHandler =
+        LinearInterpolationHandler.create(this, 10)
 
     open fun getBurnDuration(fuel: ItemStack): Int {
         return if (fuel.isEmpty) 0
@@ -242,7 +230,7 @@ open class ArgonautEntity(
         return item.builtInRegistryHolder().`is`(ItemTags.NON_FLAMMABLE_WOOD)
     }
 
-    private fun add(map: MutableMap<Item?, Int?>, itemTag: TagKey<Item?>, burnTime: Int) {
+    private fun add(map: MutableMap<Item?, Int?>, itemTag: TagKey<Item>, burnTime: Int) {
         for (holder in BuiltInRegistries.ITEM.getTagOrEmpty(itemTag)) {
             if (!isNeverAFurnaceFuel(holder.value() as Item)) {
                 map[holder.value() as Item] = burnTime
@@ -256,9 +244,7 @@ open class ArgonautEntity(
             if (SharedConstants.IS_RUNNING_IN_IDE) {
                 throw Util.pauseInIde(
                     IllegalStateException(
-                        "A developer tried to explicitly make fire resistant item " + item.getName(
-                            null as ItemStack
-                        ).string + " a furnace fuel. That will not work!"
+                        "A developer tried to explicitly make fire resistant item " + item.getName(ItemStack(item)).string + " a furnace fuel. That will not work!"
                     )
                 ) as IllegalStateException
             }
@@ -290,9 +276,9 @@ open class ArgonautEntity(
 
         litDuration = litTime
 
-        val itemRemainder = fuelItemStack.item.craftingRemainingItem
+        val itemRemainder = fuelItemStack.item.craftingRemainder
         fuelItemStack.shrink(1)
-        if (fuelItemStack.isEmpty && itemRemainder != null) itemStacks[0] = itemRemainder.defaultInstance
+        if (fuelItemStack.isEmpty && itemRemainder != null) itemStacks[0] = itemRemainder.create()
 
         setLit(true)
     }
@@ -315,7 +301,7 @@ open class ArgonautEntity(
         }
 
         tickLerp()
-        if (this.isControlledByLocalInstance) {
+        if (this.isLocalInstanceAuthoritative) {
             if (this.firstPassenger !is Player) {
                 setPropellerState(left = false, right = false)
             }
@@ -340,22 +326,7 @@ open class ArgonautEntity(
     }
 
     private fun tickLerp() {
-        if (this.isControlledByLocalInstance) {
-            this.lerpSteps = 0
-            this.syncPacketPositionCodec(this.x, this.y, this.z)
-        }
-
-        if (this.lerpSteps > 0) {
-            val d = this.x + (this.lerpX - this.x) / this.lerpSteps
-            val e = this.y + (this.lerpY - this.y) / this.lerpSteps
-            val f = this.z + (this.lerpZ - this.z) / this.lerpSteps
-            val g = Mth.wrapDegrees(this.lerpYRot - this.yRot)
-            this.yRot += g.toFloat() / this.lerpSteps
-            this.xRot += (this.lerpXRot - this.xRot).toFloat() / this.lerpSteps
-            this.lerpSteps--
-            this.setPos(d, e, f)
-            this.setRot(this.yRot, this.xRot)
-        }
+        if (isLocalInstanceAuthoritative) interpolation.cancel() else interpolation.interpolate()
     }
 
     fun tickRidden(player: Player, travelVector: Vec3) {
@@ -393,9 +364,9 @@ open class ArgonautEntity(
     private fun getRightDirection(): Vector3f {
         val rad = Math.PI.toFloat() / 180f
         return Vector3f(
-            Mth.cos(-yRot * rad),
+            kotlin.math.cos(-yRot * rad),
             0f,
-            Mth.sin(yRot * rad)
+            kotlin.math.sin(yRot * rad)
         ).normalize()
     }
 
@@ -482,12 +453,12 @@ open class ArgonautEntity(
         return this.entityData.get(DATA_ID_GLOWING)
     }
 
-    override fun hurt(source: DamageSource, amount: Float): Boolean {
-        if (this.hasPassenger(source.entity)) {
+    override fun hurtServer(level: net.minecraft.server.level.ServerLevel, source: DamageSource, amount: Float): Boolean {
+        if (source.entity?.let { this.hasPassenger(it) } == true) {
             return false
         }
 
-        if (this.isInvulnerableTo(source)) {
+        if (this.isInvulnerableToBase(source)) {
             return false
         } else if (!this.level().isClientSide && !this.isRemoved) {
             this.setHurtTime(10)
@@ -496,7 +467,7 @@ open class ArgonautEntity(
             this.gameEvent(GameEvent.ENTITY_DAMAGE, source.entity)
             val flag = source.entity is Player && (source.entity as Player).abilities.instabuild
             if (flag || this.getDamage() > 90.0f) {
-                if (!flag && this.level().gameRules.getBoolean(GameRules.RULE_DOENTITYDROPS)) {
+                if (!flag && level.gameRules.get(GameRules.ENTITY_DROPS)) {
                     this.destroy(source)
                 }
 
@@ -538,7 +509,7 @@ open class ArgonautEntity(
 
     override fun registerControllers(controllers: AnimatableManager.ControllerRegistrar) {
         controllers.add(
-            AnimationController(this, "Argonaut Controller", 4) { state ->
+            AnimationController<ArgonautEntity>( "Argonaut Controller", 4) { state ->
                 val moving = this.deltaMovement.horizontalDistanceSqr() > 0.01
 
                 when {
@@ -554,7 +525,7 @@ open class ArgonautEntity(
         )
     }
 
-    override fun getAnimatableInstanceCache(): AnimatableInstanceCache? {
+    override fun getAnimatableInstanceCache(): AnimatableInstanceCache {
         return animCache
     }
 
@@ -567,10 +538,10 @@ open class ArgonautEntity(
     }
 
     fun canVehicleCollide(vehicle: Entity, entity: Entity): Boolean {
-        return (entity.canBeCollidedWith() || entity.isPushable) && !vehicle.isPassengerOfSameVehicle(entity)
+        return (entity.canBeCollidedWith(vehicle) || entity.isPushable) && !vehicle.isPassengerOfSameVehicle(entity)
     }
 
-    override fun canBeCollidedWith(): Boolean {
+    override fun canBeCollidedWith(other: Entity?): Boolean {
         return true
     }
 
@@ -597,42 +568,42 @@ open class ArgonautEntity(
         this.clampRotation(entityToUpdate)
     }
 
-    override fun interact(player: Player, hand: InteractionHand): InteractionResult {
+    override fun interact(player: Player, hand: InteractionHand, location: Vec3): InteractionResult {
         val stack = player.getItemInHand(hand)
 
         //#region Add Glow
         if (stack.`is`(HAItems.GLOWSLIME.get()) && !this.isGlowing()) {
             if (!player.abilities.instabuild) stack.shrink(1)
             this.setGlowing(true)
-            return InteractionResult.sidedSuccess(this.level().isClientSide)
+            return InteractionResult.SUCCESS
         }
 
         //#region Remove Glow
         if (stack.`is`(Items.SLIME_BALL) && this.isGlowing()) {
             if (!player.abilities.instabuild) stack.shrink(1)
             this.setGlowing(false)
-            return InteractionResult.sidedSuccess(this.level().isClientSide)
+            return InteractionResult.SUCCESS
         }
 
         //#region Sail Color
         if (stack.item is DyeItem && player.isCrouching) {
-            val dye = (stack.item as DyeItem).dyeColor
+            val dye = stack.get(DataComponents.DYE) ?: DyeColor.WHITE
             val sailColor = SailColor.fromDye(dye)
             if (sailColor != getSailColor()) {
                 setSailColor(sailColor)
                 if (!player.abilities.instabuild) stack.shrink(1)
-                return InteractionResult.sidedSuccess(level().isClientSide)
+                return InteractionResult.SUCCESS
             }
         }
 
         //#region Shell Color
         if (stack.item is DyeItem) {
-            val dye = (stack.item as DyeItem).dyeColor
+            val dye = stack.get(DataComponents.DYE) ?: DyeColor.WHITE
             val shellColor = ShellColor.fromDye(dye)
             if (shellColor != getShellColor()) {
                 setShellColor(shellColor)
                 if (!player.abilities.instabuild) stack.shrink(1)
-                return InteractionResult.sidedSuccess(level().isClientSide)
+                return InteractionResult.SUCCESS
             }
         }
 
@@ -682,8 +653,8 @@ open class ArgonautEntity(
     //#region Container
     protected open fun destroy(damageSource: DamageSource) {
         val stack = getArgonautItem(this)
-        this.spawnAtLocation(stack)
-        this.chestVehicleDestroyed(damageSource, this.level(), this)
+        this.spawnDrop(stack)
+        (level() as? net.minecraft.server.level.ServerLevel)?.let { chestVehicleDestroyed(damageSource, it, this) }
     }
 
     override fun remove(reason: RemovalReason) {
@@ -700,25 +671,27 @@ open class ArgonautEntity(
         }
     }
 
-    override fun getLootTable(): ResourceKey<LootTable>? {
+    override fun getContainerLootTable(): ResourceKey<LootTable>? {
         return argonautLootTable
     }
 
-    override fun setLootTable(id: ResourceKey<LootTable>?) {
-        if (id != null) argonautLootTable = id
+    override fun setContainerLootTable(id: ResourceKey<LootTable>?) {
+        argonautLootTable = id
     }
 
-    override fun getLootTableSeed(): Long {
+    override fun getContainerLootTableSeed(): Long {
         return argonautLootTableSeed
     }
 
-    override fun setLootTableSeed(seed: Long) {
+    override fun setContainerLootTableSeed(seed: Long) {
         argonautLootTableSeed = seed
     }
 
     override fun getItemStacks(): NonNullList<ItemStack> {
         return this.itemStacks
     }
+
+    override fun getSlot(index: Int): SlotAccess? = getChestVehicleSlot(index)
 
     override fun clearItemStacks() {
         this.itemStacks = NonNullList.withSize(this.containerSize, ItemStack.EMPTY)
@@ -759,7 +732,7 @@ open class ArgonautEntity(
         playerInventory: Inventory,
         player: Player,
     ): AbstractContainerMenu? {
-        if (this.lootTable == null && player.isSpectator) {
+        if (this.containerLootTable != null && player.isSpectator) {
             return null
         } else {
             this.unpackLootTable(playerInventory.player)
@@ -771,8 +744,8 @@ open class ArgonautEntity(
         this.unpackChestVehicleLootTable(player)
     }
 
-    override fun stopOpen(player: Player) {
-        this.level().gameEvent(GameEvent.CONTAINER_CLOSE, this.position(), GameEvent.Context.of(player))
+    override fun stopOpen(user: ContainerUser) {
+        this.level().gameEvent(GameEvent.CONTAINER_CLOSE, this.position(), GameEvent.Context.of(user.livingEntity))
     }
     //#endregion
 

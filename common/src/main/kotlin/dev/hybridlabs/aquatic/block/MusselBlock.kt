@@ -39,7 +39,7 @@ class MusselBlock(properties: Properties) :
     }
 
     override fun canPlaceLiquid(
-        p0: Player?,
+        p0: net.minecraft.world.entity.LivingEntity?,
         world: BlockGetter,
         pos: BlockPos,
         state: BlockState,

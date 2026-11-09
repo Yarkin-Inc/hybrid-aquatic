@@ -1,44 +1,32 @@
 package dev.hybridlabs.aquatic.client.render.item
 
-import com.mojang.blaze3d.vertex.PoseStack
-import dev.hybridlabs.aquatic.block.BlockEntityHelper.Companion.createBlockEntityRendererProviderContext
-import dev.hybridlabs.aquatic.block.HABlocks
+import com.geckolib.constant.dataticket.DataTicket
+import com.geckolib.model.GeoModel
+import com.geckolib.renderer.GeoItemRenderer
+import com.geckolib.renderer.base.GeoRenderState
+import dev.hybridlabs.aquatic.block.MessageInABottleBlock.Variant
 import dev.hybridlabs.aquatic.block.entity.MessageInABottleBlockEntity
-import dev.hybridlabs.aquatic.client.render.block.entity.MessageInABottleBlockEntityRenderer
-import net.minecraft.client.Minecraft
-import net.minecraft.client.model.geom.EntityModelSet
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
-import net.minecraft.client.renderer.MultiBufferSource
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher
-import net.minecraft.core.BlockPos
-import net.minecraft.world.item.ItemDisplayContext
-import net.minecraft.world.item.ItemStack
+import dev.hybridlabs.aquatic.client.model.block.entity.MessageInABottleBlockEntityModel
+import dev.hybridlabs.aquatic.item.MessageInABottleItem
+import net.minecraft.core.component.DataComponents
+import net.minecraft.resources.Identifier
+import net.minecraft.client.renderer.rendertype.RenderTypes
 
-class MessageInABottleBlockItemRenderer(
-    blockEntityRenderDispatcher: BlockEntityRenderDispatcher,
-    entityModelSet: EntityModelSet
-) :
-    BlockEntityWithoutLevelRenderer(
-        blockEntityRenderDispatcher, entityModelSet
-    ) {
+class MessageInABottleBlockItemRenderer : GeoItemRenderer<MessageInABottleItem>(BottleItemModel()) {
+    override fun getRenderType(state: GeoRenderState, texture: Identifier) = RenderTypes.entityTranslucent(texture)
+}
 
-    constructor() : this(client.blockEntityRenderDispatcher, client.entityModels)
-
-    val blockEntity by lazy {
-        MessageInABottleBlockEntity(BlockPos.ZERO, HABlocks.MESSAGE_IN_A_BOTTLE.get().defaultBlockState())
+private class BottleItemModel : GeoModel<MessageInABottleItem>() {
+    private val variantTicket = DataTicket.create("ha_bottle_item_variant", Variant::class.java)
+    override fun addAdditionalStateData(item: MessageInABottleItem, related: Any?, state: GeoRenderState) {
+        val stack = (related as? GeoItemRenderer.RenderData)?.itemStack()
+        val name = stack?.get(DataComponents.BLOCK_ENTITY_DATA)?.copyTagWithoutId()
+            ?.getStringOr(MessageInABottleBlockEntity.VARIANT_KEY, "bottle") ?: "bottle"
+        state.addGeckolibData(variantTicket, Variant.byId(name))
     }
-
-    override fun renderByItem(
-        stack: ItemStack, displayContext: ItemDisplayContext,
-        poseStack: PoseStack, buffer: MultiBufferSource, packedLight: Int,
-        packedOverlay: Int
-    ) {
-        RENDERER.render(blockEntity, 1.0f, poseStack, buffer, packedLight, packedOverlay)
-    }
-
-    companion object {
-        private val RENDERER =
-            MessageInABottleBlockEntityRenderer(createBlockEntityRendererProviderContext())
-        private val client: Minecraft = Minecraft.getInstance()
-    }
+    override fun getModelResource(state: GeoRenderState) =
+        MessageInABottleBlockEntityModel.VARIANT_MODELS.getValue(state.getGeckolibData(variantTicket) ?: Variant.BOTTLE)
+    override fun getTextureResource(state: GeoRenderState) =
+        MessageInABottleBlockEntityModel.VARIANT_TEXTURES.getValue(state.getGeckolibData(variantTicket) ?: Variant.BOTTLE)
+    override fun getAnimationResource(item: MessageInABottleItem) = MessageInABottleBlockEntityModel.WATER_BOB_ANIMATION_ID
 }

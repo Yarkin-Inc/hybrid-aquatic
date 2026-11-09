@@ -6,7 +6,7 @@ import dev.hybridlabs.hapi.entity.base.aquatic.BaseCrustaceanEntity
 import net.minecraft.core.BlockPos
 import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.MobSpawnType
+import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.level.Level
@@ -29,7 +29,7 @@ class SpiderCrabEntity(entityType: EntityType<out SpiderCrabEntity>, world: Leve
         fun canSpawn(
             type: EntityType<out SpiderCrabEntity>,
             world: ServerLevelAccessor,
-            reason: MobSpawnType,
+            reason: EntitySpawnReason,
             pos: BlockPos,
             random: RandomSource,
         ): Boolean {
@@ -37,10 +37,10 @@ class SpiderCrabEntity(entityType: EntityType<out SpiderCrabEntity>, world: Leve
             val shallowSpawn = (seaLevel - 24)..(seaLevel - 4)
             val deepSpawn = (seaLevel - 256)..(seaLevel - 25)
 
-            val fullMoon = world.moonPhase == 0
-            val newMoon = world.moonPhase == 4
+            val fullMoon = world.environmentAttributes().getValue(net.minecraft.world.attribute.EnvironmentAttributes.MOON_PHASE, pos) == net.minecraft.world.level.MoonPhase.FULL_MOON
+            val newMoon = world.environmentAttributes().getValue(net.minecraft.world.attribute.EnvironmentAttributes.MOON_PHASE, pos) == net.minecraft.world.level.MoonPhase.NEW_MOON
 
-            val spawnY = if ((fullMoon || newMoon) && !world.level.isDay) shallowSpawn else deepSpawn
+            val spawnY = if ((fullMoon || newMoon) && !(world.level.environmentAttributes().getValue(net.minecraft.world.attribute.EnvironmentAttributes.SKY_LIGHT_LEVEL, pos) > 11.0f)) shallowSpawn else deepSpawn
 
             return pos.y in spawnY &&
                     world.isWaterAt(pos) &&

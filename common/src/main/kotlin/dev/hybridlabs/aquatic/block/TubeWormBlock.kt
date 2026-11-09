@@ -33,11 +33,11 @@ import org.jetbrains.annotations.Nullable
 @Suppress("DEPRECATION", "SameParameterValue", "OVERRIDE_DEPRECATION")
 class TubeWormBlock(settings: Properties) : BushBlock(settings), BonemealableBlock, SimpleWaterloggedBlock {
     companion object {
-        val CODEC: MapCodec<TubeWormBlock> = simpleCodec(::TubeWormBlock)
+
         val WORMS: IntegerProperty = IntegerProperty.create("worms", 1, 4)
         val WATERLOGGED: BooleanProperty = BlockStateProperties.WATERLOGGED
 
-        val WORM_COUNT_CODEC: Codec<IntProvider> = IntProvider.codec(WORMS.min, WORMS.max)
+        val WORM_COUNT_CODEC: Codec<IntProvider> = net.minecraft.util.valueproviders.IntProviders.codec(WORMS.possibleValues.first(), WORMS.possibleValues.last())
 
         private val ONE_WORM_SHAPE: VoxelShape = box(6.0, 0.0, 6.0, 10.0, 8.0, 10.0)
         private val TWO_WORMS_SHAPE: VoxelShape = box(4.0, 0.0, 4.0, 12.0, 8.0, 12.0)
@@ -47,14 +47,14 @@ class TubeWormBlock(settings: Properties) : BushBlock(settings), BonemealableBlo
 
     init {
         this.registerDefaultState(stateDefinition.any().setValue(BlockStateProperties.WATERLOGGED, true)
-            .setValue(WORMS, WORMS.min))
+            .setValue(WORMS, WORMS.possibleValues.first()))
     }
 
     @Nullable
     override fun getStateForPlacement(ctx: BlockPlaceContext): BlockState? {
         val blockState = ctx.level.getBlockState(ctx.clickedPos)
         return if (blockState.`is`(this)) {
-            blockState.setValue(WORMS, (blockState.getValue(WORMS) + 1).coerceAtMost(WORMS.max))
+            blockState.setValue(WORMS, (blockState.getValue(WORMS) + 1).coerceAtMost(WORMS.possibleValues.last()))
         } else {
             val fluidState = ctx.level.getFluidState(ctx.clickedPos)
             val isWaterlogged = (fluidState.`is`(FluidTags.WATER))
@@ -72,26 +72,28 @@ class TubeWormBlock(settings: Properties) : BushBlock(settings), BonemealableBlo
 
     override fun updateShape(
         state: BlockState,
-        direction: Direction,
-        neighborState: BlockState,
-        world: LevelAccessor,
+        world: net.minecraft.world.level.LevelReader,
+        tickAccess: net.minecraft.world.level.ScheduledTickAccess,
         pos: BlockPos,
-        neighborPos: BlockPos
+        direction: Direction,
+        neighborPos: BlockPos,
+        neighborState: BlockState,
+        random: net.minecraft.util.RandomSource,
     ): BlockState {
         return if (!state.canSurvive(world, pos)) {
             Blocks.AIR.defaultBlockState()
         } else {
             if (state.getValue(WATERLOGGED)) {
-                world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world))
+                tickAccess.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world))
             }
-            super.updateShape(state, direction, neighborState, world, pos, neighborPos)
+            super.updateShape(state, world, tickAccess, pos, direction, neighborPos, neighborState, random)
         }
     }
 
     override fun canBeReplaced(state: BlockState, context: BlockPlaceContext): Boolean {
         return !context.isSecondaryUseActive &&
                 context.itemInHand.`is`(asItem()) &&
-                state.getValue(WORMS) < WORMS.max || super.canBeReplaced(state, context)
+                state.getValue(WORMS) < WORMS.possibleValues.last() || super.canBeReplaced(state, context)
     }
 
     override fun getShape(
@@ -117,15 +119,15 @@ class TubeWormBlock(settings: Properties) : BushBlock(settings), BonemealableBlo
         builder.add(WORMS, WATERLOGGED)
     }
 
-    override fun isValidBonemealTarget(world: LevelReader, pos: BlockPos, state: BlockState): Boolean {
+    override fun isValidBonemealTarget(world: LevelReader, pos: BlockPos, state: BlockState, source: net.minecraft.world.level.block.BonemealSource): Boolean {
         return false
     }
 
-    override fun isBonemealSuccess(world: Level, random: RandomSource, pos: BlockPos, state: BlockState): Boolean {
+    override fun isBonemealSuccess(world: Level, random: RandomSource, pos: BlockPos, state: BlockState, source: net.minecraft.world.level.block.BonemealSource): Boolean {
         return false
     }
 
-    override fun performBonemeal(world: ServerLevel, random: RandomSource, pos: BlockPos, state: BlockState) {
+    override fun performBonemeal(world: ServerLevel, random: RandomSource, pos: BlockPos, state: BlockState, source: net.minecraft.world.level.block.BonemealSource) {
     }
 
     override fun isPathfindable(state: BlockState, type: PathComputationType): Boolean {
@@ -137,7 +139,4 @@ class TubeWormBlock(settings: Properties) : BushBlock(settings), BonemealableBlo
                 floor.isFaceSturdy(world, pos, Direction.UP)
     }
 
-    override fun codec(): MapCodec<out BushBlock> {
-        return CODEC
-    }
 }

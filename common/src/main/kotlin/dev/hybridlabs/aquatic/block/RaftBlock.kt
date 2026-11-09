@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.SimpleWaterloggedBlock
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.StateDefinition
 import net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED
-import net.minecraft.world.level.block.state.properties.DirectionProperty
+import net.minecraft.world.level.block.state.properties.EnumProperty
 import net.minecraft.world.level.material.FluidState
 import net.minecraft.world.level.material.Fluids
 import net.minecraft.world.level.pathfinder.PathComputationType
@@ -43,13 +43,15 @@ class RaftBlock(settings: Properties) : Block(settings), SimpleWaterloggedBlock 
 
     override fun updateShape(
         state: BlockState,
-        direction: Direction,
-        neighborState: BlockState,
-        world: LevelAccessor,
+        world: net.minecraft.world.level.LevelReader,
+        tickAccess: net.minecraft.world.level.ScheduledTickAccess,
         pos: BlockPos,
-        neighborPos: BlockPos
+        direction: Direction,
+        neighborPos: BlockPos,
+        neighborState: BlockState,
+        random: net.minecraft.util.RandomSource,
     ): BlockState {
-        return if (canSurvive(state, world, pos)) super.updateShape(state, direction, neighborState, world, pos, neighborPos)
+        return if (canSurvive(state, world, pos)) super.updateShape(state, world, tickAccess, pos, direction, neighborPos, neighborState, random)
         else Blocks.AIR.defaultBlockState()
     }
 
@@ -86,7 +88,7 @@ class RaftBlock(settings: Properties) : Block(settings), SimpleWaterloggedBlock 
     }
 
     companion object {
-        val FACING: DirectionProperty = HorizontalDirectionalBlock.FACING
+        val FACING: EnumProperty<Direction> = HorizontalDirectionalBlock.FACING
         private val SHAPE: VoxelShape = box(1.0, 12.0, 1.0, 15.0, 16.0, 15.0)
         private val LAND_SHAPE: VoxelShape = box(1.0, 0.0, 1.0, 15.0, 2.5, 15.0)
     }

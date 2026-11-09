@@ -6,15 +6,10 @@ import dev.hybridlabs.aquatic.entity.fish.TunaEntity
 import dev.hybridlabs.hapi.client.render.entity.aquatic.BaseFishEntityRenderer
 import net.minecraft.client.renderer.entity.EntityRendererProvider.Context
 import net.minecraft.world.item.ItemStack
-import software.bernie.geckolib.cache.`object`.GeoBone
+import com.geckolib.cache.model.GeoBone
 
 class TunaEntityRenderer(context: Context) :
     BaseFishEntityRenderer<TunaEntity>(context, TunaEntityModel(), true, false) {
 
-    override fun rotateItem(
-        poseStack: PoseStack,
-        bone: GeoBone,
-        stack: ItemStack,
-        animatable: TunaEntity
-    ) {}
+    override fun getHeldItemRotation(): Float = 0f
 }

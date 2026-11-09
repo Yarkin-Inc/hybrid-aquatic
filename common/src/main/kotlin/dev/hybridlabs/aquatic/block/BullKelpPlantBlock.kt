@@ -32,7 +32,7 @@ class BullKelpPlantBlock(settings: Properties) :
     }
 
     override fun canPlaceLiquid(
-        p0: Player?,
+        p0: net.minecraft.world.entity.LivingEntity?,
         p1: BlockGetter,
         p2: BlockPos,
         p3: BlockState,
@@ -50,11 +50,8 @@ class BullKelpPlantBlock(settings: Properties) :
         return false
     }
 
-    override fun codec(): MapCodec<out GrowingPlantBodyBlock> {
-        return CODEC
-    }
 
     companion object {
-        val CODEC: MapCodec<BullKelpPlantBlock> = simpleCodec(::BullKelpPlantBlock)
+
     }
 }

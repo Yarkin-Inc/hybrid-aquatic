@@ -13,7 +13,7 @@ import dev.hybridlabs.aquatic.sound.HASoundEvents
 import dev.hybridlabs.aquatic.world.gen.biome.HABiomes
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider
-import net.minecraft.Util
+import net.minecraft.util.Util
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.entity.EntityType

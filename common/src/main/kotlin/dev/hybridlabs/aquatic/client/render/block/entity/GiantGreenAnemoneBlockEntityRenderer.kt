@@ -4,65 +4,55 @@ import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
 import dev.hybridlabs.aquatic.block.entity.GiantGreenAnemoneBlockEntity
 import dev.hybridlabs.aquatic.client.model.block.entity.GiantGreenAnemoneBlockEntityModel
-import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider
 import net.minecraft.core.Direction
 import net.minecraft.world.level.block.DirectionalBlock
-import software.bernie.geckolib.renderer.GeoBlockRenderer
+import dev.hybridlabs.hapi.client.render.HybridGeoBlockRenderer as GeoBlockRenderer
 
 class GiantGreenAnemoneBlockEntityRenderer(context: BlockEntityRendererProvider.Context) :
-    GeoBlockRenderer<GiantGreenAnemoneBlockEntity>(GiantGreenAnemoneBlockEntityModel()) {
+    GeoBlockRenderer<GiantGreenAnemoneBlockEntity>(context, GiantGreenAnemoneBlockEntityModel()) {
 
-    override fun render(
-        animatable: GiantGreenAnemoneBlockEntity,
-        partialTick: Float,
-        poseStack: PoseStack,
-        bufferSource: MultiBufferSource,
-        packedLight: Int,
-        packedOverlay: Int
-    ) {
-        val state = animatable.blockState
-        val facing = state.getValue(DirectionalBlock.FACING)
+    override fun preRenderPass(pass: com.geckolib.renderer.base.RenderPassInfo<net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState>, collector: net.minecraft.client.renderer.SubmitNodeCollector) {
+        val poseStack = pass.poseStack()
+        val facing = pass.getOrDefaultGeckolibData(com.geckolib.renderer.GeoBlockRenderer.DIRECTION_FACING, Direction.NORTH)
 
         when(facing) {
-            Direction.NORTH -> poseStack.mulPose(Axis.YP.rotationDegrees(180f))
-            Direction.SOUTH -> poseStack.mulPose(Axis.YP.rotationDegrees(0f))
-            Direction.WEST  -> poseStack.mulPose(Axis.YP.rotationDegrees(-90f))
-            Direction.EAST  -> poseStack.mulPose(Axis.YP.rotationDegrees(90f))
+            Direction.NORTH -> poseStack.rotateDegrees(Axis.YP, 180f)
+            Direction.SOUTH -> poseStack.rotateDegrees(Axis.YP, 0f)
+            Direction.WEST  -> poseStack.rotateDegrees(Axis.YP, -90f)
+            Direction.EAST  -> poseStack.rotateDegrees(Axis.YP, 90f)
             else -> {}
         }
 
-        poseStack.pushPose()
         when (facing) {
             Direction.DOWN -> {
-                poseStack.mulPose(Axis.XP.rotationDegrees(-90f))
+                poseStack.rotateDegrees(Axis.XP, -90f)
                 poseStack.translate(0.0, -0.5, 0.5)
             }
             Direction.UP -> {
-                poseStack.mulPose(Axis.XP.rotationDegrees(-90f))
+                poseStack.rotateDegrees(Axis.XP, -90f)
                 poseStack.translate(0.0, -0.5, -0.5)
             }
             Direction.NORTH -> {
-                poseStack.mulPose(Axis.XP.rotationDegrees(90f))
+                poseStack.rotateDegrees(Axis.XP, 90f)
                 poseStack.translate(-1.0, -1.0, -1.0)
             }
             Direction.SOUTH -> {
-                poseStack.mulPose(Axis.XP.rotationDegrees(90f))
+                poseStack.rotateDegrees(Axis.XP, 90f)
                 poseStack.translate(0.0, 0.0, -1.0)
             }
             Direction.WEST -> {
-                poseStack.mulPose(Axis.XP.rotationDegrees(90f))
+                poseStack.rotateDegrees(Axis.XP, 90f)
                 poseStack.translate(0.0, -1.0, -1.0)
             }
             Direction.EAST -> {
-                poseStack.mulPose(Axis.XP.rotationDegrees(90f))
+                poseStack.rotateDegrees(Axis.XP, 90f)
                 poseStack.translate(-1.0, 0.0, -1.0)
             }
 
             else -> throw IncompatibleClassChangeError()
         }
 
-        super.render(animatable, partialTick, poseStack, bufferSource, packedLight, packedOverlay)
-        poseStack.popPose()
+        super.preRenderPass(pass, collector)
     }
 }

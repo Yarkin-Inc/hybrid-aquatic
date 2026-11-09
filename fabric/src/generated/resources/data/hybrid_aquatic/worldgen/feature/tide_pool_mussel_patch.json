@@ -1,0 +1,82 @@
+{
+  "type": "minecraft:simple_random_selector",
+  "features": [
+    {
+      "feature": {
+        "type": "minecraft:replace_single_block",
+        "targets": [
+          {
+            "state": {
+              "id": "hybrid_aquatic:wild_mussels",
+              "properties": {
+                "waterlogged": "true"
+              }
+            },
+            "target": {
+              "block_state": {
+                "id": "minecraft:water",
+                "properties": {
+                  "level": "0"
+                }
+              },
+              "predicate_type": "minecraft:blockstate_match"
+            }
+          },
+          {
+            "state": {
+              "id": "hybrid_aquatic:wild_mussels",
+              "properties": {
+                "waterlogged": "false"
+              }
+            },
+            "target": {
+              "block_state": {
+                "id": "minecraft:air"
+              },
+              "predicate_type": "minecraft:blockstate_match"
+            }
+          }
+        ]
+      },
+      "placement": [
+        {
+          "type": "minecraft:count",
+          "count": 16
+        },
+        {
+          "type": "minecraft:offset",
+          "x": {
+            "type": "minecraft:trapezoid",
+            "min": -4,
+            "max": 4,
+            "plateau": 0
+          },
+          "y": {
+            "type": "minecraft:trapezoid",
+            "min": -4,
+            "max": 4,
+            "plateau": 0
+          },
+          "z": {
+            "type": "minecraft:trapezoid",
+            "min": -4,
+            "max": 4,
+            "plateau": 0
+          }
+        },
+        {
+          "type": "minecraft:block_predicate_filter",
+          "predicate": {
+            "type": "minecraft:has_sturdy_face",
+            "direction": "up",
+            "offset": [
+              0,
+              -1,
+              0
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

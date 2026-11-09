@@ -30,11 +30,11 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.pathfinder.PathType
 import net.minecraft.world.phys.Vec3
-import software.bernie.geckolib.animation.AnimatableManager
-import software.bernie.geckolib.animation.AnimationController
-import software.bernie.geckolib.animation.PlayState
-import software.bernie.geckolib.animation.RawAnimation
-import software.bernie.geckolib.constant.DefaultAnimations
+import com.geckolib.animatable.manager.AnimatableManager
+import com.geckolib.animation.AnimationController
+import com.geckolib.animation.`object`.PlayState
+import com.geckolib.animation.RawAnimation
+import com.geckolib.constant.DefaultAnimations
 import java.util.*
 
 class HypnautilusEntity(type: EntityType<out HAMinionEntity>, world: Level) :
@@ -63,7 +63,7 @@ class HypnautilusEntity(type: EntityType<out HAMinionEntity>, world: Level) :
 
     override fun registerControllers(controllers: AnimatableManager.ControllerRegistrar) {
         controllers.add(
-            AnimationController(this, "Swim/Run/Idle", 4) { state ->
+            AnimationController<HypnautilusEntity>( "Swim/Run/Idle", 4) { state ->
                 when {
                     isInWater -> {
                         state.setAndContinue(DefaultAnimations.IDLE)
@@ -77,7 +77,7 @@ class HypnautilusEntity(type: EntityType<out HAMinionEntity>, world: Level) :
         )
 
         controllers.add(
-            AnimationController(this, "hypnosis_controller", 0) { state ->
+            AnimationController<HypnautilusEntity>( "hypnosis_controller", 0) { state ->
                 if (isHypnotizing()) {
                     state.setAndContinue(HYPNOSIS_ANIMATION)
                 } else {
@@ -115,20 +115,20 @@ class HypnautilusEntity(type: EntityType<out HAMinionEntity>, world: Level) :
         builder.define(HYPNOTIZING, false)
     }
 
-    override fun addAdditionalSaveData(nbt: CompoundTag) {
+    override fun addAdditionalSaveData(nbt: net.minecraft.world.level.storage.ValueOutput) {
         if (this.getOwner() != null) {
-            nbt.putUUID("Owner", this.getOwner()!!.uuid)
+            nbt.store("Owner", net.minecraft.core.UUIDUtil.CODEC, this.getOwner()!!.uuid)
         }
-        this.setHypnotizing(nbt.getBoolean("Hypnotizing"))
+        nbt.putBoolean("Hypnotizing", isHypnotizing())
         super.addAdditionalSaveData(nbt)
     }
 
-    override fun readAdditionalSaveData(nbt: CompoundTag) {
+    override fun readAdditionalSaveData(nbt: net.minecraft.world.level.storage.ValueInput) {
         super.readAdditionalSaveData(nbt)
         if (nbt.contains("Owner")) {
-            prevOwner = nbt.getUUID("Owner")
+            prevOwner = nbt.read("Owner", net.minecraft.core.UUIDUtil.CODEC).orElse(null)
         }
-        this.setHypnotizing(nbt.getBoolean("Hypnotizing"))
+        this.setHypnotizing(nbt.getBooleanOr("Hypnotizing", false))
     }
 
     override fun nextStep(): Float {
@@ -250,7 +250,7 @@ class HypnautilusEntity(type: EntityType<out HAMinionEntity>, world: Level) :
             override fun tick() {
                 val target = hypnautilus.calcBeastRelativePos()
                 if (hypnautilus.level().getBlockState(BlockPos.containing(target)).`is`(Blocks.WATER))
-                    hypnautilus.moveTo(hypnautilus.calcBeastRelativePos())
+                    hypnautilus.snapTo(hypnautilus.calcBeastRelativePos())
             }
         }
     }

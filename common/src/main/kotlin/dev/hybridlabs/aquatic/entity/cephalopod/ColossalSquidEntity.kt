@@ -7,7 +7,7 @@ import dev.hybridlabs.hapi.entity.base.aquatic.InkConfiguration
 import net.minecraft.core.BlockPos
 import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.MobSpawnType
+import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.level.Level
@@ -43,7 +43,7 @@ class ColossalSquidEntity(type: EntityType<out ColossalSquidEntity>, world: Leve
         fun canSpawn(
             type: EntityType<out ColossalSquidEntity>,
             world: ServerLevelAccessor,
-            reason: MobSpawnType,
+            reason: EntitySpawnReason,
             pos: BlockPos,
             random: RandomSource,
         ): Boolean {

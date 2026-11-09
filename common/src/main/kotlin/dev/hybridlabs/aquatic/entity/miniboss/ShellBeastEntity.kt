@@ -19,6 +19,7 @@ import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.BossEvent
 import net.minecraft.world.Difficulty
 import net.minecraft.world.damagesource.DamageSource
+import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.Mob
@@ -31,16 +32,19 @@ import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal
 import net.minecraft.world.entity.ai.navigation.PathNavigation
 import net.minecraft.world.entity.ai.navigation.WaterBoundPathNavigation
-import net.minecraft.world.entity.animal.IronGolem
+import net.minecraft.world.entity.animal.golem.IronGolem
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.pathfinder.PathType
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
-import software.bernie.geckolib.animation.*
-import software.bernie.geckolib.animation.AnimationController.AnimationStateHandler
-import software.bernie.geckolib.constant.DefaultAnimations
-import software.bernie.geckolib.util.ClientUtil
+import com.geckolib.animation.*
+import com.geckolib.animation.state.AnimationTest
+import com.geckolib.animatable.manager.AnimatableManager
+import com.geckolib.animation.`object`.PlayState
+import com.geckolib.animation.AnimationController.AnimationStateHandler
+import com.geckolib.constant.DefaultAnimations
+import com.geckolib.util.ClientUtil
 import java.lang.ref.WeakReference
 import java.util.Collections.synchronizedList
 import java.util.function.Predicate
@@ -70,8 +74,8 @@ class ShellBeastEntity(type: EntityType<out HAMinibossEntity>, world: Level) :
 
     override fun createNavigation(level: Level): PathNavigation {
         setPathfindingMalus(PathType.WATER, 0.0f)
-        setPathfindingMalus(PathType.DANGER_FIRE, 16.0f)
-        setPathfindingMalus(PathType.DAMAGE_FIRE, -1.0f)
+        setPathfindingMalus(PathType.FIRE_IN_NEIGHBOR, 16.0f)
+        setPathfindingMalus(PathType.FIRE, -1.0f)
 
         moveControl = SmoothStrafeSwimmingMoveControl(
             this,
@@ -92,7 +96,7 @@ class ShellBeastEntity(type: EntityType<out HAMinibossEntity>, world: Level) :
     }
 
     private var bossBar: ServerBossEvent =
-        ServerBossEvent(displayName, BossEvent.BossBarColor.YELLOW, BossEvent.BossBarOverlay.NOTCHED_6)
+        ServerBossEvent(java.util.UUID.randomUUID(), displayName, BossEvent.BossBarColor.YELLOW, BossEvent.BossBarOverlay.NOTCHED_6)
 
     override fun registerGoals() {
         goalSelector.addGoal(1, ShellBeastSummonBeaklingsGoal(this))
@@ -117,34 +121,6 @@ class ShellBeastEntity(type: EntityType<out HAMinibossEntity>, world: Level) :
         )
     }
 
-    private fun getHandSwingDuration(): Int {
-        return 20
-    }
-
-    override fun updateSwingTime() {
-        val i = this.getHandSwingDuration()
-        if (this.swinging) {
-            ++this.swingTime
-            if (this.swingTime >= i) {
-                this.swingTime = 0
-                this.swinging = false
-            }
-        } else {
-            this.swingTime = 0
-        }
-
-        this.attackAnim = swingTime.toFloat() / i.toFloat()
-    }
-
-    override fun getAttackAnim(tickDelta: Float): Float {
-        var f = this.attackAnim - this.oAttackAnim
-        if (f < 0.0f) {
-            ++f
-        }
-
-        return this.oAttackAnim + f * tickDelta
-    }
-
     override fun startSeenByPlayer(player: ServerPlayer) {
         super.startSeenByPlayer(player)
         bossBar.addPlayer(player)
@@ -156,7 +132,7 @@ class ShellBeastEntity(type: EntityType<out HAMinibossEntity>, world: Level) :
     }
 
     override fun checkDespawn() {
-        if (level().difficulty == Difficulty.PEACEFUL && this.shouldDespawnInPeaceful()) {
+        if (level().difficulty == Difficulty.PEACEFUL) {
             discard()
         } else {
             noActionTime = 0
@@ -170,7 +146,7 @@ class ShellBeastEntity(type: EntityType<out HAMinibossEntity>, world: Level) :
         builder.define(SUMMONING, false)
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
+    override fun addAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueOutput) {
         super.addAdditionalSaveData(compound)
         compound.putBoolean("Summoning", isSummoning())
         compound.putInt("SummonTimer", summonTimer)
@@ -178,15 +154,15 @@ class ShellBeastEntity(type: EntityType<out HAMinibossEntity>, world: Level) :
         compound.putInt("HypnautilusCooldown", hypnautilusCooldown)
     }
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
+    override fun readAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueInput) {
         if (hasCustomName()) {
             bossBar.name = this.displayName
         }
 
-        this.setSummoning(compound.getBoolean("Summoning"))
-        this.summonTimer = compound.getInt("SummonTimer")
-        this.beaklingCooldown = compound.getInt("BeaklingCooldown")
-        this.hypnautilusCooldown = compound.getInt("HypnautilusCooldown")
+        this.setSummoning(compound.getBooleanOr("Summoning", false))
+        this.summonTimer = compound.getIntOr("SummonTimer", 0)
+        this.beaklingCooldown = compound.getIntOr("BeaklingCooldown", 0)
+        this.hypnautilusCooldown = compound.getIntOr("HypnautilusCooldown", 0)
 
         super.readAdditionalSaveData(compound)
     }
@@ -239,12 +215,12 @@ class ShellBeastEntity(type: EntityType<out HAMinibossEntity>, world: Level) :
     override fun registerControllers(controllers: AnimatableManager.ControllerRegistrar) {
 
         controllers.add(
-            DefaultAnimations.genericSwimIdleController(this)
-                .transitionLength(8)
+            DefaultAnimations.genericSwimIdleController<ShellBeastEntity>()
+                .setTransitionTicks(8)
         )
 
         controllers.add(
-            AnimationController(this, "shoot_controller") { PlayState.STOP }
+            AnimationController<ShellBeastEntity>( "shoot_controller") { PlayState.STOP }
                 .triggerableAnim("shoot", DefaultAnimations.ATTACK_SHOOT)
                 .setSoundKeyframeHandler { event ->
                     val player = ClientUtil.getClientPlayer()
@@ -254,7 +230,7 @@ class ShellBeastEntity(type: EntityType<out HAMinibossEntity>, world: Level) :
         )
 
         controllers.add(
-            AnimationController(this, "summon_controller") { PlayState.STOP }
+            AnimationController<ShellBeastEntity>( "summon_controller") { PlayState.STOP }
                 .triggerableAnim("summon", SUMMON_ANIMATION)
                 .setSoundKeyframeHandler { event ->
                     val player = ClientUtil.getClientPlayer()
@@ -264,9 +240,9 @@ class ShellBeastEntity(type: EntityType<out HAMinibossEntity>, world: Level) :
         )
 
         controllers.add(
-            AnimationController(
-                this, "spawn_controller",
-                AnimationStateHandler { state: AnimationState<ShellBeastEntity> ->
+            AnimationController<ShellBeastEntity>(
+                 "spawn_controller",
+                AnimationStateHandler { state: AnimationTest<ShellBeastEntity> ->
                     if (this.tickCount < 120)
                         return@AnimationStateHandler state.setAndContinue(DefaultAnimations.SPAWN)
                     PlayState.STOP
@@ -313,7 +289,7 @@ class ShellBeastEntity(type: EntityType<out HAMinibossEntity>, world: Level) :
         mustSee: Boolean,
         predicate: Predicate<LivingEntity>,
     ) :
-        NearestAttackableTargetGoal<T>(shellBeast, target, mustSee, predicate) {
+        NearestAttackableTargetGoal<T>(shellBeast, target, mustSee, { candidate, _ -> predicate.test(candidate) }) {
         override fun getTargetSearchArea(targetDistance: Double): AABB {
             return this.mob.boundingBox.inflate(targetDistance)
         }
@@ -375,11 +351,11 @@ class ShellBeastEntity(type: EntityType<out HAMinibossEntity>, world: Level) :
     //    val count = 6
 
     //     for (i in 0 until count) {
-    //      val hypnautilus = HAEntityTypes.HYPNAUTILUS.get().create(level())
+    //      val hypnautilus = HAEntityTypes.HYPNAUTILUS.get().create(level(), EntitySpawnReason.MOB_SUMMONED)
     //       if (hypnautilus != null) {
     //          addMinion(hypnautilus)
     //         val spawnPos = hypnautilus.calcBeastRelativePos()
-    //         hypnautilus.moveTo(
+    //         hypnautilus.snapTo(
     //           spawnPos.x,
     //            spawnPos.y,
     //           spawnPos.z,
@@ -400,9 +376,9 @@ class ShellBeastEntity(type: EntityType<out HAMinibossEntity>, world: Level) :
             val offsetZ = (random.nextDouble() - 0.5) * 1.0
             val spawnPos = blockPosition().offset(offsetX.toInt(), 0, offsetZ.toInt())
 
-            val beakling = HAEntityTypes.BEAKLING.get().create(level())
+            val beakling = HAEntityTypes.BEAKLING.get().create(level(), EntitySpawnReason.MOB_SUMMONED)
             if (beakling != null) {
-                beakling.moveTo(
+                beakling.snapTo(
                     spawnPos.x.toDouble(),
                     spawnPos.y.toDouble(),
                     spawnPos.z.toDouble(),

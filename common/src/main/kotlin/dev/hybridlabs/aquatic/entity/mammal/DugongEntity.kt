@@ -1,5 +1,6 @@
 package dev.hybridlabs.aquatic.entity.mammal
 
+import dev.hybridlabs.hapi.entity.VariantHolder
 import dev.hybridlabs.aquatic.entity.HAEntityTypes
 import dev.hybridlabs.aquatic.sound.HASoundEvents
 import dev.hybridlabs.hapi.entity.ai.goal.aquatic.WaterAnimalBreedGoal
@@ -32,7 +33,7 @@ class DugongEntity(type: EntityType<out DugongEntity>, world: Level) : BaseSiren
     }
 
     override fun getBreedOffspring(p0: ServerLevel, p1: AgeableMob): DugongEntity? {
-        return HAEntityTypes.DUGONG.get().create(p0)
+        return HAEntityTypes.DUGONG.get().create(p0, net.minecraft.world.entity.EntitySpawnReason.BREEDING)
     }
 
     //#region SFX
@@ -60,7 +61,7 @@ class DugongEntity(type: EntityType<out DugongEntity>, world: Level) : BaseSiren
     override fun finalizeSpawn(
         world: ServerLevelAccessor,
         difficulty: DifficultyInstance,
-        spawnReason: MobSpawnType,
+        spawnReason: EntitySpawnReason,
         entityData: SpawnGroupData?
     ): SpawnGroupData? {
         variant = Type.entries.random(Random)
@@ -97,7 +98,7 @@ class DugongEntity(type: EntityType<out DugongEntity>, world: Level) : BaseSiren
                 )
 
                 fun byName(name: String?): Type {
-                    return CODEC.byName(name, PLAIN) as Type
+                    return CODEC.byName(name ?: "", PLAIN) as Type
                 }
 
                 fun fromId(id: Int): Type {
@@ -112,14 +113,14 @@ class DugongEntity(type: EntityType<out DugongEntity>, world: Level) : BaseSiren
         builder.define(TYPE, 0)
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
+    override fun addAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueOutput) {
         compound.putString("Type", this.variant.serializedName)
 
         super.addAdditionalSaveData(compound)
     }
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
-        this.variant = Type.byName(compound.getString("Type"))
+    override fun readAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueInput) {
+        this.variant = Type.byName(compound.getStringOr("Type", ""))
         super.readAdditionalSaveData(compound)
     }
 

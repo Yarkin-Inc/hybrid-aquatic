@@ -18,8 +18,11 @@ import net.minecraft.world.entity.ai.navigation.WaterBoundPathNavigation
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.pathfinder.PathType
 import net.minecraft.world.phys.Vec3
-import software.bernie.geckolib.animation.*
-import software.bernie.geckolib.constant.DefaultAnimations
+import com.geckolib.animation.*
+import com.geckolib.animation.state.AnimationTest
+import com.geckolib.animatable.manager.AnimatableManager
+import com.geckolib.animation.`object`.PlayState
+import com.geckolib.constant.DefaultAnimations
 
 class BeaklingEntity(type: EntityType<out HAMinionEntity>, world: Level) :
     HAMinionEntity(type, world) {
@@ -40,17 +43,17 @@ class BeaklingEntity(type: EntityType<out HAMinionEntity>, world: Level) :
 
     override fun registerControllers(controllers: AnimatableManager.ControllerRegistrar) {
         controllers.add(
-            AnimationController(this, "Run/Swim/Idle", 4) {
-                    state: AnimationState<BeaklingEntity> ->
-                if (this.isInWaterOrBubble && state.isMoving) state.setAndContinue(
+            AnimationController<BeaklingEntity>( "Run/Swim/Idle", 4) {
+                    state: AnimationTest<BeaklingEntity> ->
+                if (this.isInWater && state.isMoving) state.setAndContinue(
                     if (this.isSprinting) DefaultAnimations.RUN else DefaultAnimations.SWIM)
                 else state.setAndContinue(DefaultAnimations.SWIM)
             }
         )
 
         controllers.add(
-            AnimationController(this, "Flop", 4) { state ->
-                if (!this.isInWaterOrBubble) {
+            AnimationController<BeaklingEntity>( "Flop", 4) { state ->
+                if (!this.isInWater) {
                     return@AnimationController state.setAndContinue(FLOP_ANIMATION)
                 }
 
@@ -58,7 +61,7 @@ class BeaklingEntity(type: EntityType<out HAMinionEntity>, world: Level) :
             }
         )
 
-        controllers.add(DefaultAnimations.genericAttackAnimation(this, DefaultAnimations.ATTACK_BITE))
+        controllers.add(DefaultAnimations.genericAttackAnimation<BeaklingEntity>( DefaultAnimations.ATTACK_BITE))
     }
 
     override fun nextStep(): Float {

@@ -52,31 +52,21 @@ public class EntityMixin {
             method = "getBlockSpeedFactor",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/level/block/state/BlockState;is(Lnet/minecraft/world/level/block/Block;)Z")
+                    target = "Lnet/minecraft/world/level/block/state/BlockState;is(Ljava/lang/Object;)Z")
     )
-    private boolean decorativeBubbleColumn_getBlockSpeedFactorParity(BlockState instance, Block block, Operation<Boolean> original) {
-        return instance.is(HABlocks.INSTANCE.getDECORATIVE_BUBBLE_COLUMN().get()) ? block == Blocks.BUBBLE_COLUMN : original.call(instance, block);
-    }
-
-    @WrapOperation(
-            method = "isInBubbleColumn",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/level/block/state/BlockState;is(Lnet/minecraft/world/level/block/Block;)Z")
-    )
-    private boolean decorativeBubbleColumn_isInBubbleColumnParity(BlockState instance, Block block, Operation<Boolean> original) {
+    private boolean decorativeBubbleColumn_getBlockSpeedFactorParity(BlockState instance, Object block, Operation<Boolean> original) {
         return instance.is(HABlocks.INSTANCE.getDECORATIVE_BUBBLE_COLUMN().get()) ? block == Blocks.BUBBLE_COLUMN : original.call(instance, block);
     }
 
     @Inject(
-            method = "updateFluidHeightAndDoFluidPushing",
+            method = "updateFluidInteraction",
             at = @At("HEAD")
     )
 
-    private void hybridAquatic$applyBrineEffects(TagKey<Fluid> fluidTag, double motionScale, CallbackInfoReturnable<Boolean> cir) {
+    private void hybridAquatic$applyBrineEffects(CallbackInfoReturnable<Boolean> cir) {
         Entity self = (Entity) (Object) this;
 
-        if (!(self instanceof LivingEntity entity)) {
+        if (self.level().isClientSide() || !(self instanceof LivingEntity entity)) {
             return;
         }
 

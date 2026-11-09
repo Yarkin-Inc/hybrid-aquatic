@@ -39,10 +39,10 @@ class MessageInABottleBlock(settings: Properties) : BaseEntityBlock(settings), S
         this.registerDefaultState(stateDefinition.any().setValue(WATERLOGGED, false))
     }
 
-    override fun getCloneItemStack(level: LevelReader, pos: BlockPos, state: BlockState): ItemStack {
+    override fun getCloneItemStack(level: LevelReader, pos: BlockPos, state: BlockState, includeData: Boolean): ItemStack {
         val blockEntity = level.getBlockEntity(pos)
         if (blockEntity !is MessageInABottleBlockEntity) {
-            return super.getCloneItemStack(level, pos, state)
+            return super.getCloneItemStack(level, pos, state, includeData)
         }
         return createItemStack(blockEntity)
     }
@@ -71,7 +71,7 @@ class MessageInABottleBlock(settings: Properties) : BaseEntityBlock(settings), S
     ): InteractionResult {
         (level.getBlockEntity(pos) as? MessageInABottleBlockEntity)?.let { blockEntity ->
             blockEntity.variant = blockEntity.variant.next
-            return InteractionResult.sidedSuccess(level.isClientSide)
+            return InteractionResult.SUCCESS
         }
 
         return InteractionResult.PASS
@@ -89,15 +89,17 @@ class MessageInABottleBlock(settings: Properties) : BaseEntityBlock(settings), S
 
     override fun updateShape(
         state: BlockState,
-        direction: Direction,
-        neighborState: BlockState,
-        world: LevelAccessor,
+        world: net.minecraft.world.level.LevelReader,
+        tickAccess: net.minecraft.world.level.ScheduledTickAccess,
         pos: BlockPos,
-        neighborPos: BlockPos
+        direction: Direction,
+        neighborPos: BlockPos,
+        neighborState: BlockState,
+        random: net.minecraft.util.RandomSource,
     ): BlockState {
         // tick fluid when waterlogged
         if (state.getValue(WATERLOGGED)) {
-            world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world))
+            tickAccess.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world))
         }
 
         // update placement validity
@@ -105,7 +107,7 @@ class MessageInABottleBlock(settings: Properties) : BaseEntityBlock(settings), S
             return Blocks.AIR.defaultBlockState()
         }
 
-        return super.updateShape(state, direction, neighborState, world, pos, neighborPos)
+        return super.updateShape(state, world, tickAccess, pos, direction, neighborPos, neighborState, random)
     }
 
     override fun getFluidState(state: BlockState): FluidState {
@@ -125,12 +127,9 @@ class MessageInABottleBlock(settings: Properties) : BaseEntityBlock(settings), S
         builder.add(WATERLOGGED)
     }
 
-    override fun codec(): MapCodec<out BaseEntityBlock?> {
-        TODO("Not yet implemented")
-    }
 
     override fun getRenderShape(state: BlockState): RenderShape {
-        return RenderShape.ENTITYBLOCK_ANIMATED
+        return RenderShape.INVISIBLE
     }
 
     override fun newBlockEntity(pos: BlockPos, state: BlockState): BlockEntity {
@@ -174,8 +173,7 @@ class MessageInABottleBlock(settings: Properties) : BaseEntityBlock(settings), S
 
             stack.set(
                 DataComponents.BLOCK_ENTITY_DATA,
-                CustomData.of(blockEntity.getUpdateTag(RegistryAccess.EMPTY)
-                ))
+                net.minecraft.world.item.component.TypedEntityData.of(blockEntity.type, blockEntity.getUpdateTag(blockEntity.level?.registryAccess() ?: RegistryAccess.EMPTY)))
             return stack
         }
     }

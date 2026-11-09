@@ -6,18 +6,18 @@ import dev.hybridlabs.aquatic.client.render.entity.misc.layer.ArgonautShellEntit
 import dev.hybridlabs.aquatic.client.render.entity.misc.layer.ArgonautVisorEntityLayer
 import dev.hybridlabs.aquatic.entity.misc.ArgonautEntity
 import net.minecraft.client.renderer.entity.EntityRendererProvider
-import software.bernie.geckolib.renderer.GeoEntityRenderer
-import software.bernie.geckolib.renderer.layer.AutoGlowingGeoLayer
+import dev.hybridlabs.hapi.client.render.HybridGeoObjectEntityRenderer as GeoEntityRenderer
+import com.geckolib.renderer.layer.builtin.AutoGlowingGeoLayer
 
 class ArgonautEntityRenderer<T : ArgonautEntity>(
     context: EntityRendererProvider.Context
 ) : GeoEntityRenderer<T>(context, ArgonautEntityModel()) {
 
     init {
-        addRenderLayer(ArgonautVisorEntityLayer(this))
-        addRenderLayer(ArgonautSailEntityLayer(this))
-        addRenderLayer(ArgonautShellEntityLayer(this))
-        addRenderLayer(AutoGlowingGeoLayer(this))
+        withRenderLayer(ArgonautVisorEntityLayer(this))
+        withRenderLayer(ArgonautSailEntityLayer(this))
+        withRenderLayer(ArgonautShellEntityLayer(this))
+        withRenderLayer(AutoGlowingGeoLayer(this))
         this.shadowRadius = 0.3f
     }
 

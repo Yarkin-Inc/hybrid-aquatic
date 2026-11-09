@@ -34,7 +34,7 @@ class SargassumBlock(settings: Properties) :
     }
 
     override fun canPlaceLiquid(
-        p0: Player?,
+        p0: net.minecraft.world.entity.LivingEntity?,
         world: BlockGetter,
         pos: BlockPos,
         state: BlockState,
@@ -65,12 +65,9 @@ class SargassumBlock(settings: Properties) :
         return Fluids.WATER.getSource(false)
     }
 
-    override fun codec(): MapCodec<out GrowingPlantHeadBlock> {
-        return CODEC
-    }
 
     companion object {
-        val CODEC: MapCodec<SargassumBlock> = simpleCodec(::SargassumBlock)
+
         val SHAPE: VoxelShape = box(0.0, 0.0, 0.0, 16.0, 9.0, 16.0)
     }
 }

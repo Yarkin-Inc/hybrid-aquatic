@@ -1,4 +1,4 @@
 [submodule "hybrid-api"]
 	path = hybrid-api
 	url = ../hybrid-api.git
-	branch = latest
+	branch = 26.3

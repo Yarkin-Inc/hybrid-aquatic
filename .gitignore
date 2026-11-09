@@ -43,6 +43,7 @@ replay_*.log
 
 # kotlin
 .kotlin/
+**/build-port4/
 
 # Dev-run output: logs, crash dumps, world saves and per-machine configs. Regenerated on every
 # run and never useful in the repository.

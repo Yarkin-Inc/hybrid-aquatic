@@ -1,0 +1,8 @@
+// Opt-in test dependencies only. Run with -I tools/wwoo-audit.gradle.
+gradle.beforeProject { project ->
+    if (project.path == ':') project.pluginManager.withPlugin('java') {
+        project.dependencies.add('runtimeOnly', project.files(
+            '../wwoo-fot-compat/dev-mods/wwoo-fabric-26.3-3.0.1.jar',
+            '../wwoo-fot-compat/dev-mods/cristellib-fabric-26.3-3.1.13.jar'))
+    }
+}

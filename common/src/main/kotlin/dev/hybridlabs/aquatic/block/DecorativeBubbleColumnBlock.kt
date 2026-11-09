@@ -63,18 +63,20 @@ class DecorativeBubbleColumnBlock(settings: Properties): Block(settings), Bucket
 
     override fun updateShape(
         state: BlockState,
-        facing: Direction,
-        facingState: BlockState,
-        level: LevelAccessor,
+        level: net.minecraft.world.level.LevelReader,
+        tickAccess: net.minecraft.world.level.ScheduledTickAccess,
         currentPos: BlockPos,
-        facingPos: BlockPos
+        facing: Direction,
+        facingPos: BlockPos,
+        facingState: BlockState,
+        random: net.minecraft.util.RandomSource,
     ): BlockState {
-        level.scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(level))
+        tickAccess.scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(level))
         if (!state.canSurvive(level, currentPos) || facing == Direction.DOWN || facing == Direction.UP && !facingState.`is`(HABlocks.DECORATIVE_BUBBLE_COLUMN.get()) && canExistIn(facingState)) {
-            level.scheduleTick(currentPos, this, CHECK_PERIOD)
+            tickAccess.scheduleTick(currentPos, this, CHECK_PERIOD)
         }
 
-        return super.updateShape(state, facing, facingState, level, currentPos, facingPos)
+        return super.updateShape(state, level, tickAccess, currentPos, facing, facingPos, facingState, random)
     }
 
     override fun canSurvive(state: BlockState, level: LevelReader, pos: BlockPos): Boolean {
@@ -90,12 +92,12 @@ class DecorativeBubbleColumnBlock(settings: Properties): Block(settings), Bucket
         return RenderShape.INVISIBLE
     }
 
-    override fun pickupBlock(p0: Player?, level: LevelAccessor, pos: BlockPos, state: BlockState): ItemStack {
+    override fun pickupBlock(p0: net.minecraft.world.entity.LivingEntity?, level: LevelAccessor, pos: BlockPos, state: BlockState): ItemStack {
         level.setBlock(pos, Blocks.AIR.defaultBlockState(), 11)
         return ItemStack(Items.WATER_BUCKET)
     }
 
-    override fun getPickupSound(): Optional<SoundEvent?> {
+    override fun getPickupSound(): Optional<SoundEvent> {
         return Fluids.WATER.pickupSound
     }
 

@@ -1,5 +1,6 @@
 package dev.hybridlabs.aquatic.entity.crustacean
 
+import dev.hybridlabs.aquatic.entity.spawnDrop
 import dev.hybridlabs.aquatic.Constants
 import dev.hybridlabs.aquatic.item.HAItems
 import dev.hybridlabs.hapi.entity.base.aquatic.BaseCrustaceanEntity
@@ -9,7 +10,7 @@ import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.resources.ResourceKey
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.util.ByIdMap
 import net.minecraft.util.StringRepresentable
@@ -17,9 +18,9 @@ import net.minecraft.world.DifficultyInstance
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.MobSpawnType
+import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.SpawnGroupData
-import net.minecraft.world.entity.VariantHolder
+import dev.hybridlabs.hapi.entity.VariantHolder
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.player.Player
@@ -37,13 +38,7 @@ class DecoratorCrabEntity(entityType: EntityType<out DecoratorCrabEntity>, world
     BaseCrustaceanEntity(entityType, world, false),
     VariantHolder<DecoratorCrabEntity.Companion.Type> {
 
-    override fun getDefaultLootTable(): ResourceKey<LootTable?> {
-        return ResourceKey<LootTable?>.create(
-            Registries.LOOT_TABLE,
-            ResourceLocation.fromNamespaceAndPath(
-                Constants.MOD_ID, "entities/decorator_crab")
-        )
-    }
+
 
     var coralTimer: Int
         get() = entityData.get(CORAL_TIMER)
@@ -56,8 +51,8 @@ class DecoratorCrabEntity(entityType: EntityType<out DecoratorCrabEntity>, world
                 this.coralTimer = 3600
                 this.playSound(SoundEvents.SHEEP_SHEAR, 1.0f, 1.0f)
                 this.gameEvent(GameEvent.SHEAR, player)
-                itemStack.hurtAndBreak(1, player, getSlotForHand(hand))
-                spawnAtLocation(ItemStack(HAItems.CORAL_CHUNK.get()))
+                itemStack.hurtAndBreak(1, player, (if (hand == InteractionHand.MAIN_HAND) net.minecraft.world.entity.EquipmentSlot.MAINHAND else net.minecraft.world.entity.EquipmentSlot.OFFHAND))
+                spawnDrop(ItemStack(HAItems.CORAL_CHUNK.get()))
                 return InteractionResult.SUCCESS
             }
             return InteractionResult.CONSUME
@@ -76,7 +71,7 @@ class DecoratorCrabEntity(entityType: EntityType<out DecoratorCrabEntity>, world
     override fun finalizeSpawn(
         world: ServerLevelAccessor,
         difficulty: DifficultyInstance,
-        spawnReason: MobSpawnType,
+        spawnReason: EntitySpawnReason,
         entityData: SpawnGroupData?
     ): SpawnGroupData? {
         variant = Type.entries.random(Random)
@@ -114,7 +109,7 @@ class DecoratorCrabEntity(entityType: EntityType<out DecoratorCrabEntity>, world
                 )
 
                 fun byName(name: String?): Type {
-                    return CODEC.byName(name, CORAL) as Type
+                    return CODEC.byName(name ?: "", CORAL) as Type
                 }
 
                 fun fromId(id: Int): Type {
@@ -139,15 +134,15 @@ class DecoratorCrabEntity(entityType: EntityType<out DecoratorCrabEntity>, world
         super.defineSynchedData(builder)
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
+    override fun addAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueOutput) {
         compound.putString("Type", this.variant.serializedName)
         compound.putInt("CoralTimer", coralTimer)
         super.addAdditionalSaveData(compound)
     }
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
-        this.variant = Type.byName(compound.getString("Type"))
-        this.coralTimer = compound.getInt("CoralTimer")
+    override fun readAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueInput) {
+        this.variant = Type.byName(compound.getStringOr("Type", ""))
+        this.coralTimer = compound.getIntOr("CoralTimer", 0)
         super.readAdditionalSaveData(compound)
     }
     //#endregion

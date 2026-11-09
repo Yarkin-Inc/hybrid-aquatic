@@ -10,7 +10,7 @@ import dev.hybridlabs.hapi.entity.base.aquatic.BaseFishEntity
 import net.minecraft.core.BlockPos
 import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.MobSpawnType
+import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.item.ItemStack
@@ -52,12 +52,12 @@ class ParrotfishEntity(type: EntityType<out ParrotfishEntity>, world: Level) :
         fun canSpawn(
             type: EntityType<out ParrotfishEntity>,
             world: ServerLevelAccessor,
-            reason: MobSpawnType,
+            reason: EntitySpawnReason,
             pos: BlockPos,
             random: RandomSource,
         ): Boolean {
             return world.isWaterAt(pos) &&
-                    world.level.isDay &&
+                    (world.level.environmentAttributes().getValue(net.minecraft.world.attribute.EnvironmentAttributes.SKY_LIGHT_LEVEL, pos) > 11.0f) &&
                     WorldHelper.canSeeSkyFromBelowWater(world, pos)
         }
     }

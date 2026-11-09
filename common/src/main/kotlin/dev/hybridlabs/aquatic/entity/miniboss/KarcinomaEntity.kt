@@ -17,8 +17,11 @@ import net.minecraft.world.entity.ai.navigation.WaterBoundPathNavigation
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.pathfinder.PathType
 import net.minecraft.world.phys.Vec3
-import software.bernie.geckolib.animation.*
-import software.bernie.geckolib.constant.DefaultAnimations
+import com.geckolib.animation.*
+import com.geckolib.animation.state.AnimationTest
+import com.geckolib.animatable.manager.AnimatableManager
+import com.geckolib.animation.`object`.PlayState
+import com.geckolib.constant.DefaultAnimations
 
 class KarcinomaEntity(type: EntityType<out HAMinionEntity>, world: Level) :
     HAMinionEntity(type, world) {
@@ -38,17 +41,17 @@ class KarcinomaEntity(type: EntityType<out HAMinionEntity>, world: Level) :
 
     override fun registerControllers(controllers: AnimatableManager.ControllerRegistrar) {
         controllers.add(
-            AnimationController(this, "Run/Swim/Idle", 4) {
-                    state: AnimationState<KarcinomaEntity> ->
-                if (this.isInWaterOrBubble && state.isMoving) state.setAndContinue(
+            AnimationController<KarcinomaEntity>( "Run/Swim/Idle", 4) {
+                    state: AnimationTest<KarcinomaEntity> ->
+                if (this.isInWater && state.isMoving) state.setAndContinue(
                     if (this.isSprinting) DefaultAnimations.RUN else DefaultAnimations.SWIM)
                 else state.setAndContinue(DefaultAnimations.SWIM)
             }
         )
 
         controllers.add(
-            AnimationController(this, "Flop", 4) { state ->
-                if (!this.isInWaterOrBubble) {
+            AnimationController<KarcinomaEntity>( "Flop", 4) { state ->
+                if (!this.isInWater) {
                     return@AnimationController state.setAndContinue(FLOP_ANIMATION)
                 }
 
@@ -56,7 +59,7 @@ class KarcinomaEntity(type: EntityType<out HAMinionEntity>, world: Level) :
             }
         )
 
-        controllers.add(DefaultAnimations.genericAttackAnimation(this, DefaultAnimations.ATTACK_SWING))
+        controllers.add(DefaultAnimations.genericAttackAnimation<KarcinomaEntity>( DefaultAnimations.ATTACK_SWING))
     }
 
     override fun travel(travelVector: Vec3) {

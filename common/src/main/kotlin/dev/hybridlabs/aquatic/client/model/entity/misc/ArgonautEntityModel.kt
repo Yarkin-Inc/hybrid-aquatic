@@ -3,20 +3,20 @@ package dev.hybridlabs.aquatic.client.model.entity.misc
 import dev.hybridlabs.aquatic.CommonClass
 import dev.hybridlabs.aquatic.entity.misc.ArgonautEntity
 import net.minecraft.client.model.geom.PartNames
-import net.minecraft.client.renderer.RenderType
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.client.renderer.rendertype.RenderType
+import net.minecraft.resources.Identifier
 import net.minecraft.util.Mth
-import software.bernie.geckolib.animation.AnimationState
-import software.bernie.geckolib.model.GeoModel
+import dev.hybridlabs.hapi.client.model.PoseContext
+import dev.hybridlabs.hapi.client.model.HybridGeoModel as GeoModel
 
 @Suppress("OVERRIDE_DEPRECATION")
 class ArgonautEntityModel<T : ArgonautEntity>() :
     GeoModel<T>() {
-    override fun getModelResource(animatable: T): ResourceLocation {
-        return CommonClass.locate("geo/misc/argonaut.geo.json")
+    override fun getModelResource(animatable: T): Identifier {
+        return CommonClass.locate("misc/argonaut")
     }
 
-    override fun getTextureResource(animatable: T): ResourceLocation {
+    override fun getTextureResource(animatable: T): Identifier {
         return if (animatable.isGlowing()) {
             CommonClass.locate("textures/entity/misc/argonaut/glowing_argonaut.png")
         } else {
@@ -24,11 +24,11 @@ class ArgonautEntityModel<T : ArgonautEntity>() :
         }
     }
 
-    fun getVisorTextureResource(): ResourceLocation {
+    fun getVisorTextureResource(): Identifier {
         return CommonClass.locate("textures/entity/misc/argonaut/argonaut_visor.png")
     }
 
-    fun getShellTextureResource(animatable: T): ResourceLocation {
+    fun getShellTextureResource(animatable: T): Identifier {
         val textureName = when (val color = animatable.getShellColor()) {
             ArgonautEntity.ShellColor.NONE -> "argonaut_shell"
             else -> color.name.lowercase() + "_argonaut_shell"
@@ -36,7 +36,7 @@ class ArgonautEntityModel<T : ArgonautEntity>() :
         return CommonClass.locate("textures/entity/misc/argonaut/shell/$textureName.png")
     }
 
-    fun getSailTextureResource(animatable: T): ResourceLocation {
+    fun getSailTextureResource(animatable: T): Identifier {
         val textureName = when (val color = animatable.getSailColor()) {
             ArgonautEntity.SailColor.NONE -> "argonaut_sail"
             else -> color.name.lowercase() + "_argonaut_sail"
@@ -44,21 +44,21 @@ class ArgonautEntityModel<T : ArgonautEntity>() :
         return CommonClass.locate("textures/entity/misc/argonaut/sail/$textureName.png")
     }
 
-    override fun getAnimationResource(animatable: T): ResourceLocation {
-        return CommonClass.locate("animations/entity/misc/argonaut.animation.json")
+    override fun getAnimationResource(animatable: T): Identifier {
+        return CommonClass.locate("entity/misc/argonaut")
     }
 
-    override fun getRenderType(animatable: T, texture: ResourceLocation): RenderType {
-        return RenderType.entityCutoutNoCull(texture)
+    override fun getRenderType(animatable: T, texture: Identifier): RenderType {
+        return net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(texture)
     }
 
     override fun setCustomAnimations(
         animatable: T,
         instanceId: Long,
-        animationState: AnimationState<T>,
+        animationState: PoseContext,
     ) {
         val deltaTime: Float = animationState.partialTick
-        val body = animationProcessor.getBone(PartNames.BODY)
+        val body = animationState.bones.getBone(PartNames.BODY)
 
         val yawController = if (animatable.hasControllingPassenger()) animatable.controllingPassenger!! else animatable
 

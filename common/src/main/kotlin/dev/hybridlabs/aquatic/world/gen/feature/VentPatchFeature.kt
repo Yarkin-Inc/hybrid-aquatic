@@ -17,8 +17,8 @@ import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED
 import net.minecraft.world.level.levelgen.Column
-import net.minecraft.world.level.levelgen.feature.Feature
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext
+import dev.hybridlabs.aquatic.world.gen.feature.FeatureAlgorithm as Feature
+import dev.hybridlabs.aquatic.world.gen.feature.FeatureContext as FeaturePlaceContext
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider
 import java.util.*
 import java.util.function.Predicate
@@ -150,7 +150,7 @@ class VentPatchFeature(codec: Codec<VentPatchFeatureConfig>) : Feature<VentPatch
 
         val mutablePos = rootPos.mutable()
 
-        val state = ventProvider.getState(random, mutablePos)
+        val state = ventProvider.getState(world, random, mutablePos)
         if (!isValidPosition(world, mutablePos, state)) {
             return false
         }
@@ -166,7 +166,7 @@ class VentPatchFeature(codec: Codec<VentPatchFeatureConfig>) : Feature<VentPatch
         }
 
         repeat(baseThickness) {
-            val state = baseProvider.getState(random, mutablePos)
+            val state = baseProvider.getState(world, random, mutablePos)
             world.setBlock(mutablePos, state, Block.UPDATE_CLIENTS)
             mutablePos.move(Direction.UP)
         }
@@ -196,7 +196,7 @@ class VentPatchFeature(codec: Codec<VentPatchFeatureConfig>) : Feature<VentPatch
 
         val mutablePos = rootPos.mutable()
 
-        val state = giantVentProvider.getState(random, mutablePos)
+        val state = giantVentProvider.getState(world, random, mutablePos)
         if (!isValidPosition(world, mutablePos, state)) {
             return false
         }
@@ -312,7 +312,7 @@ class VentPatchFeature(codec: Codec<VentPatchFeatureConfig>) : Feature<VentPatch
                 }
             }
 
-            val state = stateProvider.getState(random, tubeWormPos)
+            val state = stateProvider.getState(world, random, tubeWormPos)
             if (isValidPosition(world, tubeWormPos, state)) {
                 val wormCount = wormCountProvider.sample(random)
                 world.setBlock(tubeWormPos, state.setValue(TubeWormBlock.WORMS, wormCount), Block.UPDATE_CLIENTS)

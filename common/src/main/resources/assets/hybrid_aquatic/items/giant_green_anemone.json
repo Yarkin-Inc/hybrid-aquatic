@@ -1,0 +1,9 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "hybrid_aquatic:item/giant_green_anemone",
+    "model": {
+      "type": "geckolib:geckolib"
+    }
+  }
+}

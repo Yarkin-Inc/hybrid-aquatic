@@ -5,9 +5,9 @@ import net.minecraft.core.BlockPos
 import net.minecraft.util.RandomSource
 import net.minecraft.world.level.LevelAccessor
 import net.minecraft.world.level.block.state.BlockState
-import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration
+import dev.hybridlabs.aquatic.world.gen.feature.config.NoneFeatureConfiguration
 
-class DeepCoralTableFeature(codec: Codec<NoneFeatureConfiguration?>) : DeepCoralFeature(codec) {
+class DeepCoralTableFeature(codec: Codec<NoneFeatureConfiguration>) : DeepCoralFeature(codec) {
 
     override fun placeFeature(
         level: LevelAccessor,

@@ -15,6 +15,6 @@ class OctopusEntityRenderer(context: Context) :
     ) {
 
     init {
-        addRenderLayer(HAOctopusEntityLayer(this))
+        withRenderLayer(HAOctopusEntityLayer(this))
     }
 }

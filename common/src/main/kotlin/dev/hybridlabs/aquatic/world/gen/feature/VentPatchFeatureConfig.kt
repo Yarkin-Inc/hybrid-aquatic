@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import dev.hybridlabs.aquatic.block.TubeWormBlock
 import net.minecraft.util.valueproviders.IntProvider
-import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration
+import dev.hybridlabs.aquatic.world.gen.feature.config.FeatureConfiguration
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider
 
 data class VentPatchFeatureConfig(
@@ -23,14 +23,14 @@ data class VentPatchFeatureConfig(
         val CODEC: Codec<VentPatchFeatureConfig> = RecordCodecBuilder.create { instance ->
             instance.group(
                 Codec.intRange(0, 512).fieldOf("floor_search_range").forGetter(VentPatchFeatureConfig::floorSearchRange),
-                BlockStateProvider.CODEC.fieldOf("base_block").forGetter(VentPatchFeatureConfig::baseProvider),
-                BlockStateProvider.CODEC.fieldOf("vent_block").forGetter(VentPatchFeatureConfig::ventProvider),
-                BlockStateProvider.CODEC.fieldOf("giant_vent_block").forGetter(VentPatchFeatureConfig::giantVentProvider),
-                BlockStateProvider.CODEC.fieldOf("worm_block").forGetter(VentPatchFeatureConfig::wormProvider),
-                IntProvider.POSITIVE_CODEC.fieldOf("count").forGetter(VentPatchFeatureConfig::count),
-                IntProvider.POSITIVE_CODEC.fieldOf("spread_radius").forGetter(VentPatchFeatureConfig::spreadRadius),
-                IntProvider.POSITIVE_CODEC.fieldOf("worm_count").forGetter(VentPatchFeatureConfig::wormCount),
-                IntProvider.POSITIVE_CODEC.fieldOf("worm_spread_radius")
+                BlockStateProvider.DIRECT_CODEC.fieldOf("base_block").forGetter(VentPatchFeatureConfig::baseProvider),
+                BlockStateProvider.DIRECT_CODEC.fieldOf("vent_block").forGetter(VentPatchFeatureConfig::ventProvider),
+                BlockStateProvider.DIRECT_CODEC.fieldOf("giant_vent_block").forGetter(VentPatchFeatureConfig::giantVentProvider),
+                BlockStateProvider.DIRECT_CODEC.fieldOf("worm_block").forGetter(VentPatchFeatureConfig::wormProvider),
+                net.minecraft.util.valueproviders.IntProviders.POSITIVE_CODEC.fieldOf("count").forGetter(VentPatchFeatureConfig::count),
+                net.minecraft.util.valueproviders.IntProviders.POSITIVE_CODEC.fieldOf("spread_radius").forGetter(VentPatchFeatureConfig::spreadRadius),
+                net.minecraft.util.valueproviders.IntProviders.POSITIVE_CODEC.fieldOf("worm_count").forGetter(VentPatchFeatureConfig::wormCount),
+                net.minecraft.util.valueproviders.IntProviders.POSITIVE_CODEC.fieldOf("worm_spread_radius")
                     .forGetter(VentPatchFeatureConfig::wormSpreadRadius),
                 TubeWormBlock.WORM_COUNT_CODEC.fieldOf("worm_count_per_block")
                     .forGetter(VentPatchFeatureConfig::wormCountPerBlock),

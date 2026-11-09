@@ -59,13 +59,14 @@ open class KarkinosMeleeAttackGoal(
         if (attackDelayTicks > 0) {
             attackDelayTicks--
             if (attackDelayTicks == 0 && pendingTarget != null && !karkinos.level().isClientSide) {
-                karkinos.doHurtTarget(pendingTarget!!)
+                karkinos.doHurtTarget(karkinos.level() as net.minecraft.server.level.ServerLevel, pendingTarget!!)
 
                 val target = pendingTarget
                 if (target is Player) {
                     val itemInUse = target.useItem
                     if (itemInUse.`is`(Items.SHIELD)) {
-                        target.disableShield()
+                        itemInUse.get(net.minecraft.core.component.DataComponents.BLOCKS_ATTACKS)?.disable(
+                            target.level() as net.minecraft.server.level.ServerLevel, target, 5f, itemInUse)
                         target.level().broadcastEntityEvent(target, 30.toByte())
                     }
                 }
@@ -101,7 +102,7 @@ open class KarkinosMeleeAttackGoal(
 
     override fun checkAndPerformAttack(enemy: LivingEntity) {
         if (canPerformAttack(enemy) && ticksUntilNextAttack <= 0 && attackDelayTicks == 0) {
-            karkinos.swing(InteractionHand.MAIN_HAND)
+            karkinos.swing(InteractionHand.MAIN_HAND, net.minecraft.world.item.component.SwingAnimation(net.minecraft.world.item.SwingAnimationType.WHACK, 40), true)
             attackDelayTicks = 10
             pendingTarget = enemy
             ticksUntilNextAttack = attackDelayTicks

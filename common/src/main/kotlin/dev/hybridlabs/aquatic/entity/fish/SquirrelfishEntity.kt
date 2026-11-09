@@ -1,5 +1,6 @@
 package dev.hybridlabs.aquatic.entity.fish
 
+import dev.hybridlabs.aquatic.entity.spawnDrop
 import dev.hybridlabs.aquatic.item.HAItems
 import dev.hybridlabs.hapi.tag.HAPIEntityTags
 import dev.hybridlabs.aquatic.world.WorldHelper
@@ -18,7 +19,7 @@ import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.*
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
-import net.minecraft.world.level.GameRules
+import net.minecraft.world.level.gamerules.GameRules
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.ServerLevelAccessor
 
@@ -63,14 +64,14 @@ class SquirrelfishEntity(type: EntityType<out SquirrelfishEntity>, world: Level)
         refreshDimensions()
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
+    override fun addAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueOutput) {
         super.addAdditionalSaveData(compound)
         compound.putInt("FishCount", getFishCount())
     }
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
+    override fun readAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueInput) {
         super.readAdditionalSaveData(compound)
-        setFishCount(compound.getInt("FishCount").coerceAtMost(THREE_FISH))
+        setFishCount(compound.getIntOr("FishCount", 0).coerceAtMost(THREE_FISH))
     }
 
     override fun tick() {
@@ -91,7 +92,7 @@ class SquirrelfishEntity(type: EntityType<out SquirrelfishEntity>, world: Level)
     override fun finalizeSpawn(
         world: ServerLevelAccessor,
         difficulty: DifficultyInstance,
-        spawnReason: MobSpawnType,
+        spawnReason: EntitySpawnReason,
         entityData: SpawnGroupData?
     ): SpawnGroupData? {
         val maxHp = getAttributeValue(Attributes.MAX_HEALTH).toFloat()
@@ -135,11 +136,11 @@ class SquirrelfishEntity(type: EntityType<out SquirrelfishEntity>, world: Level)
         super.doPush(entity)
     }
 
-    override fun hurt(source: DamageSource, amount: Float): Boolean {
+    override fun hurtServer(level: net.minecraft.server.level.ServerLevel, source: DamageSource, amount: Float): Boolean {
         val maxHp = getAttributeValue(Attributes.MAX_HEALTH).toFloat()
         val oldFraction = health / maxHp
 
-        val result = super.hurt(source, amount)
+        val result = super.hurtServer(level, source, amount)
 
         if (result && !level().isClientSide) {
             val newFraction = health / maxHp
@@ -159,12 +160,12 @@ class SquirrelfishEntity(type: EntityType<out SquirrelfishEntity>, world: Level)
             val attacker = source.directEntity
 
             if (newFishCount in 1..<oldFishCount &&
-                level().gameRules.getBoolean(GameRules.RULE_DOENTITYDROPS) &&
+                ((level() as? net.minecraft.server.level.ServerLevel)?.gameRules?.get(GameRules.ENTITY_DROPS) == true) &&
                 attacker !is BaseFishEntity &&
                 attacker !is BaseSharkEntity &&
                 attacker !is BaseCephalopodEntity &&
                 attacker !is BaseMammalEntity) {
-                spawnAtLocation(HAItems.SQUIRRELFISH.get())
+                spawnDrop(HAItems.SQUIRRELFISH.get())
             }
         }
 
@@ -191,11 +192,11 @@ class SquirrelfishEntity(type: EntityType<out SquirrelfishEntity>, world: Level)
         fun canSpawn(
             type: EntityType<out SquirrelfishEntity>,
             world: ServerLevelAccessor,
-            reason: MobSpawnType,
+            reason: EntitySpawnReason,
             pos: BlockPos,
             random: RandomSource,
         ): Boolean {
-            val skyCheck = if (world.level.isDay) {
+            val skyCheck = if ((world.level.environmentAttributes().getValue(net.minecraft.world.attribute.EnvironmentAttributes.SKY_LIGHT_LEVEL, pos) > 11.0f)) {
                 !WorldHelper.canSeeSkyFromBelowWater(world, pos)
             } else {
                 WorldHelper.canSeeSkyFromBelowWater(world, pos)

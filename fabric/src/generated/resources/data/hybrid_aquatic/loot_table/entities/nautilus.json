@@ -16,28 +16,26 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "functions": [
+          "name": "hybrid_aquatic:raw_tentacle",
+          "modifier": [
             {
-              "conditions": [
-                {
-                  "condition": "minecraft:entity_properties",
-                  "entity": "this",
-                  "predicate": {
-                    "flags": {
-                      "is_on_fire": true
-                    }
+              "type": "minecraft:furnace_smelt",
+              "condition": {
+                "entity": "this",
+                "predicate": {
+                  "minecraft:flags": {
+                    "is_on_fire": true
                   }
-                }
-              ],
-              "function": "minecraft:furnace_smelt"
+                },
+                "type": "minecraft:entity_properties"
+              }
             },
             {
               "add": false,
               "count": 1.0,
-              "function": "minecraft:set_count"
+              "type": "minecraft:set_count"
             }
-          ],
-          "name": "hybrid_aquatic:raw_tentacle"
+          ]
         }
       ],
       "rolls": 1.0

@@ -5,7 +5,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.vehicle.Boat
+import net.minecraft.world.entity.vehicle.boat.Boat
 import net.minecraft.world.item.context.BlockPlaceContext
 import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.Level
@@ -44,10 +44,10 @@ class WaterHyacinthBlock(settings: Properties) : BushBlock(settings), SimpleWate
         return fluidState.`is`(Fluids.WATER) || canSupportCenter(world, pos.below(), Direction.UP)
     }
 
-    override fun entityInside(state: BlockState, level: Level, pos: BlockPos, entity: Entity) {
-        super.entityInside(state, level, pos, entity)
+    override fun entityInside(state: BlockState, level: Level, pos: BlockPos, entity: Entity, effectApplier: net.minecraft.world.entity.InsideBlockEffectApplier, isPrecise: Boolean) {
+        super.entityInside(state, level, pos, entity, effectApplier, isPrecise)
         if (level is ServerLevel && entity is Boat) {
-            level.destroyBlock(BlockPos(pos), true, entity)
+            level.destroyBlock(pos, true, entity)
         }
     }
 
@@ -64,21 +64,23 @@ class WaterHyacinthBlock(settings: Properties) : BushBlock(settings), SimpleWate
 
     override fun updateShape(
         state: BlockState,
-        direction: Direction,
-        neighborState: BlockState,
-        world: LevelAccessor,
+        world: net.minecraft.world.level.LevelReader,
+        tickAccess: net.minecraft.world.level.ScheduledTickAccess,
         pos: BlockPos,
+        direction: Direction,
         neighborPos: BlockPos,
+        neighborState: BlockState,
+        random: net.minecraft.util.RandomSource,
     ): BlockState {
         if (state.getValue(WATERLOGGED)) {
-            world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world))
+            tickAccess.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world))
         }
 
         if (!canSurvive(state, world, pos)) {
             return Blocks.AIR.defaultBlockState()
         }
 
-        return super.updateShape(state, direction, neighborState, world, pos, neighborPos)
+        return super.updateShape(state, world, tickAccess, pos, direction, neighborPos, neighborState, random)
     }
 
     override fun getShape(
@@ -94,16 +96,13 @@ class WaterHyacinthBlock(settings: Properties) : BushBlock(settings), SimpleWate
         return if (state.getValue(WATERLOGGED)) Fluids.WATER.getSource(false) else super.getFluidState(state)
     }
 
-    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block?, BlockState?>) {
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
         builder.add(WATERLOGGED)
     }
 
-    override fun codec(): MapCodec<out BushBlock> {
-        return CODEC
-    }
 
     companion object {
-        val CODEC: MapCodec<WaterHyacinthBlock> = simpleCodec(::WaterHyacinthBlock)
+
         private val SHAPE: VoxelShape = box(3.0, 14.0, 3.0, 13.0, 16.0, 13.0)
     }
 }

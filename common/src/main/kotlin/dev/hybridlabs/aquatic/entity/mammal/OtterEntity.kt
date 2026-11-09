@@ -1,5 +1,6 @@
 package dev.hybridlabs.aquatic.entity.mammal
 
+import dev.hybridlabs.hapi.entity.VariantHolder
 import dev.hybridlabs.aquatic.entity.HAEntityTypes
 import dev.hybridlabs.aquatic.item.HAItems
 import dev.hybridlabs.aquatic.sound.HASoundEvents
@@ -46,10 +47,10 @@ import net.minecraft.world.level.levelgen.Heightmap
 import net.minecraft.world.level.pathfinder.PathType
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
-import software.bernie.geckolib.animation.AnimatableManager
-import software.bernie.geckolib.animation.AnimationController
-import software.bernie.geckolib.animation.RawAnimation
-import software.bernie.geckolib.constant.DefaultAnimations
+import com.geckolib.animatable.manager.AnimatableManager
+import com.geckolib.animation.AnimationController
+import com.geckolib.animation.RawAnimation
+import com.geckolib.constant.DefaultAnimations
 import java.util.*
 import java.util.function.IntFunction
 
@@ -70,8 +71,8 @@ class OtterEntity(entityType: EntityType<out OtterEntity>, world: Level) : BaseM
     init {
         setPathfindingMalus(PathType.WATER_BORDER, 0.0f)
         setPathfindingMalus(PathType.WATER, 0.0f)
-        setPathfindingMalus(PathType.DANGER_FIRE, 16.0f)
-        setPathfindingMalus(PathType.DAMAGE_FIRE, -1.0f)
+        setPathfindingMalus(PathType.FIRE_IN_NEIGHBOR, 16.0f)
+        setPathfindingMalus(PathType.FIRE, -1.0f)
 
         moveControl = swimControl
         lookControl = OtterLookControl(this)
@@ -112,9 +113,9 @@ class OtterEntity(entityType: EntityType<out OtterEntity>, world: Level) : BaseM
      *
      * We want otters to seek air for the behavior, but it's too sad when they drown.
      */
-    override fun hurt(source: DamageSource, amount: Float): Boolean {
+    override fun hurtServer(level: net.minecraft.server.level.ServerLevel, source: DamageSource, amount: Float): Boolean {
         if (source == damageSources().drown()) return false
-        return super.hurt(source, amount)
+        return super.hurtServer(level, source, amount)
     }
 
     /* A little boost to help short fellas get up slopes. */
@@ -165,7 +166,7 @@ class OtterEntity(entityType: EntityType<out OtterEntity>, world: Level) : BaseM
     override fun finalizeSpawn(
         world: ServerLevelAccessor,
         difficulty: DifficultyInstance,
-        spawnReason: MobSpawnType,
+        spawnReason: EntitySpawnReason,
         entityData: SpawnGroupData?,
     ): SpawnGroupData? {
         val biome = world.getBiome(this.blockPosition())
@@ -202,7 +203,7 @@ class OtterEntity(entityType: EntityType<out OtterEntity>, world: Level) : BaseM
     //#endregion
 
     override fun getBreedOffspring(p0: ServerLevel, p1: AgeableMob): OtterEntity? {
-        return HAEntityTypes.OTTER.get().create(p0)
+        return HAEntityTypes.OTTER.get().create(p0, net.minecraft.world.entity.EntitySpawnReason.BREEDING)
     }
 
     override fun getWaterline(): Float {
@@ -213,7 +214,7 @@ class OtterEntity(entityType: EntityType<out OtterEntity>, world: Level) : BaseM
     /* Animation controller triggers based on the OtterAction enum in otter.action, which is set by various goals */
     override fun registerControllers(controllers: AnimatableManager.ControllerRegistrar) {
         controllers.add(
-            AnimationController(this, "otter_controller", 8) { state ->
+            AnimationController<OtterEntity>( "otter_controller", 8) { state ->
                 when {
                     state.isMoving && getAction() == OtterAction.WALKING ->
                         state.setAndContinue(DefaultAnimations.WALK)
@@ -291,7 +292,7 @@ class OtterEntity(entityType: EntityType<out OtterEntity>, world: Level) : BaseM
                 )
 
                 fun byName(name: String?): OtterAction {
-                    return OtterAction.CODEC.byName(name, IDLE) as OtterAction
+                    return OtterAction.CODEC.byName(name ?: "", IDLE) as OtterAction
                 }
 
                 fun fromId(id: Int): OtterAction {
@@ -317,7 +318,7 @@ class OtterEntity(entityType: EntityType<out OtterEntity>, world: Level) : BaseM
                 )
 
                 fun byName(name: String?): Type {
-                    return CODEC.byName(name, RIVER) as Type
+                    return CODEC.byName(name ?: "", RIVER) as Type
                 }
 
                 fun fromId(id: Int): Type {
@@ -358,7 +359,7 @@ class OtterEntity(entityType: EntityType<out OtterEntity>, world: Level) : BaseM
         super.defineSynchedData(builder)
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
+    override fun addAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueOutput) {
         compound.putString("Type", this.variant.serializedName)
         compound.putInt(HUNGER_KEY, hunger)
         compound.putString("Action", this.getAction().serializedName)
@@ -366,10 +367,10 @@ class OtterEntity(entityType: EntityType<out OtterEntity>, world: Level) : BaseM
         super.addAdditionalSaveData(compound)
     }
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
-        this.variant = Type.byName(compound.getString("Type"))
-        hunger = compound.getInt(HUNGER_KEY)
-        this.setAction(OtterAction.byName(compound.getString("Action")))
+    override fun readAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueInput) {
+        this.variant = Type.byName(compound.getStringOr("Type", ""))
+        hunger = compound.getIntOr(HUNGER_KEY, 0)
+        this.setAction(OtterAction.byName(compound.getStringOr("Action", "")))
         super.readAdditionalSaveData(compound)
     }
 
@@ -412,8 +413,8 @@ class OtterEntity(entityType: EntityType<out OtterEntity>, world: Level) : BaseM
             if (canPerformAttack(enemy))
             {
                 this.resetAttackCooldown()
-                otter.swing(InteractionHand.MAIN_HAND)
-                otter.doHurtTarget(enemy)
+                otter.swing(InteractionHand.MAIN_HAND, net.minecraft.world.item.component.SwingAnimation(net.minecraft.world.item.SwingAnimationType.WHACK, 20), true)
+                otter.doHurtTarget(otter.level() as net.minecraft.server.level.ServerLevel, enemy)
 
                 if (enemy.health <= 0) otter.hunger = MAX_HUNGER
                 otter.health = otter.maxHealth
@@ -531,13 +532,13 @@ class OtterEntity(entityType: EntityType<out OtterEntity>, world: Level) : BaseM
              */
             val pos = otter.blockPosition().mutable()
             val angle = otter.random.nextFloat() * Mth.TWO_PI
-            val vec = Vec2(Mth.cos(angle), Mth.sin(angle))
+            val vec = Vec2(kotlin.math.cos(angle), kotlin.math.sin(angle))
             vec.scale((otter.random.nextFloat() * 6) + 2)
             pos.move(vec.x.toInt(), 0, vec.y.toInt())
             pos.y = otter.level().getHeight(Heightmap.Types.OCEAN_FLOOR, pos.x, pos.z) + 1
 
             if (otter.level().getBlockState(pos) == Blocks.WATER.defaultBlockState()) {
-                target = pos.center
+                target = Vec3.atCenterOf(pos)
                 otter.navigation.moveTo(target.x, target.y, target.z, speedModifier)
             }
         }
@@ -595,7 +596,7 @@ class OtterEntity(entityType: EntityType<out OtterEntity>, world: Level) : BaseM
     internal class OtterMoveControl(
         val otter: OtterEntity, maxTurnX: Int, maxTurnY: Int, inWaterSpeedModifier: Float,
         outsideWaterSpeedModifier: Float, var applyGravity: Boolean,
-    ) : SmoothSwimmingMoveControl(otter, maxTurnX, maxTurnY, inWaterSpeedModifier, outsideWaterSpeedModifier, false) {
+    ) : SmoothSwimmingMoveControl<OtterEntity>(otter, maxTurnX, maxTurnY, inWaterSpeedModifier, outsideWaterSpeedModifier, false) {
 
         override fun tick() {
             if (this.applyGravity && otter.isInWater) {

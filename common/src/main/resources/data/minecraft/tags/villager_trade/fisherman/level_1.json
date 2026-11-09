@@ -1,0 +1,20 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "hybrid_aquatic:trades_enabled"
+    }
+  ],
+  "values": [
+    "hybrid_aquatic:fisherman/1/coconut_crab_claw",
+    "hybrid_aquatic:fisherman/1/dungeness_crab_claw",
+    "hybrid_aquatic:fisherman/1/flower_crab_claw",
+    "hybrid_aquatic:fisherman/1/fiddler_crab_claw",
+    "hybrid_aquatic:fisherman/1/ghost_crab_claw",
+    "hybrid_aquatic:fisherman/1/lightfoot_crab_claw",
+    "hybrid_aquatic:fisherman/1/yeti_crab_claw",
+    "hybrid_aquatic:fisherman/1/vampire_crab_claw",
+    "hybrid_aquatic:fisherman/1/spider_crab_claw",
+    "hybrid_aquatic:fisherman/1/raw_fish_meat",
+    "hybrid_aquatic:fisherman/1/raw_fish_steak"
+  ]
+}

@@ -1,5 +1,6 @@
 package dev.hybridlabs.aquatic.entity.cephalopod
 
+import dev.hybridlabs.hapi.entity.VariantHolder
 import com.mojang.serialization.Codec
 import dev.hybridlabs.aquatic.entity.feature.OverlayTextureFeature
 import dev.hybridlabs.hapi.tag.HAPIBiomeTags
@@ -37,7 +38,7 @@ class OctopusEntity(type: EntityType<out OctopusEntity>, world: Level) : BaseOct
     override fun finalizeSpawn(
         world: ServerLevelAccessor,
         difficulty: DifficultyInstance,
-        spawnReason: MobSpawnType,
+        spawnReason: EntitySpawnReason,
         entityData: SpawnGroupData?,
     ): SpawnGroupData? {
         val biome = world.getBiome(this.blockPosition())
@@ -117,7 +118,7 @@ class OctopusEntity(type: EntityType<out OctopusEntity>, world: Level) : BaseOct
                 )
 
                 fun byName(name: String?): Type {
-                    return CODEC.byName(name, OCTOPUS) as Type
+                    return CODEC.byName(name ?: "", OCTOPUS) as Type
                 }
 
                 fun fromId(id: Int): Type {
@@ -143,14 +144,14 @@ class OctopusEntity(type: EntityType<out OctopusEntity>, world: Level) : BaseOct
         }
     }
 
-    override fun hurt(source: DamageSource, amount: Float): Boolean {
+    override fun hurtServer(level: net.minecraft.server.level.ServerLevel, source: DamageSource, amount: Float): Boolean {
         val attacker = source.directEntity
 
         if (this.variant == Type.BLUE_RINGED && attacker is LivingEntity) {
             attacker.addEffect(MobEffectInstance(MobEffects.POISON, 100, 1))
         }
 
-        return super.hurt(source, amount)
+        return super.hurtServer(level, source, amount)
     }
 
     private var overlayTexture
@@ -169,16 +170,16 @@ class OctopusEntity(type: EntityType<out OctopusEntity>, world: Level) : BaseOct
         super.defineSynchedData(builder)
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
+    override fun addAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueOutput) {
         compound.putString("Type", this.variant.serializedName)
         compound.putInt("texture_overlay", this.overlayTexture.id)
         super.addAdditionalSaveData(compound)
     }
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
-        this.variant = Type.byName(compound.getString("Type"))
+    override fun readAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueInput) {
+        this.variant = Type.byName(compound.getStringOr("Type", ""))
         if (compound.contains("texture_overlay")) this.overlayTexture =
-            OverlayTextures.byId(compound.getInt("texture_overlay"))
+            OverlayTextures.byId(compound.getIntOr("texture_overlay", 0))
         super.readAdditionalSaveData(compound)
     }
 

@@ -6,19 +6,19 @@ import dev.hybridlabs.hapi.entity.base.aquatic.BaseCrustaceanEntity
 import net.minecraft.core.BlockPos
 import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.MobSpawnType
+import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal
-import net.minecraft.world.entity.animal.Turtle
+import net.minecraft.world.entity.animal.turtle.Turtle
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.ServerLevelAccessor
-import software.bernie.geckolib.animation.AnimatableManager
-import software.bernie.geckolib.animation.AnimationController
-import software.bernie.geckolib.animation.AnimationController.AnimationStateHandler
-import software.bernie.geckolib.animation.AnimationState
-import software.bernie.geckolib.animation.PlayState
-import software.bernie.geckolib.constant.DefaultAnimations
+import com.geckolib.animatable.manager.AnimatableManager
+import com.geckolib.animation.AnimationController
+import com.geckolib.animation.AnimationController.AnimationStateHandler
+import com.geckolib.animation.state.AnimationTest
+import com.geckolib.animation.`object`.PlayState
+import com.geckolib.constant.DefaultAnimations
 
 @Suppress("UNUSED_PARAMETER", "DEPRECATION")
 class CoconutCrabEntity(entityType: EntityType<out CoconutCrabEntity>, world: Level) :
@@ -37,9 +37,9 @@ class CoconutCrabEntity(entityType: EntityType<out CoconutCrabEntity>, world: Le
         super.registerControllers(controllerRegistrar)
 
         controllerRegistrar.add(
-            AnimationController(
-                this, "Spawning",
-                AnimationStateHandler { state: AnimationState<BaseCrustaceanEntity> ->
+            AnimationController<BaseCrustaceanEntity>(
+                 "Spawning",
+                AnimationStateHandler { state: AnimationTest<BaseCrustaceanEntity> ->
                     if (this.tickCount < 20)
                         return@AnimationStateHandler state.setAndContinue(DefaultAnimations.SPAWN)
                     PlayState.STOP
@@ -50,9 +50,9 @@ class CoconutCrabEntity(entityType: EntityType<out CoconutCrabEntity>, world: Le
         )
 
         controllerRegistrar.add(
-            AnimationController(
-                this, "Digging",
-                AnimationStateHandler { state: AnimationState<BaseCrustaceanEntity> ->
+            AnimationController<BaseCrustaceanEntity>(
+                 "Digging",
+                AnimationStateHandler { state: AnimationTest<BaseCrustaceanEntity> ->
                     if (this.isDigging())
                         return@AnimationStateHandler state.setAndContinue(DIG_ANIMATION)
                     PlayState.STOP
@@ -60,7 +60,7 @@ class CoconutCrabEntity(entityType: EntityType<out CoconutCrabEntity>, world: Le
             )
         )
         controllerRegistrar.add(
-            DefaultAnimations.genericAttackAnimation(this, DefaultAnimations.ATTACK_SWING))
+            DefaultAnimations.genericAttackAnimation<CoconutCrabEntity>( DefaultAnimations.ATTACK_SWING))
     }
 
     companion object {
@@ -76,7 +76,7 @@ class CoconutCrabEntity(entityType: EntityType<out CoconutCrabEntity>, world: Le
         fun canSpawn(
             type: EntityType<out CoconutCrabEntity>,
             world: ServerLevelAccessor,
-            reason: MobSpawnType,
+            reason: EntitySpawnReason,
             pos: BlockPos,
             random: RandomSource,
         ): Boolean {
@@ -84,7 +84,7 @@ class CoconutCrabEntity(entityType: EntityType<out CoconutCrabEntity>, world: Le
             return pos.y <= seaLevel + 4 &&
                     world.getBlockState(pos.below()).isSolid &&
                     world.isEmptyBlock(pos) &&
-                    world.level.isDay &&
+                    (world.level.environmentAttributes().getValue(net.minecraft.world.attribute.EnvironmentAttributes.SKY_LIGHT_LEVEL, pos) > 11.0f) &&
                     WorldHelper.canSeeSkyFromBelowWater(world, pos)
         }
     }

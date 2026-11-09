@@ -9,7 +9,7 @@ import net.minecraft.sounds.SoundEvents
 import net.minecraft.util.RandomSource
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.MobSpawnType
+import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.level.Level
@@ -33,7 +33,7 @@ class NautilusEntity(type: EntityType<out NautilusEntity>, world: Level) : BaseC
         fun canSpawn(
             type: EntityType<out NautilusEntity>,
             world: ServerLevelAccessor,
-            reason: MobSpawnType,
+            reason: EntitySpawnReason,
             pos: BlockPos,
             random: RandomSource,
         ): Boolean {
@@ -41,7 +41,7 @@ class NautilusEntity(type: EntityType<out NautilusEntity>, world: Level) : BaseC
             val nightSpawn = (seaLevel - 256)..(seaLevel - 8)
             val daySpawn = (seaLevel - 256)..(seaLevel - 48)
 
-            val spawnY = if (!world.level.isDay) nightSpawn else daySpawn
+            val spawnY = if (!(world.level.environmentAttributes().getValue(net.minecraft.world.attribute.EnvironmentAttributes.SKY_LIGHT_LEVEL, pos) > 11.0f)) nightSpawn else daySpawn
 
             return pos.y in spawnY && world.isWaterAt(pos)
         }

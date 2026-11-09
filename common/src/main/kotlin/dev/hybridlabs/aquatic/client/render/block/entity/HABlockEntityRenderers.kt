@@ -3,7 +3,7 @@ package dev.hybridlabs.aquatic.client.render.block.entity
 import dev.hybridlabs.aquatic.block.HABlocks
 import dev.hybridlabs.aquatic.block.entity.HABlockEntityTypes
 import dev.hybridlabs.aquatic.platform.ClientServices
-import net.minecraft.client.renderer.RenderType
+import net.minecraft.client.renderer.rendertype.RenderType
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers
 
 object HABlockEntityRenderers {
@@ -34,12 +34,5 @@ object HABlockEntityRenderers {
             ::BellBuoyBlockEntityRenderer
         )
 
-        ClientServices.PLATFORM.registerBlockRenderers(
-            RenderType.translucent(),
-            HABlocks.ANEMONE.get(),
-            HABlocks.GIANT_GREEN_ANEMONE.get(),
-            HABlocks.STRAWBERRY_ANEMONE.get(),
-            HABlocks.MESSAGE_IN_A_BOTTLE.get(),
-        )
     }
 }

@@ -31,6 +31,8 @@ open class PrimedDepthChargeEntity(
 
     private var owner: LivingEntity? = null
 
+    override fun hurtServer(level: net.minecraft.server.level.ServerLevel, source: net.minecraft.world.damagesource.DamageSource, damage: Float): Boolean = false
+
     override fun getMovementEmission(): MovementEmission {
         return MovementEmission.NONE
     }
@@ -58,7 +60,7 @@ open class PrimedDepthChargeEntity(
                 this.explode()
             }
         } else {
-            this.updateInWaterStateAndDoFluidPushing()
+            this.updateFluidInteraction()
             if (this.level().isClientSide) {
                 this.level()
                     .addParticle(ParticleTypes.BUBBLE_COLUMN_UP, this.x, this.y + 0.5, this.z, 0.0, 0.0, 0.0)
@@ -84,15 +86,15 @@ open class PrimedDepthChargeEntity(
 
     //#region Data
     override fun defineSynchedData(builder: SynchedEntityData.Builder) {
-        builder.define<Int?>(DATA_FUSE_ID, 100)
+        builder.define<Int>(DATA_FUSE_ID, 100)
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
+    override fun addAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueOutput) {
         compound.putShort("Fuse", this.fuse.toShort())
     }
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
-        this.fuse = compound.getShort("Fuse").toInt()
+    override fun readAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueInput) {
+        this.fuse = compound.getShortOr("Fuse", 100.toShort()).toInt()
     }
     //#endregion
 
@@ -101,8 +103,8 @@ open class PrimedDepthChargeEntity(
     }
 
     var fuse: Int
-        get() = this.entityData.get<Int?>(DATA_FUSE_ID) as Int
-        set(life) { this.entityData.set<Int?>(DATA_FUSE_ID, life)
+        get() = this.entityData.get<Int>(DATA_FUSE_ID) as Int
+        set(life) { this.entityData.set<Int>(DATA_FUSE_ID, life)
         }
 
     init {
@@ -110,7 +112,7 @@ open class PrimedDepthChargeEntity(
     }
 
     companion object {
-        private val DATA_FUSE_ID: EntityDataAccessor<Int?> =
-            SynchedEntityData.defineId<Int?>(PrimedDepthChargeEntity::class.java, EntityDataSerializers.INT)
+        private val DATA_FUSE_ID: EntityDataAccessor<Int> =
+            SynchedEntityData.defineId<Int>(PrimedDepthChargeEntity::class.java, EntityDataSerializers.INT)
     }
 }

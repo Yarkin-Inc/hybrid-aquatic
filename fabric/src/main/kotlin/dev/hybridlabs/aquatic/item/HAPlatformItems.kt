@@ -45,8 +45,8 @@ object HAPlatformItems {
     val GLOWSLIME_BLOCK = registerBlockItem("glowslime_block") { HAPlatformBlocks.GLOWSLIME_BLOCK.get() }
     val HAGSLIME_BLOCK = registerBlockItem("hagslime_block") { HAPlatformBlocks.HAGSLIME_BLOCK.get() }
 
-    val BRINE_BUCKET = register("brine_bucket") {
-        BucketItem(HAPlatformFluids.BRINE_STILL.get(),Item.Properties()
+    val BRINE_BUCKET = register("brine_bucket") { properties ->
+        BucketItem(HAPlatformFluids.BRINE_STILL.get(),properties
             .stacksTo(1)
             .craftRemainder(Items.BUCKET)
     ) }

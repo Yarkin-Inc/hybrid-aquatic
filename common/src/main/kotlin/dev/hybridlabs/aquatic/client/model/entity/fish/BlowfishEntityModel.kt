@@ -3,15 +3,15 @@ package dev.hybridlabs.aquatic.client.model.entity.fish
 import dev.hybridlabs.aquatic.CommonClass
 import dev.hybridlabs.aquatic.entity.fish.BlowfishEntity
 import dev.hybridlabs.hapi.client.model.entity.aquatic.BaseFishEntityModel
-import net.minecraft.client.renderer.RenderType
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.client.renderer.rendertype.RenderType
+import net.minecraft.resources.Identifier
 
 class BlowfishEntityModel : BaseFishEntityModel<BlowfishEntity>("hybrid_aquatic", "blowfish") {
-    override fun getRenderType(animatable: BlowfishEntity, texture: ResourceLocation): RenderType {
-        return RenderType.entityTranslucent(texture)
+    override fun getRenderType(animatable: BlowfishEntity, texture: Identifier): RenderType {
+        return net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucent(texture)
     }
 
-    override fun getTextureResource(animatable: BlowfishEntity): ResourceLocation {
+    override fun getTextureResource(animatable: BlowfishEntity): Identifier {
         val puffState = animatable.getPuffState()
 
         val texturePath = when (puffState) {
@@ -23,13 +23,13 @@ class BlowfishEntityModel : BaseFishEntityModel<BlowfishEntity>("hybrid_aquatic"
         return CommonClass.locate(texturePath)
     }
 
-    override fun getModelResource(animatable: BlowfishEntity): ResourceLocation {
+    override fun getModelResource(animatable: BlowfishEntity): Identifier {
         val puffState = animatable.getPuffState()
 
         val texturePath = when (puffState) {
-            0 -> "geo/fish/blowfish/blowfish_small.geo.json"
-            1 -> "geo/fish/blowfish/blowfish_medium.geo.json"
-            else -> "geo/fish/blowfish/blowfish_large.geo.json"
+            0 -> "fish/blowfish/blowfish_small"
+            1 -> "fish/blowfish/blowfish_medium"
+            else -> "fish/blowfish/blowfish_large"
         }
 
         return CommonClass.locate(texturePath)

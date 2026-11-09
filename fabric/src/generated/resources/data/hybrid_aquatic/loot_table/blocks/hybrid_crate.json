@@ -9,15 +9,13 @@
           "children": [
             {
               "type": "minecraft:loot_table",
-              "conditions": [
-                {
-                  "condition": "minecraft:match_tool",
-                  "predicate": {
-                    "items": "#minecraft:axes"
-                  }
-                }
-              ],
-              "value": "hybrid_aquatic:gameplay/hybrid_crate_treasure"
+              "value": "hybrid_aquatic:gameplay/hybrid_crate_treasure",
+              "condition": {
+                "predicate": {
+                  "items": "#minecraft:axes"
+                },
+                "type": "minecraft:match_tool"
+              }
             },
             {
               "type": "minecraft:item",

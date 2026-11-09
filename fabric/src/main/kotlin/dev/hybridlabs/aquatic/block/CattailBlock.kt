@@ -6,7 +6,7 @@ import net.minecraft.world.level.LevelReader
 import net.minecraft.world.level.block.state.BlockState
 
 class CattailBlock(settings: Properties) : BaseCattailBlock(settings) {
-    override fun getCloneItemStack(world: LevelReader, pos: BlockPos, state: BlockState): ItemStack {
+    override fun getCloneItemStack(world: LevelReader, pos: BlockPos, state: BlockState, includeData: Boolean): ItemStack {
         return ItemStack(HAPlatformBlocks.CATTAIL.get())
     }
 }

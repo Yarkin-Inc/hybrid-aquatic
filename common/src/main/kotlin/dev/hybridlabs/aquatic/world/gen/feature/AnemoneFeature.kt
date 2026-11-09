@@ -9,9 +9,9 @@ import net.minecraft.world.level.WorldGenLevel
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.DirectionalBlock
 import net.minecraft.world.level.block.state.BlockState
-import net.minecraft.world.level.levelgen.feature.Feature
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext
-import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration
+import dev.hybridlabs.aquatic.world.gen.feature.FeatureAlgorithm as Feature
+import dev.hybridlabs.aquatic.world.gen.feature.FeatureContext as FeaturePlaceContext
+import dev.hybridlabs.aquatic.world.gen.feature.config.NoneFeatureConfiguration
 
 class AnemoneFeature : Feature<NoneFeatureConfiguration>(NoneFeatureConfiguration.CODEC) {
     override fun place(context: FeaturePlaceContext<NoneFeatureConfiguration>): Boolean {
@@ -57,8 +57,8 @@ class AnemoneFeature : Feature<NoneFeatureConfiguration>(NoneFeatureConfiguratio
 
     private fun getRandomAnemoneState(level: LevelAccessor, random: RandomSource): BlockState? {
         val possibleBlocks = level.registryAccess()
-            .registryOrThrow(net.minecraft.core.registries.Registries.BLOCK)
-            .getTag(HABlockTags.ANEMONES).orElse(null)
+            .lookupOrThrow(net.minecraft.core.registries.Registries.BLOCK)
+            .get(HABlockTags.ANEMONES).orElse(null)
             ?.toList()
             ?: return null
 

@@ -5,7 +5,7 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.registries.Registries
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.tags.TagKey
 import net.minecraft.world.entity.EntityType
 import java.util.concurrent.CompletableFuture
@@ -23,6 +23,6 @@ class EntityTypeTagProvider(output: FabricDataOutput, registriesFuture: Completa
 
     companion object {
         private val HAPI_BOATS: TagKey<EntityType<*>> =
-            TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath("hapi", "boats"))
+            TagKey.create(Registries.ENTITY_TYPE, Identifier.fromNamespaceAndPath("hapi", "boats"))
     }
 }

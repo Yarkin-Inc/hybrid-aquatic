@@ -1,0 +1,6 @@
+{
+  "sound_event": "hybrid_aquatic:item.ominous_conch.blows",
+  "use_duration": 7.0,
+  "range": 256.0,
+  "description": { "translate": "item.hybrid_aquatic.ominous_conch" }
+}

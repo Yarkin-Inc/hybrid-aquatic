@@ -10,6 +10,6 @@ class WhaleSharkEntityRenderer(context: Context) :
     BaseSharkEntityRenderer<WhaleSharkEntity>(context, WhaleSharkEntityModel(), true) {
 
     init {
-        addRenderLayer(HASharkEntityLayer(this))
+        withRenderLayer(HASharkEntityLayer(this))
     }
 }

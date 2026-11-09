@@ -1,10 +1,10 @@
 package dev.hybridlabs.aquatic.client.render.particle
 
 import dev.hybridlabs.aquatic.particle.*
-import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry
+import net.fabricmc.fabric.api.client.particle.v1.ParticleProviderRegistry
 
 object HAParticleRendererRegistry {
-    private val particleFactoryRegistry = ParticleFactoryRegistry.getInstance()
+    private val particleFactoryRegistry = ParticleProviderRegistry.getInstance()
 
     init {
         particleFactoryRegistry.register(HAParticleTypes.SARGASSUM.get()) { sprites ->

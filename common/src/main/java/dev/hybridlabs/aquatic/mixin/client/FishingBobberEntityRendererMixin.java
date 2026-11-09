@@ -5,10 +5,10 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.hybridlabs.aquatic.CommonClass;
 import dev.hybridlabs.aquatic.access.CustomFishingBobberEntityData;
 import dev.hybridlabs.aquatic.item.HAItems;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.FishingHookRenderer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -36,41 +36,27 @@ public abstract class FishingBobberEntityRendererMixin {
     private static final RenderType OMINOUS_HOOK_LAYER = getRenderType(CommonClass.locate("textures/entity/bobber" +
             "/ominous_bobber.png"));
 
-    @Unique
-    FishingHook entity;
-
-    @Inject(method = "render(Lnet/minecraft/world/entity/projectile/FishingHook;" + "FFLcom/mojang/blaze3d/vertex" +
-            "/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V", at = @At(value = "HEAD"))
-    private void objectGetter(FishingHook fishingBobberEntity, float f, float g, PoseStack matrixStack,
-                              MultiBufferSource vertexConsumerProvider, int i, CallbackInfo ci) {
-        entity = fishingBobberEntity;
+    @Inject(method = "extractRenderState(Lnet/minecraft/world/entity/projectile/FishingHook;Lnet/minecraft/client/renderer/entity/state/FishingHookRenderState;F)V", at = @At("TAIL"))
+    private void hybrid$captureLure(FishingHook entity, net.minecraft.client.renderer.entity.state.FishingHookRenderState state, float partialTick, CallbackInfo ci) {
+        RenderType currentRenderType = null;
+        ItemStack currentStack = ((CustomFishingBobberEntityData)entity).getLureItem();
+        if (currentStack.is(HAItems.INSTANCE.getBARBED_HOOK().get())) currentRenderType = BARBED_HOOK_LAYER;
+        else if (currentStack.is(HAItems.INSTANCE.getGLOWING_HOOK().get())) currentRenderType = GLOWING_HOOK_LAYER;
+        else if (currentStack.is(HAItems.INSTANCE.getMAGNETIC_HOOK().get())) currentRenderType = MAGNETIC_HOOK_LAYER;
+        else if (currentStack.is(HAItems.INSTANCE.getCREEPERMAGNET_HOOK().get())) currentRenderType = CREEPERMAGNET_HOOK_LAYER;
+        else if (currentStack.is(HAItems.INSTANCE.getOMINOUS_HOOK().get())) currentRenderType = OMINOUS_HOOK_LAYER;
+        ((com.geckolib.renderer.base.GeoRenderState)state).addGeckolibData(dev.hybridlabs.aquatic.client.render.HARenderData.BOBBER_LAYER, currentRenderType);
     }
 
-    @Redirect(method =
-            "render(Lnet/minecraft/world/entity/projectile/FishingHook;" + "FFLcom/mojang/blaze3d/vertex" +
-                    "/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V", at = @At(value = "INVOKE",
-            target =
-                    "Lnet/minecraft/client/renderer/MultiBufferSource;getBuffer" + "(Lnet/minecraft/client/renderer" + "/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;", ordinal = 0))
-    private VertexConsumer changeRenderType(MultiBufferSource instance, RenderType renderLayer) {
-        RenderType currentRenderType = renderLayer;
-
-        ItemStack currentStack = ((CustomFishingBobberEntityData) entity).getLureItem();
-        if (currentStack.getItem().equals(HAItems.INSTANCE.getBARBED_HOOK().get()))
-            currentRenderType = BARBED_HOOK_LAYER;
-        else if (currentStack.getItem().equals(HAItems.INSTANCE.getGLOWING_HOOK().get()))
-            currentRenderType = GLOWING_HOOK_LAYER;
-        else if (currentStack.getItem().equals(HAItems.INSTANCE.getMAGNETIC_HOOK().get()))
-            currentRenderType = MAGNETIC_HOOK_LAYER;
-        else if (currentStack.getItem().equals(HAItems.INSTANCE.getCREEPERMAGNET_HOOK().get()))
-            currentRenderType = CREEPERMAGNET_HOOK_LAYER;
-        else if (currentStack.getItem().equals(HAItems.INSTANCE.getOMINOUS_HOOK().get()))
-            currentRenderType = OMINOUS_HOOK_LAYER;
-
-        return instance.getBuffer(currentRenderType);
+    @com.llamalad7.mixinextras.injector.ModifyExpressionValue(method = "submit(Lnet/minecraft/client/renderer/entity/state/FishingHookRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
+        at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/entity/FishingHookRenderer;RENDER_TYPE:Lnet/minecraft/client/renderer/rendertype/RenderType;"))
+    private RenderType hybrid$lureLayer(RenderType original, @com.llamalad7.mixinextras.sugar.Local(argsOnly = true) net.minecraft.client.renderer.entity.state.FishingHookRenderState state) {
+        RenderType custom = ((com.geckolib.renderer.base.GeoRenderState)state).getGeckolibData(dev.hybridlabs.aquatic.client.render.HARenderData.BOBBER_LAYER);
+        return custom == null ? original : custom;
     }
 
     @Unique
-    private static RenderType getRenderType(ResourceLocation textureLocation) {
-        return RenderType.entityCutout(textureLocation);
+    private static RenderType getRenderType(Identifier textureLocation) {
+        return RenderTypes.entityCutout(textureLocation);
     }
 }

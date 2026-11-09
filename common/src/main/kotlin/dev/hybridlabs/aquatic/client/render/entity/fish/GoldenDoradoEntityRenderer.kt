@@ -6,15 +6,10 @@ import dev.hybridlabs.aquatic.entity.fish.GoldenDoradoEntity
 import dev.hybridlabs.hapi.client.render.entity.aquatic.BaseFishEntityRenderer
 import net.minecraft.client.renderer.entity.EntityRendererProvider.Context
 import net.minecraft.world.item.ItemStack
-import software.bernie.geckolib.cache.`object`.GeoBone
+import com.geckolib.cache.model.GeoBone
 
 class GoldenDoradoEntityRenderer(context: Context) :
     BaseFishEntityRenderer<GoldenDoradoEntity>(context, GoldenDoradoEntityModel(), true, false) {
 
-    override fun rotateItem(
-        poseStack: PoseStack,
-        bone: GeoBone,
-        stack: ItemStack,
-        animatable: GoldenDoradoEntity
-    ) {}
+    override fun getHeldItemRotation(): Float = 0f
 }

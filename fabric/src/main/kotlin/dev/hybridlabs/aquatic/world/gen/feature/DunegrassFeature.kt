@@ -6,9 +6,9 @@ import dev.hybridlabs.aquatic.block.HAPlatformBlocks
 import net.minecraft.core.BlockPos
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf
 import net.minecraft.world.level.levelgen.Heightmap
-import net.minecraft.world.level.levelgen.feature.Feature
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext
-import net.minecraft.world.level.levelgen.feature.configurations.ProbabilityFeatureConfiguration
+import dev.hybridlabs.aquatic.world.gen.feature.FeatureAlgorithm as Feature
+import dev.hybridlabs.aquatic.world.gen.feature.FeatureContext as FeaturePlaceContext
+import dev.hybridlabs.aquatic.world.gen.feature.config.ProbabilityFeatureConfiguration
 
 @Suppress("DEPRECATION")
 class DunegrassFeature(codec: Codec<ProbabilityFeatureConfiguration>) :
@@ -36,7 +36,7 @@ class DunegrassFeature(codec: Codec<ProbabilityFeatureConfiguration>) :
                 val upper = HAPlatformBlocks.TALL_DUNEGRASS.get().defaultBlockState()
                     .setValue(TallDunegrassBlock.HALF, DoubleBlockHalf.UPPER)
 
-                if (pos.y < world.maxBuildHeight - 1 &&
+                if (pos.y < world.maxY - 1 &&
                     world.isEmptyBlock(pos.above()) &&
                     lower.canSurvive(world, pos)
                 ) {

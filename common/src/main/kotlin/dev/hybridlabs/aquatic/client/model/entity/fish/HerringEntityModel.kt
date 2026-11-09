@@ -3,30 +3,30 @@ package dev.hybridlabs.aquatic.client.model.entity.fish
 import dev.hybridlabs.hapi.client.model.entity.aquatic.BaseFishEntityModel
 import dev.hybridlabs.aquatic.entity.fish.HerringEntity
 import net.minecraft.client.model.geom.PartNames
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.util.Mth
-import software.bernie.geckolib.animation.AnimationState
+import dev.hybridlabs.hapi.client.model.PoseContext
 import kotlin.math.abs
 
 class HerringEntityModel : BaseFishEntityModel<HerringEntity>("hybrid_aquatic", "herring") {
 
     companion object {
         private val ONE_FISH_MODEL =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "geo/fish/herring/herring.geo.json")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "fish/herring/herring")
         private val TWO_FISH_MODEL =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "geo/fish/herring/herring_two.geo.json")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "fish/herring/herring_two")
         private val THREE_FISH_MODEL =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "geo/fish/herring/herring_three.geo.json")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "fish/herring/herring_three")
 
         private val ONE_FISH_ANIMATION =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "animations/entity/fish/herring/herring.animation.json")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "entity/fish/herring/herring")
         private val TWO_FISH_ANIMATION =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "animations/entity/fish/herring/herring_two.animation.json")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "entity/fish/herring/herring_two")
         private val THREE_FISH_ANIMATION =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "animations/entity/fish/herring/herring_three.animation.json")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "entity/fish/herring/herring_three")
     }
 
-    override fun getModelResource(animatable: HerringEntity): ResourceLocation {
+    override fun getModelResource(animatable: HerringEntity): Identifier {
         val fish = animatable.getFishCount()
 
         return when (fish) {
@@ -37,7 +37,7 @@ class HerringEntityModel : BaseFishEntityModel<HerringEntity>("hybrid_aquatic", 
         }
     }
 
-    override fun getAnimationResource(animatable: HerringEntity): ResourceLocation {
+    override fun getAnimationResource(animatable: HerringEntity): Identifier {
         val fish = animatable.getFishCount()
 
         return when (fish) {
@@ -51,18 +51,18 @@ class HerringEntityModel : BaseFishEntityModel<HerringEntity>("hybrid_aquatic", 
     override fun setCustomAnimations(
         animatable: HerringEntity,
         instanceId: Long,
-        animationState: AnimationState<HerringEntity>
+        animationState: PoseContext
     ) {
         super.setCustomAnimations(animatable, instanceId, animationState)
         val deltaTime: Float = animationState.partialTick
 
-        val body = animationProcessor.getBone(PartNames.BODY)
-        val body2 = animationProcessor.getBone("body_2")
-        val body3 = animationProcessor.getBone("body_3")
-        val tail2 = animationProcessor.getBone("tail2")
-        val tail3 = animationProcessor.getBone("tail3")
-        val tailFin2 = animationProcessor.getBone("tail_fin2")
-        val tailFin3 = animationProcessor.getBone("tail_fin3")
+        val body = animationState.bones.getBone(PartNames.BODY)
+        val body2 = animationState.bones.getBone("body_2")
+        val body3 = animationState.bones.getBone("body_3")
+        val tail2 = animationState.bones.getBone("tail2")
+        val tail3 = animationState.bones.getBone("tail3")
+        val tailFin2 = animationState.bones.getBone("tail_fin2")
+        val tailFin3 = animationState.bones.getBone("tail_fin3")
 
         val xRot = Mth.clamp(Mth.lerp(deltaTime, animatable.xRot, animatable.xRotO), -45f, 45f)
         body.rotX = xRot * -Mth.DEG_TO_RAD

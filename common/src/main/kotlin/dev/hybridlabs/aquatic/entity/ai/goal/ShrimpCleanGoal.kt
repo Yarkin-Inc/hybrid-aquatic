@@ -27,18 +27,18 @@ class ShrimpCleanGoal(
             Blocks.MOSSY_STONE_BRICK_STAIRS to Blocks.STONE_BRICK_STAIRS,
             Blocks.MOSSY_STONE_BRICK_WALL to Blocks.STONE_BRICK_WALL,
             Blocks.INFESTED_MOSSY_STONE_BRICKS to Blocks.INFESTED_STONE_BRICKS,
-            Blocks.OXIDIZED_COPPER to Blocks.WEATHERED_COPPER,
-            Blocks.WEATHERED_COPPER to Blocks.EXPOSED_COPPER,
-            Blocks.EXPOSED_COPPER to Blocks.COPPER_BLOCK,
-            Blocks.OXIDIZED_CUT_COPPER to Blocks.WEATHERED_CUT_COPPER,
-            Blocks.WEATHERED_CUT_COPPER to Blocks.EXPOSED_CUT_COPPER,
-            Blocks.EXPOSED_CUT_COPPER to Blocks.CUT_COPPER,
-            Blocks.OXIDIZED_CUT_COPPER_SLAB to Blocks.WEATHERED_CUT_COPPER_SLAB,
-            Blocks.WEATHERED_CUT_COPPER_SLAB to Blocks.EXPOSED_CUT_COPPER_SLAB,
-            Blocks.EXPOSED_CUT_COPPER_SLAB to Blocks.CUT_COPPER_SLAB,
-            Blocks.OXIDIZED_CUT_COPPER_STAIRS to Blocks.WEATHERED_CUT_COPPER_STAIRS,
-            Blocks.WEATHERED_CUT_COPPER_STAIRS to Blocks.EXPOSED_CUT_COPPER_STAIRS,
-            Blocks.EXPOSED_CUT_COPPER_STAIRS to Blocks.CUT_COPPER_STAIRS,
+            Blocks.COPPER_BLOCK.weathering().oxidized() to Blocks.COPPER_BLOCK.weathering().weathered(),
+            Blocks.COPPER_BLOCK.weathering().weathered() to Blocks.COPPER_BLOCK.weathering().exposed(),
+            Blocks.COPPER_BLOCK.weathering().exposed() to Blocks.COPPER_BLOCK.weathering().unaffected(),
+            Blocks.CUT_COPPER.weathering().oxidized() to Blocks.CUT_COPPER.weathering().weathered(),
+            Blocks.CUT_COPPER.weathering().weathered() to Blocks.CUT_COPPER.weathering().exposed(),
+            Blocks.CUT_COPPER.weathering().exposed() to Blocks.CUT_COPPER.weathering().unaffected(),
+            Blocks.CUT_COPPER_SLAB.weathering().oxidized() to Blocks.CUT_COPPER_SLAB.weathering().weathered(),
+            Blocks.CUT_COPPER_SLAB.weathering().weathered() to Blocks.CUT_COPPER_SLAB.weathering().exposed(),
+            Blocks.CUT_COPPER_SLAB.weathering().exposed() to Blocks.CUT_COPPER_SLAB.weathering().unaffected(),
+            Blocks.CUT_COPPER_STAIRS.weathering().oxidized() to Blocks.CUT_COPPER_STAIRS.weathering().weathered(),
+            Blocks.CUT_COPPER_STAIRS.weathering().weathered() to Blocks.CUT_COPPER_STAIRS.weathering().exposed(),
+            Blocks.CUT_COPPER_STAIRS.weathering().exposed() to Blocks.CUT_COPPER_STAIRS.weathering().unaffected(),
         )
     }
 
@@ -170,9 +170,9 @@ class ShrimpCleanGoal(
             val motionY = shrimp.getRandom().nextGaussian() * 0.07
             val motionZ = shrimp.getRandom().nextGaussian() * 0.07
             val angle = ((0.0174532925 * shrimp.yBodyRot) + i1).toFloat()
-            val extraX = (radius * Mth.sin(Mth.PI + angle)).toDouble()
+            val extraX = (radius * kotlin.math.sin(Mth.PI + angle)).toDouble()
             val extraY = 0.8
-            val extraZ = (radius * Mth.cos(angle)).toDouble()
+            val extraZ = (radius * kotlin.math.cos(angle)).toDouble()
             val state = shrimp.level().getBlockState(target)
             (shrimp.level() as ServerLevel).sendParticles(
                 BlockParticleOption(

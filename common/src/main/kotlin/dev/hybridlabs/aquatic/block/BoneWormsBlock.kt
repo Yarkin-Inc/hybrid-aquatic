@@ -46,15 +46,17 @@ class BoneWormsBlock(settings: Properties) : BushBlock(settings), LiquidBlockCon
 
     override fun updateShape(
         state: BlockState,
-        direction: Direction,
-        neighborState: BlockState,
-        world: LevelAccessor,
+        world: net.minecraft.world.level.LevelReader,
+        tickAccess: net.minecraft.world.level.ScheduledTickAccess,
         pos: BlockPos,
+        direction: Direction,
         neighborPos: BlockPos,
+        neighborState: BlockState,
+        random: net.minecraft.util.RandomSource,
     ): BlockState {
-        val blockState = super.updateShape(state, direction, neighborState, world, pos, neighborPos)
+        val blockState = super.updateShape(state, world, tickAccess, pos, direction, neighborPos, neighborState, random)
         if (!blockState.isAir) {
-            world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world))
+            tickAccess.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world))
         }
 
         return blockState
@@ -65,7 +67,7 @@ class BoneWormsBlock(settings: Properties) : BushBlock(settings), LiquidBlockCon
     }
 
     override fun canPlaceLiquid(
-        p0: Player?,
+        p0: net.minecraft.world.entity.LivingEntity?,
         world: BlockGetter,
         pos: BlockPos,
         state: BlockState,
@@ -83,12 +85,9 @@ class BoneWormsBlock(settings: Properties) : BushBlock(settings), LiquidBlockCon
         return false
     }
 
-    override fun codec(): MapCodec<out BushBlock> {
-        return CODEC
-    }
 
     companion object {
-        val CODEC: MapCodec<BoneWormsBlock> = simpleCodec(::BoneWormsBlock)
+
         private val SHAPE: VoxelShape = box(2.0, 0.0, 2.0, 14.0, 12.0, 14.0)
     }
 }

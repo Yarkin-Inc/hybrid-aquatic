@@ -24,7 +24,7 @@ class CrustaceanDaytimeBurrowGoal(
             !crustacean.onGround() ||
             crustacean.fromCreatureNet ||
             crustacean.hasCustomName() ||
-            crustacean.level().isNight ||
+            (crustacean.level().environmentAttributes().getValue(net.minecraft.world.attribute.EnvironmentAttributes.SKY_LIGHT_LEVEL, crustacean.position()) <= 11f) ||
             crustacean.level().getNearestPlayer(crustacean, 32.0) == null) {
             return false
         }

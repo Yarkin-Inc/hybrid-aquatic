@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.state.BlockState
 import kotlin.math.abs
 
 open class GlowslimeBlock(properties: Properties) : HalfTransparentBlock(properties), StickyBlock {
-    override fun fallOn(level: Level, state: BlockState, pos: BlockPos, entity: Entity, fallDistance: Float) {
+    override fun fallOn(level: Level, state: BlockState, pos: BlockPos, entity: Entity, fallDistance: Double) {
         if (entity.isSuppressingBounce) {
             super.fallOn(level, state, pos, entity, fallDistance)
         } else {
@@ -20,9 +20,9 @@ open class GlowslimeBlock(properties: Properties) : HalfTransparentBlock(propert
         }
     }
 
-    override fun updateEntityAfterFallOn(level: BlockGetter, entity: Entity) {
+    override fun bounceOn(level: Level, state: BlockState, pos: BlockPos, entity: Entity, fallDistance: Double) {
         if (entity.isSuppressingBounce) {
-            super.updateEntityAfterFallOn(level, entity)
+            super.bounceOn(level, state, pos, entity, fallDistance)
         } else {
             this.bounceUp(entity)
         }

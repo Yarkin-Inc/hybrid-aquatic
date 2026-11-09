@@ -1,0 +1,17 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "hybrid_aquatic:trades_enabled"
+    }
+  ],
+  "values": [
+    "hybrid_aquatic:wandering_trader/basking_shark_plushie",
+    "hybrid_aquatic:wandering_trader/bull_shark_plushie",
+    "hybrid_aquatic:wandering_trader/frilled_shark_plushie",
+    "hybrid_aquatic:wandering_trader/great_white_shark_plushie",
+    "hybrid_aquatic:wandering_trader/hammerhead_shark_plushie",
+    "hybrid_aquatic:wandering_trader/thresher_shark_plushie",
+    "hybrid_aquatic:wandering_trader/tiger_shark_plushie",
+    "hybrid_aquatic:wandering_trader/whale_shark_plushie"
+  ]
+}

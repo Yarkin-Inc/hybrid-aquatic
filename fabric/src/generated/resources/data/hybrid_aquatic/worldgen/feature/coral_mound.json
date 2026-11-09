@@ -1,0 +1,95 @@
+{
+  "type": "minecraft:simple_random_selector",
+  "features": [
+    {
+      "feature": {
+        "type": "minecraft:disk",
+        "half_height": 1,
+        "radius": {
+          "type": "minecraft:uniform",
+          "max_inclusive": 5,
+          "min_inclusive": 3
+        },
+        "state_provider": {
+          "fallback": {
+            "type": "minecraft:simple",
+            "state": {
+              "id": "hybrid_aquatic:coralstone"
+            }
+          },
+          "rules": [
+            {
+              "if_true": {
+                "type": "minecraft:not",
+                "predicate": {
+                  "type": "minecraft:matching_blocks",
+                  "blocks": [
+                    "minecraft:sand",
+                    "hybrid_aquatic:coralstone"
+                  ],
+                  "offset": [
+                    0,
+                    -1,
+                    0
+                  ]
+                }
+              },
+              "then": {
+                "type": "minecraft:simple",
+                "state": {
+                  "id": "minecraft:water",
+                  "properties": {
+                    "level": "0"
+                  }
+                }
+              }
+            }
+          ],
+          "type": "minecraft:rule_based"
+        },
+        "target": {
+          "type": "minecraft:matching_blocks",
+          "blocks": [
+            "minecraft:sand",
+            "hybrid_aquatic:coralstone"
+          ],
+          "offset": [
+            0,
+            -1,
+            0
+          ]
+        }
+      },
+      "placement": [
+        {
+          "type": "minecraft:count",
+          "count": 6
+        },
+        {
+          "type": "minecraft:offset",
+          "x": {
+            "type": "minecraft:trapezoid",
+            "min": -7,
+            "max": 7,
+            "plateau": 0
+          },
+          "y": 0,
+          "z": {
+            "type": "minecraft:trapezoid",
+            "min": -7,
+            "max": 7,
+            "plateau": 0
+          }
+        },
+        {
+          "type": "minecraft:count",
+          "count": 1
+        },
+        {
+          "type": "minecraft:heightmap",
+          "heightmap": "OCEAN_FLOOR"
+        }
+      ]
+    }
+  ]
+}

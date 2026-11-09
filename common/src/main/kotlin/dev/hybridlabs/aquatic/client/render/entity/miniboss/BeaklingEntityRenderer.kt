@@ -10,7 +10,7 @@ class BeaklingEntityRenderer(context: Context) :
         return 0.0025f
     }
 
-    override fun getDeathMaxRotation(animatable: BeaklingEntity): Float {
+    override fun getDeathMaxRotation(state: com.geckolib.renderer.base.GeoRenderState): Float {
         return 0f
     }
 

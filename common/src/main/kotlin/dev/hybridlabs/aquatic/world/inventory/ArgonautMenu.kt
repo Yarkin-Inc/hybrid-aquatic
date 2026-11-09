@@ -95,7 +95,8 @@ class ArgonautMenu(type: MenuType<*>, containerId: Int, playerInventory: Invento
     }
 
     fun isFuel(stack: ItemStack): Boolean {
-        return AbstractFurnaceBlockEntity.isFuel(stack)
+        return (container as? dev.hybridlabs.aquatic.entity.misc.ArgonautEntity)?.let { it.getBurnDuration(stack) > 0 }
+            ?: stack.has(net.minecraft.core.component.DataComponents.COOKING_FUEL)
     }
 
     fun getLitProgress(): Int {

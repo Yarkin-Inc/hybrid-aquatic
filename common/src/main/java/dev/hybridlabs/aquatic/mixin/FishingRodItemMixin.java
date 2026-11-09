@@ -1,49 +1,26 @@
 package dev.hybridlabs.aquatic.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import dev.hybridlabs.aquatic.access.CustomFishingBobberEntityData;
 import dev.hybridlabs.aquatic.tag.HAItemTags;
 import dev.hybridlabs.aquatic.utils.HandUtils;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.FishingHook;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.FishingRodItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.gameevent.GameEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(FishingRodItem.class)
 public abstract class FishingRodItemMixin {
-    @Inject(method = "use", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity" +
-            "(Lnet" + "/minecraft/world/entity/Entity;)Z"), cancellable = true)
-    private void redirectFix(Level world, Player user, InteractionHand hand,
-                             CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir) {
-        if (world instanceof ServerLevel serverLevel) {
-            ItemStack mainHandItemStack = user.getItemInHand(hand);
-            ItemStack opposingHandItemStack = user.getItemInHand(HandUtils.getOpposingHand(hand));
-
-            if (opposingHandItemStack.is(HAItemTags.INSTANCE.getLURE_ITEMS())) {
-                float lureLevel =
-                        EnchantmentHelper.getFishingTimeReduction(serverLevel, mainHandItemStack, user);
-                float luckLevel =
-                        EnchantmentHelper.getFishingLuckBonus(serverLevel,mainHandItemStack, user);
-                FishingHook customBobber = new FishingHook(user, world, (int)lureLevel, (int)luckLevel);
-
-                ((CustomFishingBobberEntityData) customBobber)
-                        .setLureItem(opposingHandItemStack.copyAndClear());
-                world.addFreshEntity(customBobber);
-
-                user.awardStat(Stats.ITEM_USED.get(((FishingRodItem) (Object) this)));
-                user.gameEvent(GameEvent.ITEM_INTERACT_START);
-                cir.setReturnValue(InteractionResultHolder.success(mainHandItemStack));
-            }
-        }
+    @ModifyArg(method = "use", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/projectile/Projectile;spawnProjectile(Lnet/minecraft/world/entity/projectile/Projectile;Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/entity/projectile/Projectile;"), index = 0)
+    private Projectile hybrid$attachLure(Projectile bobber, @Local(argsOnly = true) Player player,
+                                         @Local(argsOnly = true) InteractionHand hand) {
+        ItemStack lure = player.getItemInHand(HandUtils.getOpposingHand(hand));
+        if (lure.is(HAItemTags.INSTANCE.getLURE_ITEMS()))
+            ((CustomFishingBobberEntityData) bobber).setLureItem(lure.copyAndClear());
+        return bobber;
     }
 }

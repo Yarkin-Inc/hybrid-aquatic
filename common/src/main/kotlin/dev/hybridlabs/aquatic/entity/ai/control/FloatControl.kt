@@ -7,7 +7,7 @@ import kotlin.math.max
 
 // credit to Fowl Play for the code
 
-class FloatControl(mob: BaseWaterAnimal) : MoveControl(mob) {
+class FloatControl(mob: BaseWaterAnimal) : MoveControl<net.minecraft.world.entity.Mob>(mob) {
     override fun tick() {
         var deltaMovement: Vec3 = this.mob.deltaMovement
         if ((this.mob as BaseWaterAnimal).isBelowWaterline()) {

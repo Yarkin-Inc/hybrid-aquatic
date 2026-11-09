@@ -25,17 +25,19 @@ class GlowstickBlock(settings: Properties) : TorchBlock(GLOW, settings), SimpleW
 
     override fun updateShape(
         state: BlockState,
-        direction: Direction,
-        neighborState: BlockState,
-        world: LevelAccessor,
+        world: net.minecraft.world.level.LevelReader,
+        tickAccess: net.minecraft.world.level.ScheduledTickAccess,
         pos: BlockPos,
-        neighborPos: BlockPos
+        direction: Direction,
+        neighborPos: BlockPos,
+        neighborState: BlockState,
+        random: net.minecraft.util.RandomSource,
     ): BlockState {
         if (state.getValue(WATERLOGGED)) {
-            world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world))
+            tickAccess.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world))
         }
 
-        return super.updateShape(state, direction, neighborState, world, pos, neighborPos)
+        return super.updateShape(state, world, tickAccess, pos, direction, neighborPos, neighborState, random)
     }
 
     override fun getStateForPlacement(context: BlockPlaceContext): BlockState? {
@@ -47,7 +49,7 @@ class GlowstickBlock(settings: Properties) : TorchBlock(GLOW, settings), SimpleW
         return if (state.getValue(WATERLOGGED)) Fluids.WATER.getSource(false) else super.getFluidState(state)
     }
 
-    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block?, BlockState?>) {
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
         builder.add(WATERLOGGED)
     }
 

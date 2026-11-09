@@ -1,5 +1,6 @@
 package dev.hybridlabs.aquatic.entity.ai.goal
 
+import dev.hybridlabs.aquatic.entity.spawnDrop
 import dev.hybridlabs.aquatic.effect.HAMobEffects
 import dev.hybridlabs.aquatic.item.HAItems
 import dev.hybridlabs.hapi.entity.base.aquatic.BaseSharkEntity
@@ -66,7 +67,7 @@ open class SharkAttackGoal(
             false
         } else if (!this.followingTargetEvenIfNotSeen) {
             !shark.navigation.isDone
-        } else if (!shark.isWithinRestriction(livingEntity.blockPosition())) {
+        } else if (!shark.isWithinHome(livingEntity.blockPosition())) {
             false
         } else {
             livingEntity !is Player || !livingEntity.isSpectator && !livingEntity.isCreative
@@ -77,15 +78,14 @@ open class SharkAttackGoal(
         shark.navigation.moveTo(this.path, this.speedModifier)
         shark.isAggressive = true
         shark.isSprinting = true
-        shark.swinging = false
-        shark.swingTime = 0
+
         this.ticksUntilNextPathRecalculation = 0
         this.ticksUntilNextAttack = 0
     }
 
     override fun stop() {
         val livingEntity = shark.target
-        if (!EntitySelector.NO_CREATIVE_OR_SPECTATOR.test(livingEntity)) {
+        if (livingEntity != null && !EntitySelector.NO_CREATIVE_OR_SPECTATOR.test(livingEntity)) {
             shark.target = null
         }
 
@@ -140,8 +140,8 @@ open class SharkAttackGoal(
     protected open fun checkAndPerformAttack(enemy: LivingEntity) {
         if (this.canPerformAttack(enemy)) {
             this.resetAttackCooldown()
-            shark.swing(InteractionHand.MAIN_HAND)
-            shark.doHurtTarget(enemy)
+            shark.swing(InteractionHand.MAIN_HAND, net.minecraft.world.item.component.SwingAnimation(net.minecraft.world.item.SwingAnimationType.WHACK, 20), true)
+            shark.doHurtTarget(shark.level() as net.minecraft.server.level.ServerLevel, enemy)
             if (!enemy.isBlocking) {
                 enemy.addEffect(MobEffectInstance(HAMobEffects.BLEEDING.asHolder(), 200, 0), shark)
             }
@@ -150,7 +150,7 @@ open class SharkAttackGoal(
 
             val hasShield = enemy.mainHandItem.`is`(Items.SHIELD) || enemy.offhandItem.`is`(Items.SHIELD)
             if (hasShield && enemy.isBlocking) {
-                shark.spawnAtLocation(HAItems.SHARK_TOOTH.get())
+                shark.spawnDrop(HAItems.SHARK_TOOTH.get())
             }
         }
     }

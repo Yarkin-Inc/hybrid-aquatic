@@ -1,0 +1,14 @@
+{
+  "type": "hybrid_aquatic:sargassum",
+  "config": {
+    "to_place": {
+      "type": "minecraft:simple",
+      "state": {
+        "id": "hybrid_aquatic:sargassum",
+        "properties": {
+          "age": "0"
+        }
+      }
+    }
+  }
+}

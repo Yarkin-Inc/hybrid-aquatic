@@ -8,11 +8,11 @@ import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.level.Level
-import software.bernie.geckolib.animation.AnimatableManager
-import software.bernie.geckolib.animation.AnimationController
-import software.bernie.geckolib.animation.AnimationController.AnimationStateHandler
-import software.bernie.geckolib.animation.AnimationState
-import software.bernie.geckolib.animation.PlayState
+import com.geckolib.animatable.manager.AnimatableManager
+import com.geckolib.animation.AnimationController
+import com.geckolib.animation.AnimationController.AnimationStateHandler
+import com.geckolib.animation.state.AnimationTest
+import com.geckolib.animation.`object`.PlayState
 
 class VampireSquidEntity(type: EntityType<out VampireSquidEntity>, world: Level) : BaseCephalopodEntity(type, world) {
     override fun getTargetConfig() = MobTargetConfiguration.ofPrey(HAPIEntityTags.ALL_SHARKS)
@@ -25,9 +25,9 @@ class VampireSquidEntity(type: EntityType<out VampireSquidEntity>, world: Level)
     override fun registerControllers(controllers: AnimatableManager.ControllerRegistrar) {
         super.registerControllers(controllers)
         controllers.add(
-            AnimationController(
-                this, "Feeding",
-                AnimationStateHandler { state: AnimationState<BaseCephalopodEntity> ->
+            AnimationController<BaseCephalopodEntity>(
+                 "Feeding",
+                AnimationStateHandler { state: AnimationTest<BaseCephalopodEntity> ->
                     if (this.isFeeding())
                         return@AnimationStateHandler state.setAndContinue(FEED_ANIMATION)
                     PlayState.STOP

@@ -7,8 +7,8 @@ import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.KelpBlock
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.levelgen.Heightmap
-import net.minecraft.world.level.levelgen.feature.Feature
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext
+import dev.hybridlabs.aquatic.world.gen.feature.FeatureAlgorithm as Feature
+import dev.hybridlabs.aquatic.world.gen.feature.FeatureContext as FeaturePlaceContext
 
 class BullKelpFeature(codec: Codec<BullKelpFeatureConfig>) : Feature<BullKelpFeatureConfig>(codec) {
     override fun place(context: FeaturePlaceContext<BullKelpFeatureConfig>): Boolean {

@@ -1,14 +1,14 @@
 {
-  "type": "lithostitched:add_surface_rule",
+  "type": "lithostitched:set_material_rule",
   "injection_type": "prepend",
-  "levels": [
-    "minecraft:overworld"
-  ],
   "predicate": {
     "type": "hybrid_aquatic:biome_enabled",
     "biome": "hybrid_aquatic:tropical_deep_coral_reef"
   },
-  "surface_rule": {
+  "target_rules": [
+    "minecraft:overworld"
+  ],
+  "material_rule": {
     "type": "minecraft:condition",
     "if_true": {
       "type": "minecraft:above_preliminary_surface"
@@ -33,7 +33,7 @@
         "then_run": {
           "type": "minecraft:block",
           "result_state": {
-            "Name": "hybrid_aquatic:coralstone"
+            "id": "hybrid_aquatic:coralstone"
           }
         }
       }

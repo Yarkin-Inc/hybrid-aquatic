@@ -10,6 +10,6 @@ class MantaRayEntityRenderer(context: Context) :
     BaseFishEntityRenderer<MantaRayEntity>(context, MantaRayEntityModel(), true, false) {
 
     init {
-        addRenderLayer(HAFishEntityLayer(this))
+        withRenderLayer(HAFishEntityLayer(this))
     }
 }

@@ -6,22 +6,22 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
-import software.bernie.geckolib.animatable.GeoAnimatable
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
-import software.bernie.geckolib.animation.AnimatableManager
-import software.bernie.geckolib.animation.Animation
-import software.bernie.geckolib.animation.AnimationController
-import software.bernie.geckolib.animation.AnimationState
-import software.bernie.geckolib.animation.PlayState
-import software.bernie.geckolib.animation.RawAnimation
-import software.bernie.geckolib.util.GeckoLibUtil
-import software.bernie.geckolib.util.RenderUtil
+import com.geckolib.animatable.GeoAnimatable
+import com.geckolib.animatable.instance.AnimatableInstanceCache
+import com.geckolib.animatable.manager.AnimatableManager
+import com.geckolib.cache.animation.Animation
+import com.geckolib.animation.AnimationController
+import com.geckolib.animation.state.AnimationTest
+import com.geckolib.animation.`object`.PlayState
+import com.geckolib.animation.RawAnimation
+import com.geckolib.util.GeckoLibUtil
+import com.geckolib.util.RenderUtil
 
 class GiantGreenAnemoneBlockEntity(pos: BlockPos, state: BlockState) :
     BlockEntity(HABlockEntityTypes.GIANT_GREEN_ANEMONE.get(), pos, state), GeoAnimatable {
     private val factory = GeckoLibUtil.createInstanceCache(this)
 
-    private fun <E> predicate(event: AnimationState<E>): PlayState where E : BlockEntity?, E : GeoAnimatable {
+    private fun <E> predicate(event: AnimationTest<E>): PlayState where E : BlockEntity, E : GeoAnimatable {
         return if (level != null) {
             event.controller.setAnimation(SWAY_ANIMATION)
             PlayState.CONTINUE
@@ -31,16 +31,13 @@ class GiantGreenAnemoneBlockEntity(pos: BlockPos, state: BlockState) :
     }
 
     override fun registerControllers(controllerRegistrar: AnimatableManager.ControllerRegistrar) {
-        controllerRegistrar.add(AnimationController(this, "controller", 0, ::predicate))
+        controllerRegistrar.add(AnimationController<GiantGreenAnemoneBlockEntity>( "controller", 0, ::predicate))
     }
 
     override fun getAnimatableInstanceCache(): AnimatableInstanceCache {
         return factory
     }
 
-    override fun getTick(o: Any): Double {
-        return RenderUtil.getCurrentTick()
-    }
 
     override fun getUpdateTag(registries: HolderLookup.Provider): CompoundTag {
         return saveWithoutMetadata(registries)
@@ -51,6 +48,6 @@ class GiantGreenAnemoneBlockEntity(pos: BlockPos, state: BlockState) :
     }
 
     companion object {
-        val SWAY_ANIMATION: RawAnimation = RawAnimation.begin().then("sway", Animation.LoopType.LOOP)
+        val SWAY_ANIMATION: RawAnimation = RawAnimation.begin().then("sway", com.geckolib.animation.`object`.LoopType.LOOP)
     }
 }

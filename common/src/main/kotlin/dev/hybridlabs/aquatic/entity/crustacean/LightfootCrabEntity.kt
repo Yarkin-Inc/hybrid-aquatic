@@ -6,14 +6,14 @@ import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal
-import net.minecraft.world.entity.animal.Turtle
+import net.minecraft.world.entity.animal.turtle.Turtle
 import net.minecraft.world.level.Level
-import software.bernie.geckolib.animation.AnimatableManager
-import software.bernie.geckolib.animation.AnimationController
-import software.bernie.geckolib.animation.AnimationController.AnimationStateHandler
-import software.bernie.geckolib.animation.AnimationState
-import software.bernie.geckolib.animation.PlayState
-import software.bernie.geckolib.constant.DefaultAnimations
+import com.geckolib.animatable.manager.AnimatableManager
+import com.geckolib.animation.AnimationController
+import com.geckolib.animation.AnimationController.AnimationStateHandler
+import com.geckolib.animation.state.AnimationTest
+import com.geckolib.animation.`object`.PlayState
+import com.geckolib.constant.DefaultAnimations
 
 class LightfootCrabEntity(entityType: EntityType<out LightfootCrabEntity>, world: Level) :
     BaseCrustaceanEntity(entityType, world, true) {
@@ -31,9 +31,9 @@ class LightfootCrabEntity(entityType: EntityType<out LightfootCrabEntity>, world
         super.registerControllers(controllerRegistrar)
 
         controllerRegistrar.add(
-            AnimationController(
-                this, "Spawning",
-                AnimationStateHandler { state: AnimationState<BaseCrustaceanEntity> ->
+            AnimationController<BaseCrustaceanEntity>(
+                 "Spawning",
+                AnimationStateHandler { state: AnimationTest<BaseCrustaceanEntity> ->
                     if (this.tickCount < 20)
                         return@AnimationStateHandler state.setAndContinue(DefaultAnimations.SPAWN)
                     PlayState.STOP
@@ -43,9 +43,9 @@ class LightfootCrabEntity(entityType: EntityType<out LightfootCrabEntity>, world
         )
 
         controllerRegistrar.add(
-            AnimationController(
-                this, "Digging",
-                AnimationStateHandler { state: AnimationState<BaseCrustaceanEntity> ->
+            AnimationController<BaseCrustaceanEntity>(
+                 "Digging",
+                AnimationStateHandler { state: AnimationTest<BaseCrustaceanEntity> ->
                     if (this.isDigging())
                         return@AnimationStateHandler state.setAndContinue(DIG_ANIMATION)
                     PlayState.STOP
@@ -53,7 +53,7 @@ class LightfootCrabEntity(entityType: EntityType<out LightfootCrabEntity>, world
             )
         )
         controllerRegistrar.add(
-            DefaultAnimations.genericAttackAnimation(this, DefaultAnimations.ATTACK_SWING))
+            DefaultAnimations.genericAttackAnimation<LightfootCrabEntity>( DefaultAnimations.ATTACK_SWING))
     }
 
     companion object {

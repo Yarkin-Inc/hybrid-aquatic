@@ -1,0 +1,12 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": 8
+  },
+  "gives": {
+    "id": "hybrid_aquatic:frilled_shark_plushie"
+  },
+  "max_uses": 2,
+  "xp": 2,
+  "reputation_discount": 0.05
+}

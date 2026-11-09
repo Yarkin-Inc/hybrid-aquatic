@@ -5,16 +5,18 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider
 
 class BlockEntityHelper {
     companion object {
-        fun createBlockEntityRendererProviderContext(): BlockEntityRendererProvider.Context {
+        fun createBlockEntityRendererProviderContext(baking: net.minecraft.client.renderer.special.SpecialModelRenderer.BakingContext): BlockEntityRendererProvider.Context {
             val client =
                 Minecraft.getInstance()
             return BlockEntityRendererProvider.Context(
                 client.blockEntityRenderDispatcher,
-                client.blockRenderer,
-                client.itemRenderer,
+                net.minecraft.client.renderer.block.BlockModelResolver(client.modelManager),
+                client.itemModelResolver,
                 client.entityRenderDispatcher,
                 client.entityModels,
-                client.font
+                client.font,
+                baking.sprites(),
+                baking.playerSkinRenderCache()
             )
         }
     }

@@ -1,44 +1,13 @@
 package dev.hybridlabs.aquatic.client.render.item
 
-import com.mojang.blaze3d.vertex.PoseStack
-import dev.hybridlabs.aquatic.block.BlockEntityHelper.Companion.createBlockEntityRendererProviderContext
-import dev.hybridlabs.aquatic.block.HABlocks
-import dev.hybridlabs.aquatic.block.entity.StrawberryAnemoneBlockEntity
-import dev.hybridlabs.aquatic.client.render.block.entity.StrawberryAnemoneBlockEntityRenderer
-import net.minecraft.client.Minecraft
-import net.minecraft.client.model.geom.EntityModelSet
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
-import net.minecraft.client.renderer.MultiBufferSource
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher
-import net.minecraft.core.BlockPos
-import net.minecraft.world.item.ItemDisplayContext
-import net.minecraft.world.item.ItemStack
+import dev.hybridlabs.aquatic.item.StrawberryAnemoneBlockItem
+import dev.hybridlabs.aquatic.client.model.block.entity.StrawberryAnemoneBlockEntityModel
+import com.geckolib.model.GeoModel
+import com.geckolib.renderer.GeoItemRenderer
+import com.geckolib.renderer.base.GeoRenderState
 
-class StrawberryAnemoneBlockItemRenderer(
-    blockEntityRenderDispatcher: BlockEntityRenderDispatcher,
-    entityModelSet: EntityModelSet
-) :
-    BlockEntityWithoutLevelRenderer(
-        blockEntityRenderDispatcher, entityModelSet
-    ) {
-
-    constructor() : this(client.blockEntityRenderDispatcher, client.entityModels)
-
-    val blockEntity by lazy {
-        StrawberryAnemoneBlockEntity(BlockPos.ZERO, HABlocks.STRAWBERRY_ANEMONE.get().defaultBlockState())
-    }
-
-    override fun renderByItem(
-        stack: ItemStack, displayContext: ItemDisplayContext,
-        poseStack: PoseStack, buffer: MultiBufferSource, packedLight: Int,
-        packedOverlay: Int
-    ) {
-        RENDERER.render(blockEntity, 1.0f, poseStack, buffer, packedLight, packedOverlay)
-    }
-
-    companion object {
-        private val RENDERER: StrawberryAnemoneBlockEntityRenderer =
-            StrawberryAnemoneBlockEntityRenderer(createBlockEntityRendererProviderContext())
-        private val client: Minecraft = Minecraft.getInstance()
-    }
-}
+class StrawberryAnemoneBlockItemRenderer : GeoItemRenderer<StrawberryAnemoneBlockItem>(object : GeoModel<StrawberryAnemoneBlockItem>() {
+    override fun getModelResource(state: GeoRenderState) = StrawberryAnemoneBlockEntityModel.MODEL_LOCATION
+    override fun getTextureResource(state: GeoRenderState) = StrawberryAnemoneBlockEntityModel.TEXTURE_LOCATION
+    override fun getAnimationResource(item: StrawberryAnemoneBlockItem) = StrawberryAnemoneBlockEntityModel.ANIMATION_LOCATION
+})

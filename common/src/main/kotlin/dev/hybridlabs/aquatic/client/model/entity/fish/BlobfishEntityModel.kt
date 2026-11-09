@@ -2,29 +2,29 @@ package dev.hybridlabs.aquatic.client.model.entity.fish
 
 import dev.hybridlabs.aquatic.entity.fish.BlobfishEntity
 import dev.hybridlabs.hapi.client.model.entity.aquatic.BaseFishEntityModel
-import net.minecraft.client.renderer.RenderType
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.client.renderer.rendertype.RenderType
+import net.minecraft.resources.Identifier
 
 class BlobfishEntityModel : BaseFishEntityModel<BlobfishEntity>("hybrid_aquatic", "blobfish") {
-    override fun getRenderType(animatable: BlobfishEntity, texture: ResourceLocation): RenderType {
-        return RenderType.entityTranslucent(texture)
+    override fun getRenderType(animatable: BlobfishEntity, texture: Identifier): RenderType {
+        return net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucent(texture)
     }
 
-    override fun getTextureResource(animatable: BlobfishEntity): ResourceLocation =
+    override fun getTextureResource(animatable: BlobfishEntity): Identifier =
         if (animatable.moistness < 590) BLOBBY_TEXTURE else BLOBFISH_TEXTURE
 
-    override fun getModelResource(animatable: BlobfishEntity): ResourceLocation =
+    override fun getModelResource(animatable: BlobfishEntity): Identifier =
         if (animatable.moistness < 590) BLOBBY_MODEL else BLOBFISH_MODEL
 
     companion object {
         private val BLOBFISH_TEXTURE =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/fish/blobfish/blobfish.png")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/fish/blobfish/blobfish.png")
         private val BLOBBY_TEXTURE =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/fish/blobfish/blobfish_blobby.png")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/fish/blobfish/blobfish_blobby.png")
 
         private val BLOBFISH_MODEL =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "geo/fish/blobfish/blobfish.geo.json")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "fish/blobfish/blobfish")
         private val BLOBBY_MODEL =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "geo/fish/blobfish/blobfish_blobby.geo.json")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "fish/blobfish/blobfish_blobby")
     }
 }

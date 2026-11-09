@@ -6,18 +6,21 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
-import software.bernie.geckolib.animatable.GeoAnimatable
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
-import software.bernie.geckolib.animation.*
-import software.bernie.geckolib.util.GeckoLibUtil
-import software.bernie.geckolib.util.RenderUtil
+import com.geckolib.animatable.GeoAnimatable
+import com.geckolib.animatable.instance.AnimatableInstanceCache
+import com.geckolib.animation.*
+import com.geckolib.animation.state.AnimationTest
+import com.geckolib.animatable.manager.AnimatableManager
+import com.geckolib.animation.`object`.PlayState
+import com.geckolib.util.GeckoLibUtil
+import com.geckolib.util.RenderUtil
 
 class AnemoneBlockEntity(pos: BlockPos, state: BlockState) :
     BlockEntity(HABlockEntityTypes.ANEMONE.get(), pos, state),
     GeoAnimatable {
     private val factory = GeckoLibUtil.createInstanceCache(this)
 
-    private fun <E> predicate(event: AnimationState<E>): PlayState where E : BlockEntity?, E : GeoAnimatable {
+    private fun <E> predicate(event: AnimationTest<E>): PlayState where E : BlockEntity, E : GeoAnimatable {
         return if (level != null) {
             event.controller.setAnimation(SWAY_ANIMATION)
             PlayState.CONTINUE
@@ -27,16 +30,13 @@ class AnemoneBlockEntity(pos: BlockPos, state: BlockState) :
     }
 
     override fun registerControllers(controllerRegistrar: AnimatableManager.ControllerRegistrar) {
-        controllerRegistrar.add(AnimationController(this, "controller", 0, ::predicate))
+        controllerRegistrar.add(AnimationController<AnemoneBlockEntity>( "controller", 0, ::predicate))
     }
 
     override fun getAnimatableInstanceCache(): AnimatableInstanceCache {
         return factory
     }
 
-    override fun getTick(o: Any): Double {
-        return RenderUtil.getCurrentTick()
-    }
 
     override fun getUpdateTag(registries: HolderLookup.Provider): CompoundTag {
         return saveWithoutMetadata(registries)
@@ -47,6 +47,6 @@ class AnemoneBlockEntity(pos: BlockPos, state: BlockState) :
     }
 
     companion object {
-        val SWAY_ANIMATION: RawAnimation = RawAnimation.begin().then("sway", Animation.LoopType.LOOP)
+        val SWAY_ANIMATION: RawAnimation = RawAnimation.begin().then("sway", com.geckolib.animation.`object`.LoopType.LOOP)
     }
 }

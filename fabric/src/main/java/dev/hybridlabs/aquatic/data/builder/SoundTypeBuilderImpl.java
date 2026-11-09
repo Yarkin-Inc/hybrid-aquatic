@@ -5,7 +5,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.ExtraCodecs;
 import org.jetbrains.annotations.Nullable;
@@ -97,10 +97,10 @@ public final class SoundTypeBuilderImpl implements SoundTypeBuilder {
  *
  * @see net.minecraft.client.resources.sounds.Sound
  */
-public record Entry(ResourceLocation name, RegistrationType type, float volume, float pitch, int weight,
+public record Entry(Identifier name, RegistrationType type, float volume, float pitch, int weight,
                     int attenuationDistance, boolean stream, boolean preload) {
 	private static final Codec<Entry> MAP_CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			ResourceLocation.CODEC.fieldOf("name").forGetter(Entry::name),
+			Identifier.CODEC.fieldOf("name").forGetter(Entry::name),
 			RegistrationType.CODEC.optionalFieldOf("type", RegistrationType.FILE).forGetter(Entry::type),
 			Codec.floatRange(Float.MIN_VALUE, 1.0F).optionalFieldOf("volume", RegistrationBuilder.DEFAULT_VOLUME).forGetter(Entry::volume),
 			Codec.floatRange(0.5F, 2.0F).optionalFieldOf("pitch", RegistrationBuilder.DEFAULT_PITCH).forGetter(Entry::pitch),
@@ -110,7 +110,7 @@ public record Entry(ResourceLocation name, RegistrationType type, float volume, 
 			Codec.BOOL.optionalFieldOf("preload", false).forGetter(Entry::preload)
 	).apply(instance, Entry::new));
 	
-	private static final Codec<Entry> STRING_CODEC = ResourceLocation.CODEC.xmap(
+	private static final Codec<Entry> STRING_CODEC = Identifier.CODEC.xmap(
 			id -> new Entry(id, RegistrationType.FILE, RegistrationBuilder.DEFAULT_VOLUME, RegistrationBuilder.DEFAULT_PITCH, RegistrationBuilder.DEFAULT_WEIGHT, RegistrationBuilder.DEFAULT_ATTENUATION_DISTANCE, false, false),
 			Entry::name
 	);
@@ -132,7 +132,7 @@ public record Entry(ResourceLocation name, RegistrationType type, float volume, 
 }
 
 	public static final class RegistrationBuilderImpl implements RegistrationBuilder {
-		private final ResourceLocation id;
+		private final Identifier id;
 		private final RegistrationType type;
 		
 		private float volume = DEFAULT_VOLUME;
@@ -142,16 +142,16 @@ public record Entry(ResourceLocation name, RegistrationType type, float volume, 
 		private boolean stream = false;
 		private boolean preload = false;
 		
-		private RegistrationBuilderImpl(RegistrationType type, ResourceLocation id) {
+		private RegistrationBuilderImpl(RegistrationType type, Identifier id) {
 			this.type = type;
 			this.id = id;
 		}
 		
-		public static RegistrationBuilder create(RegistrationType type, ResourceLocation id) {
+		public static RegistrationBuilder create(RegistrationType type, Identifier id) {
 			return new RegistrationBuilderImpl(type, id);
 		}
 		
-		public static RegistrationBuilder ofFile(ResourceLocation soundFile) {
+		public static RegistrationBuilder ofFile(Identifier soundFile) {
 			Objects.requireNonNull(soundFile, "Sound file/event id must not be null.");
 			
 			if (soundFile.getPath().indexOf('.') != -1) {

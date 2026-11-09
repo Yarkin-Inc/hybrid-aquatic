@@ -100,11 +100,13 @@ class ThermalVentBlock(
 
     override fun updateShape(
         state: BlockState,
-        direction: Direction,
-        neighborState: BlockState,
-        world: LevelAccessor,
+        world: net.minecraft.world.level.LevelReader,
+        tickAccess: net.minecraft.world.level.ScheduledTickAccess,
         pos: BlockPos,
+        direction: Direction,
         neighborPos: BlockPos,
+        neighborState: BlockState,
+        random: net.minecraft.util.RandomSource,
     ): BlockState {
         if (!canSurvive(state, world, pos)) {
             return Blocks.AIR.defaultBlockState()
@@ -151,11 +153,11 @@ class ThermalVentBlock(
     }
 
     override fun stepOn(world: Level, pos: BlockPos, state: BlockState, entity: Entity) {
-        if (world.isClientSide) return
+        if (world !is net.minecraft.server.level.ServerLevel) return
 
         if (state.getValue(THICKNESS) == ThermalVentPosition.TIP && state.getValue(WATERLOGGED)) {
-            if (entity is Player && !entity.isInvulnerableTo(world.damageSources().hotFloor())) {
-                entity.hurt(world.damageSources().hotFloor(), fireDamage.toFloat())
+            if (entity is Player && !entity.isInvulnerableTo(world, world.damageSources().hotFloor())) {
+                entity.hurtServer(world, world.damageSources().hotFloor(), fireDamage.toFloat())
                 entity.addEffect(MobEffectInstance(HAMobEffects.CORROSION.asHolder(), 200, 0))
             }
         }
@@ -172,7 +174,7 @@ class ThermalVentBlock(
         return SHAPE
     }
 
-    override fun getOcclusionShape(state: BlockState, world: BlockGetter, pos: BlockPos): VoxelShape {
+    override fun getOcclusionShape(state: BlockState): VoxelShape {
         return Shapes.empty()
     }
 
@@ -193,7 +195,7 @@ class ThermalVentBlock(
         }
     }
 
-    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block?, BlockState?>) {
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
         builder.add(THICKNESS, WATERLOGGED)
     }
 

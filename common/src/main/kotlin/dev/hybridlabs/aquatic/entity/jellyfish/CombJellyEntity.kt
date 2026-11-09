@@ -9,9 +9,9 @@ import net.minecraft.util.ByIdMap
 import net.minecraft.util.StringRepresentable
 import net.minecraft.world.DifficultyInstance
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.MobSpawnType
+import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.SpawnGroupData
-import net.minecraft.world.entity.VariantHolder
+import dev.hybridlabs.hapi.entity.VariantHolder
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.level.Level
@@ -59,7 +59,7 @@ class CombJellyEntity(entityType: EntityType<out CombJellyEntity>, world: Level)
                 )
 
                 fun byName(name: String?): Type {
-                    return CODEC.byName(name, SEA_WALNUT) as Type
+                    return CODEC.byName(name ?: "", SEA_WALNUT) as Type
                 }
 
                 fun fromId(id: Int): Type {
@@ -72,7 +72,7 @@ class CombJellyEntity(entityType: EntityType<out CombJellyEntity>, world: Level)
     override fun finalizeSpawn(
         world: ServerLevelAccessor,
         difficulty: DifficultyInstance,
-        spawnReason: MobSpawnType,
+        spawnReason: EntitySpawnReason,
         entityData: SpawnGroupData?
     ): SpawnGroupData? {
         variant = Type.entries.random(Random)
@@ -84,13 +84,13 @@ class CombJellyEntity(entityType: EntityType<out CombJellyEntity>, world: Level)
         super.defineSynchedData(builder)
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
+    override fun addAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueOutput) {
         compound.putString("Type", this.variant.serializedName)
         super.addAdditionalSaveData(compound)
     }
 
-    override fun readAdditionalSaveData(nbt: CompoundTag) {
-        this.variant = Type.byName(nbt.getString("Type"))
+    override fun readAdditionalSaveData(nbt: net.minecraft.world.level.storage.ValueInput) {
+        this.variant = Type.byName(nbt.getStringOr("Type", ""))
         super.readAdditionalSaveData(nbt)
     }
 

@@ -3,15 +3,15 @@ package dev.hybridlabs.aquatic.client.render.entity.misc
 import dev.hybridlabs.aquatic.client.model.entity.misc.CavitationBubbleEntityModel
 import dev.hybridlabs.aquatic.entity.projectile.CavitationBubbleEntity
 import net.minecraft.client.renderer.entity.EntityRendererProvider
-import software.bernie.geckolib.renderer.GeoEntityRenderer
-import software.bernie.geckolib.renderer.layer.AutoGlowingGeoLayer
+import dev.hybridlabs.hapi.client.render.HybridGeoObjectEntityRenderer as GeoEntityRenderer
+import com.geckolib.renderer.layer.builtin.AutoGlowingGeoLayer
 
 class CavitationBubbleEntityRenderer(
     context: EntityRendererProvider.Context
 ) : GeoEntityRenderer<CavitationBubbleEntity>(context, CavitationBubbleEntityModel()) {
 
     init {
-        addRenderLayer(AutoGlowingGeoLayer(this))
+        withRenderLayer(AutoGlowingGeoLayer(this))
         this.shadowRadius = 0.5f
     }
 

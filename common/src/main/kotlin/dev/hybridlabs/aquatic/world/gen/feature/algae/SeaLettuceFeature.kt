@@ -8,9 +8,9 @@ import net.minecraft.world.level.block.TallSeagrassBlock
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf
 import net.minecraft.world.level.levelgen.Heightmap
-import net.minecraft.world.level.levelgen.feature.Feature
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext
-import net.minecraft.world.level.levelgen.feature.configurations.ProbabilityFeatureConfiguration
+import dev.hybridlabs.aquatic.world.gen.feature.FeatureAlgorithm as Feature
+import dev.hybridlabs.aquatic.world.gen.feature.FeatureContext as FeaturePlaceContext
+import dev.hybridlabs.aquatic.world.gen.feature.config.ProbabilityFeatureConfiguration
 
 class SeaLettuceFeature(codec: Codec<ProbabilityFeatureConfiguration>) :
     Feature<ProbabilityFeatureConfiguration>(codec) {

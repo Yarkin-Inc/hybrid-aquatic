@@ -5,9 +5,12 @@
     "shark": [
       {
         "type": "hybrid_aquatic:great_white_shark",
-        "maxCount": 3,
-        "minCount": 1,
-        "weight": 1
+        "weight": 1,
+        "count": {
+          "type": "minecraft:uniform",
+          "min_inclusive": 1,
+          "max_inclusive": 3
+        }
       }
     ]
   },

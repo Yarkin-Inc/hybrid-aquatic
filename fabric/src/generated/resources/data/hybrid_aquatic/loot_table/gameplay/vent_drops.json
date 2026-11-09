@@ -5,7 +5,8 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "functions": [
+          "name": "hybrid_aquatic:sulfur",
+          "modifier": [
             {
               "add": false,
               "count": {
@@ -13,22 +14,15 @@
                 "max": 2.0,
                 "min": 0.0
               },
-              "function": "minecraft:set_count"
+              "type": "minecraft:set_count"
             }
-          ],
-          "name": "hybrid_aquatic:sulfur"
+          ]
         }
       ],
       "rolls": 1.0
     },
     {
       "bonus_rolls": 0.0,
-      "conditions": [
-        {
-          "chance": 0.5,
-          "condition": "minecraft:random_chance"
-        }
-      ],
       "entries": [
         {
           "type": "minecraft:item",
@@ -45,7 +39,11 @@
           "weight": 5
         }
       ],
-      "rolls": 1.0
+      "rolls": 1.0,
+      "condition": {
+        "chance": 0.5,
+        "type": "minecraft:random_chance"
+      }
     }
   ],
   "random_sequence": "hybrid_aquatic:gameplay/vent_drops"

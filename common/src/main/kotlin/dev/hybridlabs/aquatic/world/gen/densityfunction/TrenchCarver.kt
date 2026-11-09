@@ -10,12 +10,15 @@ import net.minecraft.core.Holder
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.RegistryOps
 import net.minecraft.resources.ResourceKey
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.server.MinecraftServer
-import net.minecraft.util.KeyDispatchDataCodec
+import net.minecraft.world.level.levelgen.densityfunction.DfRewriteRule
+import net.minecraft.world.level.levelgen.densityfunction.DensitySampler
+import net.minecraft.world.level.levelgen.densityfunction.op.FindTopSurfaceFunction
+import net.minecraft.util.Interval
 import net.minecraft.world.level.dimension.LevelStem
-import net.minecraft.world.level.levelgen.DensityFunction
-import net.minecraft.world.level.levelgen.DensityFunctions
+import net.minecraft.world.level.levelgen.densityfunction.DensityFunction
+import net.minecraft.world.level.levelgen.densityfunction.DensityFunctions
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings
 import net.minecraft.world.level.levelgen.NoiseRouter
@@ -36,14 +39,14 @@ object TrenchCarver {
     private val CARVER = ResourceKey.create(Registries.DENSITY_FUNCTION, CommonClass.locate("trench/carver"))
     private val BIOME_DEPTH = ResourceKey.create(Registries.DENSITY_FUNCTION, CommonClass.locate("trench/biome_depth"))
     private val CLEANUP_CARVER = ResourceKey.create(Registries.DENSITY_FUNCTION, CommonClass.locate("trench/cleanup_carver"))
-    private val VANILLA_OFFSET = ResourceLocation.withDefaultNamespace("overworld/offset")
+    private val VANILLA_OFFSET = Identifier.withDefaultNamespace("overworld/offset")
 
     private val DENSITY_FUNCTION_TYPES = CommonClass.DENSITY_FUNCTION_TYPES
-    val CONTINENTS_MARKER = DENSITY_FUNCTION_TYPES.register("continents_marker") { ContinentsMarker.CODEC.codec() }
+    val CONTINENTS_MARKER = DENSITY_FUNCTION_TYPES.register("continents_marker") { ContinentsMarker.CODEC }
 
     @JvmStatic
     fun apply(server: MinecraftServer) {
-        val overworld = server.registryAccess().registryOrThrow(Registries.LEVEL_STEM).get(LevelStem.OVERWORLD) ?: return
+        val overworld = server.registryAccess().lookupOrThrow(Registries.LEVEL_STEM).get(LevelStem.OVERWORLD).orElse(null)?.value() ?: return
         val generator = overworld.generator() as? NoiseBasedChunkGenerator ?: return
 
         // Inline settings have no registry holder to rebind, which only happens with hand-written world presets
@@ -53,32 +56,26 @@ object TrenchCarver {
         }
 
         val router = settings.value().noiseRouter()
-        val densityFunctions = server.registryAccess().registryOrThrow(Registries.DENSITY_FUNCTION)
-        fun load(key: ResourceKey<DensityFunction>) = densityFunctions.getHolderOrThrow(key).value()
-            .mapAll { function -> if (function is ContinentsMarker) router.continents() else function }
+        val densityFunctions = server.registryAccess().lookupOrThrow(Registries.DENSITY_FUNCTION)
+        fun load(key: ResourceKey<DensityFunction>) = DensityFunctionWrappers.rewrite(densityFunctions.getOrThrow(key).value()) { function ->
+            if (function is ContinentsMarker) router.continents() else function
+        }
 
         val offsetShapesTrench = reads(router.finalDensity(), VANILLA_OFFSET, server)
         Constants.LOGGER.info(if (offsetShapesTrench) "Trenches follow the overworld offset" else "Overworld terrain skips the offset, so trenches are carved directly")
         val carver = load(if (offsetShapesTrench) CLEANUP_CARVER else CARVER)
         val depth = if (offsetShapesTrench) router.depth() else DensityFunctions.min(router.depth(), load(BIOME_DEPTH))
 
+        // 26.3 stores surface height explicitly. Carve the density used by each surface
+        // search, retaining its original search bounds and vertical resolution.
+        val carvedSurface = DensityFunctionWrappers.rewrite(router.chunkSurfaceLevel()) { function ->
+            if (function is FindTopSurfaceFunction) FindTopSurfaceFunction(
+                DensityFunctions.min(function.density(), carver), function.upperBound(),
+                function.lowerBound(), function.cellHeight()) else function
+        }
         val carvedRouter = NoiseRouter(
-            router.barrierNoise(),
-            router.fluidLevelFloodednessNoise(),
-            router.fluidLevelSpreadNoise(),
-            router.lavaNoise(),
-            router.temperature(),
-            router.vegetation(),
-            router.continents(),
-            router.erosion(),
-            depth,
-            router.ridges(),
-            // Initial density sets the preliminary surface, which aquifers use to flood the trench with sea water
-            DensityFunctions.min(router.initialDensityWithoutJaggedness(), carver),
-            DensityFunctions.min(router.finalDensity(), carver),
-            router.veinToggle(),
-            router.veinRidged(),
-            router.veinGap(),
+            router.temperature(), router.vegetation(), router.continents(), router.erosion(),
+            depth, router.ridges(), carvedSurface, DensityFunctions.min(router.finalDensity(), carver),
         )
 
         val current = settings.value()
@@ -88,13 +85,13 @@ object TrenchCarver {
             current.defaultBlock(),
             current.defaultFluid(),
             carvedRouter,
-            current.surfaceRule(),
+            current.materialRule(),
             current.spawnTarget(),
             current.seaLevel(),
             current.disableMobGeneration(),
-            current.isAquifersEnabled(),
-            current.oreVeinsEnabled(),
+            current.aquifers(),
             current.useLegacyRandomSource(),
+            current.debugFunctions(),
         )
 
         @Suppress("UNCHECKED_CAST")
@@ -104,18 +101,18 @@ object TrenchCarver {
     /**
      * Whether [function] references the registered density function [target], following references through the registry.
      */
-    private fun reads(function: DensityFunction, target: ResourceLocation, server: MinecraftServer): Boolean {
+    private fun reads(function: DensityFunction, target: Identifier, server: MinecraftServer): Boolean {
         val ops = RegistryOps.create(JsonOps.INSTANCE, server.registryAccess())
-        val densityFunctions = server.registryAccess().registryOrThrow(Registries.DENSITY_FUNCTION)
-        val visited = mutableSetOf<ResourceLocation>()
+        val densityFunctions = server.registryAccess().lookupOrThrow(Registries.DENSITY_FUNCTION)
+        val visited = mutableSetOf<Identifier>()
         val pending = ArrayDeque(listOf(function))
 
         while (pending.isNotEmpty()) {
             // References to registered functions encode as their ID, so every string in the encoding is a candidate
-            val json = DensityFunction.HOLDER_HELPER_CODEC.encodeStart(ops, pending.removeFirst()).result().orElse(null) ?: continue
-            for (id in strings(json).mapNotNull(ResourceLocation::tryParse)) {
+            val json = DensityFunction.CODEC.encodeStart(ops, pending.removeFirst()).result().orElse(null) ?: continue
+            for (id in strings(json).mapNotNull(Identifier::tryParse)) {
                 if (id == target) return true
-                if (visited.add(id)) densityFunctions.get(id)?.let(pending::add)
+                if (visited.add(id)) densityFunctions.get(ResourceKey.create(Registries.DENSITY_FUNCTION, id)).ifPresent { pending.add(it.value()) }
             }
         }
 
@@ -132,12 +129,14 @@ object TrenchCarver {
     /**
      * Placeholder for the router's continentalness. [apply] replaces every marker, so it never reaches world generation.
      */
-    object ContinentsMarker : DensityFunction.SimpleFunction {
-        val CODEC: KeyDispatchDataCodec<ContinentsMarker> = KeyDispatchDataCodec.of(MapCodec.unit(ContinentsMarker))
+    object ContinentsMarker : DensityFunction {
+        val CODEC: MapCodec<ContinentsMarker> = MapCodec.unit(ContinentsMarker)
 
-        override fun compute(context: DensityFunction.FunctionContext): Double = 0.0
-        override fun minValue(): Double = 0.0
-        override fun maxValue(): Double = 0.0
-        override fun codec(): KeyDispatchDataCodec<out DensityFunction> = CODEC
+        override fun compileSampler(context: DensityFunction.CompileContext): DensitySampler =
+            error("Unresolved continents_marker reached world generation")
+        override fun rewriteChildren(rule: DfRewriteRule): DensityFunction = this
+        override fun range(): Interval = Interval.INFINITE
+        override fun domainAxes(): Int = DensityFunction.ALL_AXES
+        override fun codec(): MapCodec<out DensityFunction> = CODEC
     }
 }

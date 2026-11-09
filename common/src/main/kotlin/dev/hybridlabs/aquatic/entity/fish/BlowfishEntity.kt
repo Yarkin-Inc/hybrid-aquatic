@@ -21,7 +21,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.ai.goal.Goal
 import net.minecraft.world.entity.ai.targeting.TargetingConditions
-import net.minecraft.world.entity.animal.WaterAnimal
+import net.minecraft.world.entity.animal.fish.WaterAnimal
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import java.util.function.Predicate
@@ -68,14 +68,14 @@ class BlowfishEntity(type: EntityType<out BlowfishEntity>, world: Level) :
         refreshDimensions()
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
+    override fun addAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueOutput) {
         super.addAdditionalSaveData(compound)
         compound.putInt("PuffState", getPuffState())
     }
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
+    override fun readAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueInput) {
         super.readAdditionalSaveData(compound)
-        setPuffState(compound.getInt("PuffState").coerceAtMost(FULLY_PUFFED))
+        setPuffState(compound.getIntOr("PuffState", 0).coerceAtMost(FULLY_PUFFED))
     }
 
     override fun tick() {
@@ -112,9 +112,9 @@ class BlowfishEntity(type: EntityType<out BlowfishEntity>, world: Level) :
 
     override fun aiStep() {
         super.aiStep()
-        if (isAlive && getPuffState() > 0) {
+        if (level() is net.minecraft.server.level.ServerLevel && isAlive && getPuffState() > 0) {
             val nearbyEntities = level().getEntitiesOfClass(Mob::class.java, boundingBox.inflate(0.3)) {
-                BLOW_UP_TARGET_PREDICATE.test(this, it)
+                BLOW_UP_TARGET_PREDICATE.test(level() as net.minecraft.server.level.ServerLevel, this, it)
             }
             nearbyEntities.forEach { touch(it) }
         }
@@ -122,7 +122,7 @@ class BlowfishEntity(type: EntityType<out BlowfishEntity>, world: Level) :
 
     private fun touch(mob: Mob) {
         val i = this.getPuffState()
-        if (mob.hurt(damageSources().mobAttack(this), (1 + i).toFloat())) {
+        if (mob.hurtServer(level() as net.minecraft.server.level.ServerLevel, damageSources().mobAttack(this), (1 + i).toFloat())) {
             mob.addEffect(
                 MobEffectInstance(MobEffects.POISON, 60 * i, 0),
                 this
@@ -133,7 +133,7 @@ class BlowfishEntity(type: EntityType<out BlowfishEntity>, world: Level) :
 
     override fun playerTouch(entity: Player) {
         val i = this.getPuffState()
-        if (entity is ServerPlayer && i > 0 && entity.hurt(damageSources().mobAttack(this), (1 + i).toFloat())) {
+        if (entity is ServerPlayer && i > 0 && entity.hurtServer(entity.level(), damageSources().mobAttack(this), (1 + i).toFloat())) {
             if (!this.isSilent) {
                 entity.connection.send(ClientboundGameEventPacket(ClientboundGameEventPacket.PUFFER_FISH_STING, 0.0f))
             }
@@ -148,7 +148,7 @@ class BlowfishEntity(type: EntityType<out BlowfishEntity>, world: Level) :
     private inner class InflateGoal : Goal() {
         override fun canUse(): Boolean {
             val nearbyEntities = level().getEntitiesOfClass(LivingEntity::class.java, boundingBox.inflate(2.0)) {
-                BLOW_UP_TARGET_PREDICATE.test(this@BlowfishEntity, it)
+                BLOW_UP_TARGET_PREDICATE.test(level() as net.minecraft.server.level.ServerLevel, this@BlowfishEntity, it)
             }
             return nearbyEntities.isNotEmpty()
         }
@@ -190,7 +190,7 @@ class BlowfishEntity(type: EntityType<out BlowfishEntity>, world: Level) :
 
         private val BLOW_UP_TARGET_PREDICATE: TargetingConditions =
             TargetingConditions.forNonCombat().ignoreInvisibilityTesting().ignoreLineOfSight()
-                .selector(BLOW_UP_FILTER)
+                .selector { entity, _ -> BLOW_UP_FILTER.test(entity) }
 
         const val NOT_PUFFED = 0
         const val SEMI_PUFFED = 1

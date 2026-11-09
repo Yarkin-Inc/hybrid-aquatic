@@ -18,11 +18,8 @@ import net.minecraft.world.level.block.state.BlockState
 class GrassySandBlock(properties: Properties) :
     FallingBlock(properties), BonemealableBlock {
 
-    override fun codec(): MapCodec<out FallingBlock> {
-        return CODEC
-    }
 
-    override fun isValidBonemealTarget(level: LevelReader, pos: BlockPos, state: BlockState): Boolean {
+    override fun isValidBonemealTarget(level: LevelReader, pos: BlockPos, state: BlockState, source: net.minecraft.world.level.block.BonemealSource): Boolean {
         return level.getBlockState(pos.above()).isAir
     }
 
@@ -30,20 +27,18 @@ class GrassySandBlock(properties: Properties) :
         level: Level,
         random: RandomSource,
         pos: BlockPos,
-        state: BlockState,
-    ): Boolean = true
+        state: BlockState, source: net.minecraft.world.level.block.BonemealSource): Boolean = true
 
     override fun performBonemeal(
         level: ServerLevel,
         random: RandomSource,
         pos: BlockPos,
-        state: BlockState,
-    ) {
+        state: BlockState, source: net.minecraft.world.level.block.BonemealSource) {
         val startPos = pos.above()
 
         val optional = level.registryAccess()
-            .registryOrThrow(Registries.PLACED_FEATURE)
-            .getHolder(AquaticPlacements.SEAGRASS_WARM)
+            .lookupOrThrow(Registries.PLACED_FEATURE)
+            .get(AquaticPlacements.SEAGRASS_WARM)
 
         if (!optional.isPresent) return
 
@@ -94,9 +89,11 @@ class GrassySandBlock(properties: Properties) :
         }
     }
 
+    override fun getDustColor(state: BlockState, level: net.minecraft.world.level.BlockGetter, pos: BlockPos): Int = 0xDBD3A0
+
     override fun isRandomlyTicking(state: BlockState): Boolean = true
 
     companion object {
-        val CODEC: MapCodec<GrassySandBlock> = simpleCodec(::GrassySandBlock)
+
     }
 }

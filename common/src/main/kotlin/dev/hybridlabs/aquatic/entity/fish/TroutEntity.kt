@@ -1,5 +1,6 @@
 package dev.hybridlabs.aquatic.entity.fish
 
+import dev.hybridlabs.hapi.entity.VariantHolder
 import dev.hybridlabs.hapi.entity.ai.MobTargetConfiguration
 import dev.hybridlabs.hapi.entity.base.aquatic.BaseFishEntity
 import dev.hybridlabs.hapi.tag.HAPIEntityTags
@@ -50,7 +51,7 @@ class TroutEntity(type: EntityType<out TroutEntity>, world: Level) :
     override fun finalizeSpawn(
         world: ServerLevelAccessor,
         difficulty: DifficultyInstance,
-        spawnReason: MobSpawnType,
+        spawnReason: EntitySpawnReason,
         entityData: SpawnGroupData?
     ): SpawnGroupData? {
         val spawnData = super.finalizeSpawn(world, difficulty, spawnReason, entityData)
@@ -101,7 +102,7 @@ class TroutEntity(type: EntityType<out TroutEntity>, world: Level) :
                 )
 
                 fun byName(name: String?): Type {
-                    return CODEC.byName(name, REDBAND_TROUT) as Type
+                    return CODEC.byName(name ?: "", REDBAND_TROUT) as Type
                 }
 
                 fun fromId(id: Int): Type {
@@ -116,13 +117,13 @@ class TroutEntity(type: EntityType<out TroutEntity>, world: Level) :
         super.defineSynchedData(builder)
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
+    override fun addAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueOutput) {
         compound.putString("Type", this.variant.serializedName)
         super.addAdditionalSaveData(compound)
     }
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
-        this.variant = Type.byName(compound.getString("Type"))
+    override fun readAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueInput) {
+        this.variant = Type.byName(compound.getStringOr("Type", ""))
         super.readAdditionalSaveData(compound)
     }
 

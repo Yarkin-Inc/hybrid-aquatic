@@ -4,6 +4,8 @@ import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.particle.*
 import net.minecraft.core.BlockPos
 import net.minecraft.core.particles.SimpleParticleType
+import net.minecraft.client.renderer.texture.TextureAtlasSprite
+import net.minecraft.util.RandomSource
 import net.minecraft.tags.FluidTags
 
 class BrineBubbleParticle(
@@ -13,8 +15,7 @@ class BrineBubbleParticle(
     z: Double,
     xSpeed: Double,
     ySpeed: Double,
-    zSpeed: Double,
-) : TextureSheetParticle(level, x, y, z) {
+    zSpeed: Double, initialSprite: TextureAtlasSprite) : SingleQuadParticle(level, x, y, z, initialSprite) {
     init {
         this.setSize(0.02f, 0.02f)
         this.quadSize *= this.random.nextFloat() * 0.6f + 0.2f
@@ -42,8 +43,8 @@ class BrineBubbleParticle(
         }
     }
 
-    override fun getRenderType(): ParticleRenderType {
-        return ParticleRenderType.PARTICLE_SHEET_OPAQUE
+    override fun getLayer(): SingleQuadParticle.Layer {
+        return SingleQuadParticle.Layer.OPAQUE
     }
 
     companion object {
@@ -56,10 +57,9 @@ class BrineBubbleParticle(
                 z: Double,
                 xSpeed: Double,
                 ySpeed: Double,
-                zSpeed: Double,
-            ): Particle {
-                val bubbleParticle = BrineBubbleParticle(level, x, y, z, xSpeed, ySpeed, zSpeed)
-                bubbleParticle.pickSprite(this.sprite)
+                zSpeed: Double, random: RandomSource): SingleQuadParticle {
+                val bubbleParticle = BrineBubbleParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, this.sprite.get(random))
+
                 return bubbleParticle
             }
         }

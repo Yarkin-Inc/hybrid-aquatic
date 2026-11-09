@@ -3,8 +3,8 @@ package dev.hybridlabs.aquatic.loot
 import dev.hybridlabs.aquatic.CommonClass
 import dev.hybridlabs.aquatic.config.ConfigHelper
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents
-import net.minecraft.advancements.critereon.EntityPredicate
-import net.minecraft.advancements.critereon.FishingHookPredicate
+import net.minecraft.advancements.predicates.entity.EntityPredicate
+import net.minecraft.advancements.predicates.entity.FishingHookPredicate
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
 import net.minecraft.world.level.storage.loot.BuiltInLootTables
@@ -29,19 +29,19 @@ object LootTableModifications {
                                 // add fishing loot tables
                                 .add(
                                     NestedLootTable.lootTableReference(
-                                        ResourceKey.create(Registries.LOOT_TABLE, HALootTables.HA_SMALL_FISH))
+                                        registries.lookupOrThrow(Registries.LOOT_TABLE).getOrThrow(ResourceKey.create(Registries.LOOT_TABLE, HALootTables.HA_SMALL_FISH)))
                                         .setWeight(30)
                                         .setQuality(1)
                                 )
                                 .add(
                                     NestedLootTable.lootTableReference(
-                                        ResourceKey.create(Registries.LOOT_TABLE, HALootTables.HA_MEDIUM_FISH))
+                                        registries.lookupOrThrow(Registries.LOOT_TABLE).getOrThrow(ResourceKey.create(Registries.LOOT_TABLE, HALootTables.HA_MEDIUM_FISH)))
                                         .setWeight(25)
                                         .setQuality(1)
                                 )
                                 .add(
                                     NestedLootTable.lootTableReference(
-                                        ResourceKey.create(Registries.LOOT_TABLE, HALootTables.HA_LARGE_FISH))
+                                        registries.lookupOrThrow(Registries.LOOT_TABLE).getOrThrow(ResourceKey.create(Registries.LOOT_TABLE, HALootTables.HA_LARGE_FISH)))
                                         .setWeight(20)
                                         .setQuality(1)
                                 )
@@ -49,14 +49,14 @@ object LootTableModifications {
                                 // add fishing treasure loot table
                                 .add(
                                     NestedLootTable.lootTableReference(
-                                        ResourceKey.create(Registries.LOOT_TABLE, HALootTables.HA_CRATES))
+                                        registries.lookupOrThrow(Registries.LOOT_TABLE).getOrThrow(ResourceKey.create(Registries.LOOT_TABLE, HALootTables.HA_CRATES)))
                                         .setWeight(15)
                                         .setQuality(2)
                                         .`when`(
                                             LootItemEntityPropertyCondition.hasProperties(
                                                 LootContext.EntityTarget.THIS,
                                                 EntityPredicate.Builder.entity()
-                                                    .subPredicate(FishingHookPredicate.inOpenWater(true))
+                                                    .fishingHook(FishingHookPredicate.inOpenWater(true))
                                             )
                                         )
                                 )

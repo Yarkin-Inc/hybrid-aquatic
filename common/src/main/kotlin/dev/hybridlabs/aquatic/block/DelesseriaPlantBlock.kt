@@ -32,7 +32,7 @@ class DelesseriaPlantBlock(settings: Properties) :
     }
 
     override fun canPlaceLiquid(
-        p0: Player?,
+        p0: net.minecraft.world.entity.LivingEntity?,
         world: BlockGetter,
         pos: BlockPos,
         state: BlockState,
@@ -50,11 +50,8 @@ class DelesseriaPlantBlock(settings: Properties) :
         return false
     }
 
-    override fun codec(): MapCodec<out GrowingPlantBodyBlock> {
-        return CODEC
-    }
 
     companion object {
-        val CODEC: MapCodec<DelesseriaPlantBlock> = simpleCodec(::DelesseriaPlantBlock)
+
     }
 }

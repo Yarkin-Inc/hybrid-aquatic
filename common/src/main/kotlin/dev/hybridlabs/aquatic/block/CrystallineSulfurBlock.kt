@@ -16,8 +16,8 @@ import net.minecraft.world.level.block.state.BlockState
 class CrystallineSulfurBlock(settings: Properties): Block(settings) {
 
     override fun playerDestroy(
-        level: Level,
-        player: Player,
+        level: net.minecraft.server.level.ServerLevel,
+        player: net.minecraft.server.level.ServerPlayer,
         pos: BlockPos,
         state: BlockState,
         blockEntity: BlockEntity?,
@@ -40,7 +40,7 @@ class CrystallineSulfurBlock(settings: Properties): Block(settings) {
         level.addFreshEntity(cloud)
     }
 
-    override fun wasExploded(level: Level, pos: BlockPos, explosion: Explosion) {
+    override fun wasExploded(level: net.minecraft.server.level.ServerLevel, pos: BlockPos, explosion: Explosion) {
         super.wasExploded(level, pos, explosion)
 
         if (level.isClientSide) return

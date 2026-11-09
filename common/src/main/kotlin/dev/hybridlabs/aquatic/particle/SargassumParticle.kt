@@ -3,12 +3,14 @@ package dev.hybridlabs.aquatic.particle
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.particle.*
 import net.minecraft.core.particles.SimpleParticleType
+import net.minecraft.client.renderer.texture.TextureAtlasSprite
+import net.minecraft.util.RandomSource
 import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.sin
 
-class SargassumParticle(world: ClientLevel, x: Double, y: Double, z: Double): TextureSheetParticle(world, x, y, z) {
+class SargassumParticle(world: ClientLevel, x: Double, y: Double, z: Double, initialSprite: TextureAtlasSprite): SingleQuadParticle(world, x, y, z, initialSprite) {
     private var rotSpeed: Float = Math.toRadians(if (this.random.nextBoolean()) -30.0 else 30.0).toFloat()
     private val particleRandom: Float = this.random.nextFloat()
     private val spinAcceleration: Float = Math.toRadians(if (this.random.nextBoolean()) -5.0 else 5.0).toFloat()
@@ -22,8 +24,8 @@ class SargassumParticle(world: ClientLevel, x: Double, y: Double, z: Double): Te
         this.friction = 1.0f
     }
 
-    override fun getRenderType(): ParticleRenderType {
-        return ParticleRenderType.PARTICLE_SHEET_OPAQUE
+    override fun getLayer(): SingleQuadParticle.Layer {
+        return SingleQuadParticle.Layer.OPAQUE
     }
 
     override fun tick() {
@@ -63,10 +65,9 @@ class SargassumParticle(world: ClientLevel, x: Double, y: Double, z: Double): Te
             override fun createParticle(
                 type: SimpleParticleType, level: ClientLevel,
                 x: Double, y: Double, z: Double,
-                xSpeed: Double, ySpeed: Double, zSpeed: Double
-            ): Particle {
-                val sargassumParticle = SargassumParticle(level, x, y, z)
-                sargassumParticle.pickSprite(this.sprite)
+                xSpeed: Double, ySpeed: Double, zSpeed: Double, random: RandomSource): SingleQuadParticle {
+                val sargassumParticle = SargassumParticle(level, x, y, z, this.sprite.get(random))
+
                 return sargassumParticle
             }
         }

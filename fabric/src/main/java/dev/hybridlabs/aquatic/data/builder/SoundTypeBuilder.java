@@ -1,9 +1,9 @@
 package dev.hybridlabs.aquatic.data.builder;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.StringRepresentable;
@@ -146,7 +146,7 @@ public interface SoundTypeBuilder {
 		 *
 		 * @param id sound file or event
 		 */
-		static RegistrationBuilder create(RegistrationType type, ResourceLocation id) {
+		static RegistrationBuilder create(RegistrationType type, Identifier id) {
 			return SoundTypeBuilderImpl.RegistrationBuilderImpl.create(type, id);
 		}
 		
@@ -155,7 +155,7 @@ public interface SoundTypeBuilder {
 		 *
 		 * @param soundFile sound file excluding the {@code .ogg} extension
 		 */
-		static RegistrationBuilder ofFile(ResourceLocation soundFile) {
+		static RegistrationBuilder ofFile(Identifier soundFile) {
 			return SoundTypeBuilderImpl.RegistrationBuilderImpl.ofFile(soundFile);
 		}
 		

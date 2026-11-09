@@ -1,0 +1,9 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "hybrid_aquatic:item/strawberry_anemone",
+    "model": {
+      "type": "geckolib:geckolib"
+    }
+  }
+}

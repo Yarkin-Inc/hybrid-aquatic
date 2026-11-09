@@ -2,11 +2,11 @@ package dev.hybridlabs.aquatic.client.model.entity.mammal
 
 import dev.hybridlabs.aquatic.entity.mammal.DugongEntity
 import dev.hybridlabs.hapi.client.model.entity.aquatic.BaseSirenianEntityModel
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 
 class DugongEntityModel : BaseSirenianEntityModel<DugongEntity>("hybrid_aquatic", "dugong") {
 
-    override fun getTextureResource(animatable: DugongEntity): ResourceLocation {
+    override fun getTextureResource(animatable: DugongEntity): Identifier {
         return if (animatable.isBaby) {
             BABY_TEXTURE
         } else when (animatable.variant) {
@@ -17,11 +17,11 @@ class DugongEntityModel : BaseSirenianEntityModel<DugongEntity>("hybrid_aquatic"
 
     companion object {
         private val BABY_TEXTURE =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/mammal/dugong/baby_dugong.png")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/mammal/dugong/baby_dugong.png")
 
         private val PLAIN_TEXTURE =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/mammal/dugong/dugong.png")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/mammal/dugong/dugong.png")
         private val MOSSY_TEXTURE =
-            ResourceLocation.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/mammal/dugong/mossy_dugong.png")
+            Identifier.fromNamespaceAndPath("hybrid_aquatic", "textures/entity/mammal/dugong/mossy_dugong.png")
     }
 }

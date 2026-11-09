@@ -11,12 +11,12 @@ import dev.hybridlabs.aquatic.item.HAPlatformItems
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider
 import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.data.models.BlockModelGenerators
-import net.minecraft.data.models.ItemModelGenerators
-import net.minecraft.data.models.model.ModelTemplates
-import net.minecraft.data.models.model.TextureMapping
-import net.minecraft.data.models.model.TexturedModel
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.client.data.models.BlockModelGenerators
+import net.minecraft.client.data.models.ItemModelGenerators
+import net.minecraft.client.data.models.model.ModelTemplates
+import net.minecraft.client.data.models.model.TextureMapping
+import net.minecraft.client.data.models.model.TexturedModel
+import net.minecraft.resources.Identifier
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.CropBlock
@@ -45,7 +45,7 @@ class ModelProvider(output: FabricDataOutput) : FabricModelProvider(output) {
                 }
 
             // builtin
-            mapOf<Block, Pair<Block?, ResourceLocation>>(
+            mapOf<Block, Pair<Block?, Identifier>>(
                 HABlocks.ANEMONE.get() to (null to TEMPLATE_ANEMONE),
                 HABlocks.STRAWBERRY_ANEMONE.get() to (null to TEMPLATE_ANEMONE),
                 HABlocks.GIANT_GREEN_ANEMONE.get() to (null to TEMPLATE_ANEMONE),

@@ -18,6 +18,7 @@ import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.BossEvent
 import net.minecraft.world.Difficulty
 import net.minecraft.world.damagesource.DamageSource
+import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
@@ -29,17 +30,17 @@ import net.minecraft.world.entity.ai.goal.RandomStrollGoal
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation
-import net.minecraft.world.entity.animal.IronGolem
+import net.minecraft.world.entity.animal.golem.IronGolem
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.enchantment.EnchantmentHelper
 import net.minecraft.world.item.enchantment.Enchantments
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.pathfinder.PathType
-import software.bernie.geckolib.animation.AnimatableManager
-import software.bernie.geckolib.animation.AnimationController
-import software.bernie.geckolib.animation.PlayState
-import software.bernie.geckolib.animation.RawAnimation
-import software.bernie.geckolib.constant.DefaultAnimations
+import com.geckolib.animatable.manager.AnimatableManager
+import com.geckolib.animation.AnimationController
+import com.geckolib.animation.`object`.PlayState
+import com.geckolib.animation.RawAnimation
+import com.geckolib.constant.DefaultAnimations
 
 class KarkinosEntity(type: EntityType<out HAMinibossEntity>, world: Level) :
     HAMinibossEntity(type, world) {
@@ -64,7 +65,7 @@ class KarkinosEntity(type: EntityType<out HAMinibossEntity>, world: Level) :
     }
 
     private var bossBar: ServerBossEvent =
-        ServerBossEvent(displayName, BossEvent.BossBarColor.RED, BossEvent.BossBarOverlay.NOTCHED_20)
+        ServerBossEvent(java.util.UUID.randomUUID(), displayName, BossEvent.BossBarColor.RED, BossEvent.BossBarOverlay.NOTCHED_20)
 
     override fun registerGoals() {
         goalSelector.addGoal(1, KarkinosSummonGoal(this))
@@ -75,34 +76,6 @@ class KarkinosEntity(type: EntityType<out HAMinibossEntity>, world: Level) :
         targetSelector.addGoal(1, HurtByTargetGoal(this))
         targetSelector.addGoal(2, NearestAttackableTargetGoal(this, Player::class.java, 10, true, true, null))
         targetSelector.addGoal(2, NearestAttackableTargetGoal(this, IronGolem::class.java, 10, true, true, null))
-    }
-
-    private fun getHandSwingDuration(): Int {
-        return 40
-    }
-
-    override fun updateSwingTime() {
-        val i = this.getHandSwingDuration()
-        if (this.swinging) {
-            ++this.swingTime
-            if (this.swingTime >= i) {
-                this.swingTime = 0
-                this.swinging = false
-            }
-        } else {
-            this.swingTime = 0
-        }
-
-        this.attackAnim = swingTime.toFloat() / i.toFloat()
-    }
-
-    override fun getAttackAnim(tickDelta: Float): Float {
-        var f = this.attackAnim - this.oAttackAnim
-        if (f < 0.0f) {
-            ++f
-        }
-
-        return this.oAttackAnim + f * tickDelta
     }
 
     override fun startSeenByPlayer(player: ServerPlayer) {
@@ -116,7 +89,7 @@ class KarkinosEntity(type: EntityType<out HAMinibossEntity>, world: Level) :
     }
 
     override fun checkDespawn() {
-        if (level().difficulty == Difficulty.PEACEFUL && this.shouldDespawnInPeaceful()) {
+        if (level().difficulty == Difficulty.PEACEFUL) {
             discard()
         } else {
             noActionTime = 0
@@ -163,9 +136,9 @@ class KarkinosEntity(type: EntityType<out HAMinibossEntity>, world: Level) :
             val offsetZ = (random.nextDouble() - 0.5) * 6.0
             val spawnPos = blockPosition().offset(offsetX.toInt(), 0, offsetZ.toInt())
 
-            val karcinogen = HAEntityTypes.KARCINOGEN.get().create(level())
+            val karcinogen = HAEntityTypes.KARCINOGEN.get().create(level(), EntitySpawnReason.MOB_SUMMONED)
             if (karcinogen != null) {
-                karcinogen.moveTo(
+                karcinogen.snapTo(
                     spawnPos.x.toDouble() + 0.5,
                     spawnPos.y.toDouble(),
                     spawnPos.z.toDouble() + 0.5,
@@ -188,9 +161,9 @@ class KarkinosEntity(type: EntityType<out HAMinibossEntity>, world: Level) :
             val offsetZ = (random.nextDouble() - 0.5) * 6.0
             val spawnPos = blockPosition().offset(offsetX.toInt(), 0, offsetZ.toInt())
 
-            val karcinoma = HAEntityTypes.KARCINOMA.get().create(level())
+            val karcinoma = HAEntityTypes.KARCINOMA.get().create(level(), EntitySpawnReason.MOB_SUMMONED)
             if (karcinoma != null) {
-                karcinoma.moveTo(
+                karcinoma.snapTo(
                     spawnPos.x.toDouble() + 0.5,
                     spawnPos.y.toDouble(),
                     spawnPos.z.toDouble() + 0.5,
@@ -210,7 +183,7 @@ class KarkinosEntity(type: EntityType<out HAMinibossEntity>, world: Level) :
         builder.define(SUMMONING, false)
     }
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
+    override fun addAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueOutput) {
         compound.putBoolean("Flipped", isFlipped())
         compound.putBoolean("Summoning", isSummoning())
         compound.putInt("SummonTimer", summonTimer)
@@ -218,14 +191,14 @@ class KarkinosEntity(type: EntityType<out HAMinibossEntity>, world: Level) :
         super.addAdditionalSaveData(compound)
     }
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
+    override fun readAdditionalSaveData(compound: net.minecraft.world.level.storage.ValueInput) {
         if (hasCustomName()) {
             bossBar.name = this.displayName
         }
-        this.setFlipped(compound.getBoolean("Flipped"))
-        this.setSummoning(compound.getBoolean("Summoning"))
-        this.summonTimer = compound.getInt("SummonTimer")
-        this.summonCooldown = compound.getInt("SummonCooldown")
+        this.setFlipped(compound.getBooleanOr("Flipped", false))
+        this.setSummoning(compound.getBooleanOr("Summoning", false))
+        this.summonTimer = compound.getIntOr("SummonTimer", 0)
+        this.summonCooldown = compound.getIntOr("SummonCooldown", 0)
         super.readAdditionalSaveData(compound)
     }
 
@@ -275,8 +248,8 @@ class KarkinosEntity(type: EntityType<out HAMinibossEntity>, world: Level) :
         super.aiStep()
     }
 
-    override fun hurt(source: DamageSource, amount: Float): Boolean {
-        val result = super.hurt(source, amount)
+    override fun hurtServer(level: net.minecraft.server.level.ServerLevel, source: DamageSource, amount: Float): Boolean {
+        val result = super.hurtServer(level, source, amount)
 
         if (result && !level().isClientSide &&
             source.directEntity is Player &&
@@ -289,12 +262,12 @@ class KarkinosEntity(type: EntityType<out HAMinibossEntity>, world: Level) :
             val weapon = player.mainHandItem
             val hasFlipEnchant =
                 EnchantmentHelper.getItemEnchantmentLevel(
-                    level().registryAccess().registry(Registries.ENCHANTMENT).get()
-                        .getHolder(Enchantments.BANE_OF_ARTHROPODS).get(), weapon
+                    level().registryAccess().lookupOrThrow(Registries.ENCHANTMENT)
+                        .get(Enchantments.BANE_OF_ARTHROPODS).get(), weapon
                 ) > 1 ||
                         EnchantmentHelper.getItemEnchantmentLevel(
-                            level().registryAccess().registry(Registries.ENCHANTMENT).get()
-                                .getHolder(Enchantments.RIPTIDE).get(), weapon
+                            level().registryAccess().lookupOrThrow(Registries.ENCHANTMENT)
+                                .get(Enchantments.RIPTIDE).get(), weapon
                         ) > 1
 
             if (hasFlipEnchant) {
@@ -312,8 +285,8 @@ class KarkinosEntity(type: EntityType<out HAMinibossEntity>, world: Level) :
     }
 
     override fun registerControllers(controllers: AnimatableManager.ControllerRegistrar) {
-        controllers.add(DefaultAnimations.genericWalkRunIdleController(this))
-        controllers.add(AnimationController(this, "flip_controller", 8) { state ->
+        controllers.add(DefaultAnimations.genericWalkRunIdleController<KarkinosEntity>())
+        controllers.add(AnimationController<KarkinosEntity>( "flip_controller", 8) { state ->
             if (isFlipped()) {
                 state.setAndContinue(FLIP_ANIMATION)
                 PlayState.CONTINUE
@@ -321,7 +294,7 @@ class KarkinosEntity(type: EntityType<out HAMinibossEntity>, world: Level) :
                 PlayState.STOP
             }
         })
-        controllers.add(AnimationController(this, "summon_controller", 4) { state ->
+        controllers.add(AnimationController<KarkinosEntity>( "summon_controller", 4) { state ->
             if (isSummoning()) {
                 state.setAndContinue(SUMMON_ANIMATION)
                 PlayState.CONTINUE
@@ -329,7 +302,7 @@ class KarkinosEntity(type: EntityType<out HAMinibossEntity>, world: Level) :
                 PlayState.STOP
             }
         })
-        controllers.add(DefaultAnimations.genericAttackAnimation(this, DefaultAnimations.ATTACK_SWING))
+        controllers.add(DefaultAnimations.genericAttackAnimation<KarkinosEntity>( DefaultAnimations.ATTACK_SWING))
     }
 
     override fun getAmbientSound(): SoundEvent {
@@ -366,7 +339,7 @@ class KarkinosEntity(type: EntityType<out HAMinibossEntity>, world: Level) :
 
     internal class KarkinosMoveControl(
         private val karkinos: KarkinosEntity,
-    ) : MoveControl(
+    ) : MoveControl<KarkinosEntity>(
         karkinos
     ) {
         override fun tick() {

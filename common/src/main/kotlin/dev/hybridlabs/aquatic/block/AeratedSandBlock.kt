@@ -19,17 +19,19 @@ class AeratedSandBlock(dustColor: ColorRGBA, settings: Properties) : ColoredFall
 
     override fun updateShape(
         state: BlockState,
-        facing: Direction,
-        facingState: BlockState,
-        level: LevelAccessor,
+        level: net.minecraft.world.level.LevelReader,
+        tickAccess: net.minecraft.world.level.ScheduledTickAccess,
         currentPos: BlockPos,
+        facing: Direction,
         facingPos: BlockPos,
+        facingState: BlockState,
+        random: net.minecraft.util.RandomSource,
     ): BlockState {
         if (facing == Direction.UP && facingState.`is`(Blocks.WATER)) {
-            level.scheduleTick(currentPos, this, DECORATIVE_BUBBLE_COLUMN_CHECK_DELAY)
+            tickAccess.scheduleTick(currentPos, this, DECORATIVE_BUBBLE_COLUMN_CHECK_DELAY)
         }
 
-        return super.updateShape(state, facing, facingState, level, currentPos, facingPos)
+        return super.updateShape(state, level, tickAccess, currentPos, facing, facingPos, facingState, random)
     }
 
     override fun onPlace(state: BlockState, level: Level, pos: BlockPos, oldState: BlockState, isMoving: Boolean) {

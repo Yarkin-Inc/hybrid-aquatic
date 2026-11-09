@@ -10,6 +10,6 @@ class ShrimpEntityRenderer(context: Context) :
     BaseCrustaceanEntityRenderer<ShrimpEntity>(context, ShrimpEntityModel(), true, false) {
 
     init {
-        addRenderLayer(HACrustaceanEntityLayer(this))
+        withRenderLayer(HACrustaceanEntityLayer(this))
     }
 }

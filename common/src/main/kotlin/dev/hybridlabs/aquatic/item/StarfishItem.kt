@@ -5,7 +5,7 @@ import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
 import net.minecraft.stats.Stats
 import net.minecraft.world.InteractionHand
-import net.minecraft.world.InteractionResultHolder
+import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
@@ -16,7 +16,7 @@ class StarfishItem(properties: Properties) : Item(properties) {
         level: Level,
         player: Player,
         hand: InteractionHand,
-    ): InteractionResultHolder<ItemStack> {
+    ): InteractionResult {
         val itemstack = player.getItemInHand(hand)
         level.playSound(
             null as Player?,
@@ -28,7 +28,7 @@ class StarfishItem(properties: Properties) : Item(properties) {
             0.5f,
             0.4f / (level.getRandom().nextFloat() * 0.4f + 0.8f)
         )
-        player.cooldowns.addCooldown(this, 10)
+        player.cooldowns.addCooldown(itemstack, 10)
 
         if (!level.isClientSide) {
             val starfish = StarfishProjectileEntity(level, player)
@@ -41,6 +41,6 @@ class StarfishItem(properties: Properties) : Item(properties) {
             itemstack.shrink(1)
         }
 
-        return InteractionResultHolder.sidedSuccess(itemstack, level.isClientSide)
+        return InteractionResult.SUCCESS
     }
 }

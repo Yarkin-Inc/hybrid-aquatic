@@ -43,19 +43,21 @@ class LivingSpongeBlock(
 
     override fun updateShape(
         state: BlockState,
-        direction: Direction,
-        neighborState: BlockState,
-        world: LevelAccessor,
+        world: net.minecraft.world.level.LevelReader,
+        tickAccess: net.minecraft.world.level.ScheduledTickAccess,
         pos: BlockPos,
-        neighborPos: BlockPos
+        direction: Direction,
+        neighborPos: BlockPos,
+        neighborState: BlockState,
+        random: net.minecraft.util.RandomSource,
     ): BlockState {
         if (state.getValue(WATERLOGGED)) {
-            world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world))
+            tickAccess.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world))
         }
 
         return if (!canSurvive(state, world, pos)) {
             Blocks.AIR.defaultBlockState()
-        } else super.updateShape(state, direction, neighborState, world, pos, neighborPos)
+        } else super.updateShape(state, world, tickAccess, pos, direction, neighborPos, neighborState, random)
     }
 
     override fun getShape(state: BlockState, world: BlockGetter, pos: BlockPos, context: CollisionContext): VoxelShape {
@@ -100,12 +102,9 @@ class LivingSpongeBlock(
         bubbleTimer++
     }
 
-    override fun codec(): MapCodec<out BushBlock> {
-        return CODEC
-    }
 
     companion object {
-        val CODEC: MapCodec<LivingSpongeBlock> = simpleCodec(::LivingSpongeBlock)
+
         private val SHAPE = box(4.0, 0.0, 4.0, 12.0, 12.0, 12.0)
     }
 }

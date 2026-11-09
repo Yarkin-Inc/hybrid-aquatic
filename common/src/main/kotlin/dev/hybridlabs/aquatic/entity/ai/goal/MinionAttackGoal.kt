@@ -65,7 +65,7 @@ open class MinionAttackGoal(
             false
         } else if (!this.followingTargetEvenIfNotSeen) {
             !minion.navigation.isDone
-        } else if (!minion.isWithinRestriction(livingEntity.blockPosition())) {
+        } else if (!minion.isWithinHome(livingEntity.blockPosition())) {
             false
         } else {
             livingEntity !is Player || !livingEntity.isSpectator && !livingEntity.isCreative
@@ -76,15 +76,14 @@ open class MinionAttackGoal(
         minion.navigation.moveTo(this.path, this.speedModifier)
         minion.isAggressive = true
         minion.isSprinting = true
-        minion.swinging = false
-        minion.swingTime = 0
+
         this.ticksUntilNextPathRecalculation = 0
         this.ticksUntilNextAttack = 0
     }
 
     override fun stop() {
         val livingEntity = minion.target
-        if (!EntitySelector.NO_CREATIVE_OR_SPECTATOR.test(livingEntity)) {
+        if (livingEntity != null && !EntitySelector.NO_CREATIVE_OR_SPECTATOR.test(livingEntity)) {
             minion.target = null
         }
 
@@ -141,8 +140,8 @@ open class MinionAttackGoal(
         val d0 = this.getAttackReachSqr(enemy)
         if (distToEnemySqr <= d0 && this.ticksUntilNextAttack <= 0) {
             this.resetAttackCooldown()
-            minion.swing(InteractionHand.MAIN_HAND)
-            minion.doHurtTarget(enemy)
+            minion.swing(InteractionHand.MAIN_HAND, net.minecraft.world.item.component.SwingAnimation(net.minecraft.world.item.SwingAnimationType.WHACK, 6), true)
+            minion.doHurtTarget(minion.level() as net.minecraft.server.level.ServerLevel, enemy)
         }
     }
 

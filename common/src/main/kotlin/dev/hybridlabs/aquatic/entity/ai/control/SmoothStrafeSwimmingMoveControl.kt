@@ -16,7 +16,7 @@ open class SmoothStrafeSwimmingMoveControl(
     private val inWaterSpeedModifier: Float,
     private val outsideWaterSpeedModifier: Float,
     private val applyGravity: Boolean,
-) : MoveControl(mob) {
+) : MoveControl<net.minecraft.world.entity.Mob>(mob) {
 
     override fun tick() {
         if (applyGravity && mob.isInWater) {
@@ -37,8 +37,8 @@ open class SmoothStrafeSwimmingMoveControl(
             forward *= magnitude
             right *= magnitude
 
-            val sin = Mth.sin(mob.yRot * (Math.PI.toFloat() / 180f))
-            val cos = Mth.cos(mob.yRot * (Math.PI.toFloat() / 180f))
+            val sin = kotlin.math.sin(mob.yRot * (Math.PI.toFloat() / 180f))
+            val cos = kotlin.math.cos(mob.yRot * (Math.PI.toFloat() / 180f))
 
             val relX = forward * cos - right * sin
             val relZ = right * cos + forward * sin
@@ -93,8 +93,8 @@ open class SmoothStrafeSwimmingMoveControl(
                     mob.xRot = rotlerp(mob.xRot, pitch, 5f)
                 }
 
-                val cosPitch = Mth.cos(mob.xRot * (Math.PI.toFloat() / 180f))
-                val sinPitch = Mth.sin(mob.xRot * (Math.PI.toFloat() / 180f))
+                val cosPitch = kotlin.math.cos(mob.xRot * (Math.PI.toFloat() / 180f))
+                val sinPitch = kotlin.math.sin(mob.xRot * (Math.PI.toFloat() / 180f))
 
                 mob.zza = cosPitch * baseSpeed
                 mob.yya = -sinPitch * baseSpeed

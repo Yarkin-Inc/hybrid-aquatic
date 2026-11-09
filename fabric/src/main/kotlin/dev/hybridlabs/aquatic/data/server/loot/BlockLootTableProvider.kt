@@ -9,8 +9,8 @@ import dev.hybridlabs.aquatic.item.HAItems
 import dev.hybridlabs.aquatic.loot.HALootTables
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider
-import net.minecraft.advancements.critereon.ItemPredicate
-import net.minecraft.advancements.critereon.StatePropertiesPredicate
+import net.minecraft.advancements.predicates.ItemPredicate
+import net.minecraft.advancements.predicates.StatePropertiesPredicate
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries

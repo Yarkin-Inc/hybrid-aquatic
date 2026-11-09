@@ -1,42 +1,30 @@
 package dev.hybridlabs.aquatic.mixin.client;
 
-import com.llamalad7.mixinextras.sugar.Local;
 import dev.hybridlabs.aquatic.effect.HAMobEffects;
 import dev.hybridlabs.aquatic.fog.ClarityFogModifier;
 import dev.hybridlabs.aquatic.fog.ThalassophobiaFogModifier;
 import net.minecraft.client.Camera;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.FogRenderer;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.Level;
+import net.minecraft.client.renderer.fog.FogData;
+import net.minecraft.client.renderer.fog.FogRenderer;
 import net.minecraft.world.level.material.FogType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(FogRenderer.class)
 public class FogRendererMixin {
-
-    @Inject(method = "setupFog", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;" +
-                                                                         "setShaderFogStart(F)V"))
-    private static void hybrid$renderFog(Camera camera, FogRenderer.FogMode fogType, float viewDistance,
-                                         boolean thickFog, float tickDelta, CallbackInfo ci,
-                                         @Local FogType cameraSubmersionType, @Local Entity entity, @Local FogRenderer.FogData fogData) {
-
-        if (entity instanceof LocalPlayer clientPlayerEntity && cameraSubmersionType == FogType.WATER) {
-            Level world = clientPlayerEntity.level();
-            MobEffectInstance clarityEffect = clientPlayerEntity.getEffect(HAMobEffects.INSTANCE.getCLARITY().asHolder());
-            MobEffectInstance thalassophobiaEffect = clientPlayerEntity.getEffect(HAMobEffects.INSTANCE.getTHALASSOPHOBIA().asHolder());
-
-            if (clarityEffect != null) {
-                new ClarityFogModifier().setupFog(fogData, clientPlayerEntity, clarityEffect, viewDistance, tickDelta);
-            } else if (thalassophobiaEffect != null) {
-                new ThalassophobiaFogModifier().setupFog(fogData, clientPlayerEntity, thalassophobiaEffect,
-                        viewDistance, tickDelta);
-            }
+    @Inject(method = "setupFog", at = @At("RETURN"))
+    private void hybrid$renderFog(Camera camera, int chunks, DeltaTracker delta, float darken, ClientLevel level,
+                                 CallbackInfoReturnable<FogData> cir) {
+        if (camera.entity() instanceof LocalPlayer player && camera.getFluidInCamera() == FogType.WATER) {
+            var clarity = player.getEffect(HAMobEffects.INSTANCE.getCLARITY().asHolder());
+            var fear = player.getEffect(HAMobEffects.INSTANCE.getTHALASSOPHOBIA().asHolder());
+            if (clarity != null) new ClarityFogModifier().setupFog(cir.getReturnValue(), player, clarity, chunks * 16f, delta.getGameTimeDeltaPartialTick(false));
+            else if (fear != null) new ThalassophobiaFogModifier().setupFog(cir.getReturnValue(), player, fear, chunks * 16f, delta.getGameTimeDeltaPartialTick(false));
         }
     }
 }

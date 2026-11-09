@@ -70,14 +70,14 @@ class GiantClamBlockEntity(
         }
     }
 
-    override fun saveAdditional(tag: CompoundTag, registries: HolderLookup.Provider) {
-        super.saveAdditional(tag, registries)
+    override fun saveAdditional(tag: net.minecraft.world.level.storage.ValueOutput) {
+        super.saveAdditional(tag)
         tag.putInt("pearl_timer", pearlTimer)
     }
 
-    override fun loadAdditional(tag: CompoundTag, registries: HolderLookup.Provider) {
-        super.loadAdditional(tag, registries)
-        pearlTimer = tag.getInt("pearl_timer")
+    override fun loadAdditional(tag: net.minecraft.world.level.storage.ValueInput) {
+        super.loadAdditional(tag)
+        pearlTimer = tag.getIntOr("pearl_timer", 0)
     }
 
     companion object {

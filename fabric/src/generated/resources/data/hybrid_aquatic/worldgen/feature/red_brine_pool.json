@@ -1,0 +1,20 @@
+{
+  "type": "hybrid_aquatic:brine_lake",
+  "config": {
+    "barrier_block": {
+      "type": "minecraft:simple",
+      "state": {
+        "id": "hybrid_aquatic:red_brinestone"
+      }
+    },
+    "fluid_block": {
+      "type": "minecraft:simple",
+      "state": {
+        "id": "hybrid_aquatic:brine",
+        "properties": {
+          "level": "0"
+        }
+      }
+    }
+  }
+}
